@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>完善资料</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+    <style>
+		body{background-color: #fff;}
+		.z-login-code-btn:before{
+			content: '';
+			display: block;
+			height: 0.8rem;
+			width: 1px;
+			background-color: #24518e;
+			position: absolute;
+			left: 0;
+			top: 50%;
+			transform: translateY(-50%);
+    }
+		.wz-bottom:after{
+  		content: '';
+  		bottom: 0;
+  		height: 1px;
+  		background-color: #ddd;
+  		left: 15px;
+  		right: 15px;
+  		display: block;
+  	}
+    </style>
+</head>
+<body class="z-fff">
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">完善资料</div>
+		</div>
+	</div>
+	<div id="main" style="margin-bottom: 0;position: relative;z-index: 10;padding-top: 30%">
+		<div class="z-login-column wz-bottom" style="padding: 0 15px;position: relative;">
+			<span onclick="select()" style="color:#24518e;display: inline-block;width: 60px;position: absolute;left: 15px;top: 0;text-align: left;"><i id="quhao" style="font-style: none">+86</i> <span class="icon iconfont icon-sanjiao-copy" style="width: 4px;color: #24518e;font-size: 0.75rem;position: absolute;right: 0.4rem;"></span></span>
+			<label style="margin-left: 70px" for="phone">
+				<input style="padding-left:0;width: 80%;box-sizing: border-box;" placeholder="请输入您的手机号码" id="phone" type="tel">
+			</label>
+		</div>
+		<div class="z-login-column" style="padding: 0 15px;">
+			<label for="password" style="overflow: hidden;position: relative;border-bottom: 1px solid #ddd;">
+				<input onfocus="onF(this)" maxlength="6" id="code" type="tel" style="padding-left: 70px;box-sizing: border-box;" placeholder="请输入验证码">
+				<div id="send" class="z-login-code-btn" style="color:#24518e;border: none;border-radius: 0;font-size: 0.75rem;right: -10px;top: 12px;">获取验证码</div>
+			</label>
+		</div>
+		<div class="z-login-column" style="padding: 0 15px;">
+			<label style="border-bottom: 1px solid #ddd;" for="nickname">
+				<input style="width: 100%;padding-left: 70px;box-sizing: border-box;" placeholder="请输入您的姓名" id="nickname" type="text">
+			</label>
+		</div>
+		<div style="height: 15px"></div>
+		<div style="font-size: 0.8rem;padding: 8px 15px" class="z-login-column z-login-column-btn">
+			<label onclick="next()" style="background-color: #24518e;border-radius: 3px;line-height: 50px;height: 50px;font-size: 0.9rem"> 下一步 </label>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script>
+	var clicked = false;
+	var s = 30;
+	var inte;
+	var phone,code;
+	var HeadBar = $api.byId('HeadBar');
+
+	var _font = 16;
+	var isSelector = false;
+	var UIActionSelector;
+	var zip = 86;
+	var JSONS = [
+		{"name":"+86"},
+		{"name":"+1"},
+		{"name":"+1242"},
+		{"name":"+1284"},
+		{"name":"+1345"},
+		{"name":"+1473"},
+		{"name":"+1868"},
+		{"name":"+1876"},
+		{"name":"+20"},
+		{"name":"+212"},
+		{"name":"+216"},
+		{"name":"+220"},
+		{"name":"+221"},
+		{"name":"+222"},
+		{"name":"+223"},
+		{"name":"+224"},
+		{"name":"+226"},
+		{"name":"+227"},
+		{"name":"+228"},
+		{"name":"+229"},
+		{"name":"+230"},
+		{"name":"+232"},
+		{"name":"+234"},
+		{"name":"+235"},
+		{"name":"+237"},
+		{"name":"+238"},
+		{"name":"+240"},
+		{"name":"+241"},	
+		{"name":"+244"},
+		{"name":"+245"},
+		{"name":"+248"},
+		{"name":"+250"},
+		{"name":"+253"},
+		{"name":"+254"},
+		{"name":"+255"},
+		{"name":"+256"},
+		{"name":"+258"},
+		{"name":"+260"},		
+		{"name":"+261"},
+		{"name":"+263"},
+		{"name":"+264"},
+		{"name":"+265"},
+		{"name":"+266"},
+		{"name":"+268"},
+		{"name":"+269"},
+		{"name":"+27"},		
+		{"name":"+30"},		
+		{"name":"+31"},
+		{"name":"+32"},	
+		{"name":"+33"},	
+		{"name":"+34"},
+		{"name":"+351"},
+		{"name":"+352"},	
+		{"name":"+353"},
+		{"name":"+355"},
+		{"name":"+357"},
+		{"name":"+358"},
+		{"name":"+359"},
+		{"name":"+36"},
+		{"name":"+370"},
+		{"name":"+371"},
+		{"name":"+372"},
+		{"name":"+373"},			
+		{"name":"+375"},
+		{"name":"+380"},
+		{"name":"+381"},
+		{"name":"+385"},
+		{"name":"+386"},
+		{"name":"+39"},
+		{"name":"+40"},
+		{"name":"+41"},
+		{"name":"+421"},
+		{"name":"+43"},
+		{"name":"+44"},
+		{"name":"+45"},
+		{"name":"+46"},
+		{"name":"+47"},
+		{"name":"+48"},
+		{"name":"+49"},
+		{"name":"+501"},
+		{"name":"+502"},
+		{"name":"+503"},
+		{"name":"+504"},
+		{"name":"+505"},
+		{"name":"+506"},
+		{"name":"+507"},
+		{"name":"+51"},
+		{"name":"+52"},
+		{"name":"+54"},
+		{"name":"+55"},
+		{"name":"+56"},
+		{"name":"+57"},
+		{"name":"+58"},
+		{"name":"+591"},
+		{"name":"+592"},
+		{"name":"+597"},
+		{"name":"+598"},
+		{"name":"+60"},
+		{"name":"+61"},
+		{"name":"+62"},
+		{"name":"+63"},
+		{"name":"+64"},
+		{"name":"+65"},
+		{"name":"+66"},
+		{"name":"+673"},
+		{"name":"+675"},
+		{"name":"+7"},
+		{"name":"+81"},
+		{"name":"+82"},
+		{"name":"+84"},
+		{"name":"+852"},
+		{"name":"+853"},
+		{"name":"+855"},
+		{"name":"+886"},		
+		{"name":"+90"},
+		{"name":"+91"},
+		{"name":"+94"},
+		{"name":"+960"},
+		{"name":"+962"},
+		{"name":"+965"},
+		{"name":"+966"},
+		{"name":"+967"},	
+		{"name":"+968"},
+		{"name":"+970"},
+		{"name":"+971"},
+		{"name":"+972"},
+		{"name":"+973"},
+		{"name":"+974"},
+		{"name":"+976"},
+		{"name":"+992"},
+		{"name":"+993"},
+		{"name":"+994"},
+		{"name":"+995"},				
+		{"name":"+996"},						
+		{"name":"+998"}		
+	];
+
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+
+		UIActionSelector = api.require('UIActionSelector');
+		if(!App.iphone){
+	    _font = 14;
+	  }
+
+		api.addEventListener({
+		    name: 'keyback'
+		}, function(ret, err) {
+			if(isSelector){
+				UIActionSelector.close();
+			}else{
+				api.closeWin();
+			}
+		});
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('wx2tel',{'Active':'加载'},'微信-绑定手机');"});
+		//MD End
+
+		api.getPrefs({
+		    key: 'tel'
+		}, function(ret, err){
+		    if( ret ){
+					tel = ret.value;
+					if(tel && (tel.length > 6)){
+						document.getElementById('phone').value = tel;
+						document.querySelector('.z-login-code-btn').className = document.querySelector('.z-login-code-btn').className.replace('unclick','');
+					}
+		    }
+		});
+
+		document.getElementById('send').onclick = function(){
+			if(App.State()){
+				if(clicked){return;}
+				api.execScript({name: 'root', script: "ChatAna('wxPage',{'Active':'获取验证码'},'手机绑定-获取验证码');"});
+				clicked = true;
+				phone = document.getElementById('phone').value;
+				if((phone.length <7) || isNaN(phone)){clicked =false;return;}
+				clickSendBtn();
+				document.getElementById('code').focus();
+				inte = setInterval(clickSendBtn,1000);
+				var zip = document.getElementById('phone').value;
+				api.execScript({name: 'root',script: "XO.GetCode('"+zip+"','"+phone+"',{name:'wxinfo',fun:'sendSuccess'},{name:'wxinfo',fun:'codefail'});"});
+			}
+		}
+	};
+
+	function onF(dom){
+		if(!/^\d*$/g.test(dom.value)){
+			dom.value = '';
+		}
+	}
+
+	function sendSuccess(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		api.toast({
+		    msg: data.msg,
+		    duration: 2000,
+		    location: 'bottom'
+		});
+
+		api.execScript({name: 'root', script: "ChatAna('sendCode',{'is_success':true},'手机绑定-验证码获取成功');"});
+	}
+
+	function codefail(msg){
+		api.hideProgress();
+		api.toast({
+		    msg: msg,
+		    duration: 2000,
+		    location: 'bottom'
+		});
+		api.execScript({name: 'root', script: "ChatAna('sendCode',{'is_success':false},'手机绑定-验证码获取失败');"});
+	}
+
+	function clickSendBtn(){
+		if(s > 0){
+			document.getElementById('send').innerHTML = s +'s后重新获取';
+			s--;
+		}else{
+			document.getElementById('send').innerHTML = '获取验证码';
+			s = 30;
+			clicked = false;
+			clearInterval(inte);
+		}
+	}
+
+	function next(){
+		if(!App.State()){return;}
+		phone = document.getElementById("phone").value;
+		if(!phone){
+			api.toast({
+			    msg: '请输入手机号',
+			    duration: 2000,
+			    location: 'bottom'
+			});
+			return;
+		}else{
+			if(isNaN(phone)){
+				api.toast({
+				    msg: '请输入正确手机号',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+				return;
+			}
+		}
+
+		var nickname = document.getElementById("nickname").value;
+		if(!nickname || (nickname.length < 2)){
+			api.toast({
+			    msg: '请输入真实姓名',
+			    duration: 2000,
+			    location: 'bottom'
+			});
+			return;
+		}
+
+		var code = document.getElementById('code').value;
+		if(!code || !/^\d*$/g.test(code)){
+			api.toast({
+			    msg: '请输入验证码',
+			    duration: 2000,
+			    location: 'bottom'
+			});
+			return;
+		}
+		var openid = api.pageParam.openid || '';
+		var unionid = api.pageParam.unionid || '';
+		api.execScript({name: 'root',script: "XO.BindUser('"+ App.guest +"','"+ nickname +"','"+ openid +"','"+ zip +"','"+ phone +"','"+ code +"','"+ unionid +"',{name:'wxInfo',fun:'success'},{name:'wxInfo',fun:'fail'});"});
+	}
+
+	function success(msg){
+		api.hideProgress();
+		if(msg.length > 30){
+			$api.setStorage('token',msg);
+			api.showProgress({
+				style: 'default',
+				animationType: 'fade',
+				title: '登录中...',
+				modal: false
+			});
+			api.execScript({name: 'root',script: "XO.GetUinfo('"+ msg +"',{name:'root',fun:'getUinfoUpview'},{name:'root',fun:'getUinfoFail'});"});
+			var indexFrameGroup = $api.getStorage('indexFrameGroup');
+			if(!indexFrameGroup || (indexFrameGroup != '1')){
+				api.execScript({name: 'root',script: "openIndexFrameGroup();"});
+			}
+			api.closeToWin({
+	      name: 'root'
+	    });
+		}
+		api.toast({
+			msg: '保存成功!',
+			duration: 2000,
+			location: 'bottom'
+		});
+		//$api.setStorage('wx_openid', wx_openid);
+	}
+
+	function fail(msg){
+		api.toast({
+			msg: msg,
+			duration: 2000,
+			location: 'bottom'
+		});
+	}
+
+	function select(){
+		isSelector = true;
+		UIActionSelector.open({
+		    datas: JSONS,
+		    layout: {
+		        row: 2,
+		        col: 1,
+		        height: 30,
+		        size: _font,
+		        sizeActive: _font+2,
+		        rowSpacing: 2,
+		        colSpacing: 2,
+		        maskBg: 'rgba(0,0,0,0.2)',
+		        bg: '#fff',
+		        color: '#888',
+		        colorActive: '#0084ff',
+		        colorSelected: '#0084ff'
+		    },
+		    animation: true,
+		    cancel: {
+		        text: '取消',
+		        size: _font,
+		        w: 90,
+		        h: 35,
+		        bg: '#eee',
+		        bgActive: '#ccc',
+		        color: '#888',
+		        colorActive: '#fff'
+		    },
+		    ok: {
+		        text: '确定',
+		        size: _font,
+		        w: 90,
+		        h: 35,
+		        bg: '#eee',
+		        bgActive: '#ccc',
+		        color: '#888',
+		        colorActive: '#fff'
+		    },
+		    title: {
+		        text: '',
+		        size: 16,
+		        h: 44,
+		        bg: '#eee',
+		        color: '#888'
+		    },
+		    fixedOn: api.frameName
+		}, function(ret, err) {
+		    if (ret) {
+		        isSelector = false;
+		        if(ret.eventType == 'ok'){
+		        	document.getElementById("quhao").innerHTML = ret.selectedInfo[0].name;
+		        	zip = ret.selectedInfo[0].name;
+		        	zip = zip.slice(1);
+		        }
+		    }
+				UIActionSelector.close();
+		});
+	}
+
+</script>
+</html>

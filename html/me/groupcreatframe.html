@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>学生会</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .persondata {
+            background: white;
+            margin-bottom: 20px;
+        }
+
+        .oimgdata {
+            width: 3.3rem;
+            height: 3.3rem;
+            display: block;
+            margin: 1rem auto 0 1.2rem;
+            border-radius: 50%;
+        }
+
+        .persontitle {
+            padding: 0.75rem 0.6rem;
+            font-size: 17px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .groupheader {
+            color: #9d9d9d;
+            font-size: 14px;
+            text-align: center;
+            line-height: 2.5rem;
+        }
+
+        .peoplemessage {
+            width: 100%;
+            background: white;
+        }
+
+        .publicli {
+            padding: 0 10px;
+            box-sizing: border-box;
+            border-bottom: 1px solid #ebebeb;
+            line-height: 2.5rem;
+            height: 2.5rem;
+            background: white;
+            color: #898989;
+            font-size: 14px;
+        }
+
+        .publiclipicture {
+            padding: 0 10px 1.5rem 10px;
+            box-sizing: border-box;
+            border-bottom: 1px solid #ebebeb;
+            background: white;
+            color: #898989;
+            font-size: 14px;
+        }
+
+        .publicli input {
+            border: none;
+            text-align: right;
+            float: right;
+            padding: 0.45rem 0;
+        }
+
+        .publicli span {
+            font-size: 15px;
+            color: black;
+        }
+
+        .userpicture {
+            text-align: center;
+            padding-top: 1.3rem;
+            width: 48%;
+            height: 5rem;
+            background: #f3f3f3;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .userpicture p {
+            line-height: 2.5rem;
+        }
+
+        .submitbtn {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            background: #d9b270;
+            text-align: center;
+            height: 2.5rem;
+            line-height: 2.5rem;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .submitbtn:active {
+            background: gainsboro;
+        }
+
+        .publicfont {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 3px 9px;
+            background: #000;
+            opacity: 0.6;
+            color: white;
+            font-size: 25px
+        }
+
+        .rightboxheader {
+            float: right;
+            line-height: 5rem;
+        }
+
+        .laterimg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%
+        }
+
+        .thetitlepic {
+            position: absolute;
+            bottom: -1rem;
+            background: #d2b379;
+            text-align: center;
+            color: white;
+            line-height: 1.5rem;
+            width: 100%;
+            height: 1.5rem;
+            left: 0;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bottomserver {
+            width: 100%;
+            text-align: center;
+            line-height: 2rem;
+            color: #9d9d9d;
+            font-size: 11px;
+        }
+
+        .changetype {
+            width: 100%;
+            background: white;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            color: #f2c63e;
+            z-index: 999;
+        }
+
+        .changetype div {
+            height: 3rem;
+            line-height: 3rem;
+            font-size: 16px;
+        }
+
+        .changetype div:active {
+            background: gainsboro;
+        }
+
+        .mkdir {
+            width: 100%;
+            height: 100%;
+            background: black;
+            opacity: 0.5;
+            position: fixed;
+            top: 0;
+            z-index: 99;
+            left: 0;
+        }
+    </style>
+</head>
+<body style="position: relative;">
+<div id="app" style="margin-top: 5px;background: #f3f3f3;padding-bottom: 2rem">
+    <div class="mkdir" v-show="mkirshow" @click="closemkir"></div>
+    <div class="persondata">
+        <div class="persontitle">填写资料信息</div>
+        <div style="width: 100%;height: 5rem;text-align: center">
+            <div style="float: left;height: 5rem;display: flex;margin-left: 1.2rem">
+                <img class="oimgdata" style="margin: auto" :src=headerimg>
+            </div>
+            <div class="rightboxheader" @click="changeuserpic(4)">
+				<span style="margin-right: 10px;font-size: 0.8rem">
+					小组头像
+					<i style="color: #b5b5b5;margin-left: 0.5rem;font-size:0.8rem" class="iconfont icon-jiantou"></i>
+				</span>
+            </div>
+        </div>
+    </div>
+    <div class="peoplemessage">
+        <div class="persontitle">个人信息</div>
+        <div class="publicli">
+            <span>小组名称</span>
+            <input @blur="groupnameclick" maxlength="12" minlength="4" v-model="form.groupname" type="text"
+                   placeholder="请输入小组名称">
+        </div>
+        <div class="publicli">
+            <span>负责人姓名</span>
+            <input type="text" placeholder="请输入真实姓名" maxlength="4" v-model="form.username">
+        </div>
+        <div class="publicli">
+            <span>身份证号码</span>
+            <input type="tel" placeholder="请输入负责人身份证号" v-model="form.id_card">
+        </div>
+        <div class="publiclipicture">
+            <p style="line-height: 3rem;color: black">上传身份证照片</p>
+            <div style="width: 100%;display: flex;text-align:justify; justify-content: space-between">
+                <div class="userpicture" @click="changeuserpic(0)" style="position: relative">
+                    <img class="laterimg" src="../../image/face.png">
+                    <img v-show="facepicbool==true"
+                         style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;border-radius: 5px"
+                         :src=facepic>
+                    <div class="thetitlepic">身份证正面照片</div>
+                </div>
+                <div class="userpicture" @click="changeuserpic(1)" style="position: relative">
+                    <img class="laterimg" src="../../image/back.png">
+                    <img v-show="thebackpicbool==true"
+                         style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;border-radius: 5px"
+                         :src=thebackpic>
+                    <div class="thetitlepic">身份证反面照片</div>
+                </div>
+            </div>
+        </div>
+        <div class="publiclipicture">
+            <p style="line-height: 3rem">请上传手持身份证照片</p>
+            <div class="userpicture" style="position: relative" @click="changeuserpic(2)">
+                <img class="laterimg" src="../../image/userpic.png">
+                <img v-show="theusertellbool==true"
+                     style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;border-radius: 5px"
+                     :src=theusertell>
+                <div class="thetitlepic">手持身份证照片</div>
+            </div>
+        </div>
+        <div class="publicli">
+            <span>联系电话</span>
+            <input type="tel" placeholder="请输入手机号" v-model="form.tel">
+        </div>
+    </div>
+    <!--公司信息-->
+    <div class="peoplemessage" style="margin-top: 8px" v-if="trouble == 1">
+        <div class="publicli" style="font-size: 15px;color:black">公司信息</div>
+        <div class="publicli">
+            <span>公司名称</span>
+            <input type="text" placeholder="请输入公司名称" v-model="form.company_name">
+        </div>
+        <div class="publicli">
+            <span>组织机构代码</span>
+            <input type="text" placeholder="请输入组织机构代码" v-model="form.organization_code">
+        </div>
+        <div class="publiclipicture">
+            <p style="line-height: 3rem">营业执照照片</p>
+            <div class="userpicture" style="position: relative" @click="changeuserpic(3)">
+                <img class="laterimg" src="../../image/componybook.png">
+                <img v-show="workpicturebool==true"
+                     style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;border-radius: 5px"
+                     :src=workpicture>
+                <div class="thetitlepic">请上传营业执照</div>
+            </div>
+        </div>
+    </div>
+    <div class="bottomserver">
+        如有疑问请咨询，客服021-60260888
+    </div>
+    <!--企业的-->
+    <div class="submitbtn" @click="creatCompany" v-if="trouble == 1">提交申请</div>
+    <!--个人的-->
+    <div v-if="trouble == 0" class="submitbtn" @click="creatgroup">提交申请</div>
+    <!--审核的-->
+    <div v-if="trouble == 3" class="submitbtn">正在审核，请耐心等待</div>
+
+    <div class="changetype" v-show="mkirshow">
+        <div style="text-align: center;border-bottom: 1px solid gainsboro" @click="pushimoge(1)">拍照</div>
+        <div style="text-align: center;border-bottom: 1px solid gainsboro" @click="pushimoge(2)">从相册中选择</div>
+        <div style="text-align: center;border-bottom: 1px solid gainsboro;color: black" @click="closemkir">取消</div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {
+  });
+  var app = new Vue({
+    el: '#app',
+    data: {
+//      trouble:false,
+      headerimg: '../../image/avatar2.png',
+      facepic: '',
+      thebackpic: '',
+      theusertell: '',
+      workpicture: '',
+      trouble: '',
+      form: {
+        groupname: '',
+        id_card: '',
+        username: '',
+        tel: '',
+        company_name: '',
+        organization_code: ''
+      },
+//			身份证
+      facepicbool: false,
+      thebackpicbool: false,
+      theusertellbool: false,
+      workpicturebool: false,
+      mkirshow: false,
+      changewhereindex: null
+    },
+    created: function () {
+      apiready = function () {
+//        检测登录
+        App.checkLogin();
+        app.opentinne = api.pageParam.opentinne;
+        if (app.opentinne === 1) {
+          app.trouble = 1
+        } else if (app.opentinne === 3) {
+          app.trouble = 3
+        } else {
+          app.trouble = 0
+        }
+      };
+    },
+    filters: {},
+    methods: {
+      //头像选择方式
+      pushimoge: function (index) {
+        if (index == 1) {
+          api.getPicture({
+            sourceType: 'camera',
+            encodingType: 'jpg',
+            mediaValue: 'pic',
+            destinationType: 'url',
+            allowEdit: true,
+            quality: 50,
+            saveToPhotoAlbum: true
+          }, function (ret, err) {
+            app.closemkir();
+            if (ret) {
+//            if(index === 0) {app.facepic = ret.data}else{app.thebackpic=ret.data}
+              switch (app.changewhereindex) {
+                case 0:
+                  app.facepicbool = true;
+                  return app.facepic = ret.data;
+                case 1:
+                  app.thebackpicbool = true;
+                  return app.thebackpic = ret.data;
+                case 2:
+                  app.theusertellbool = true;
+                  return app.theusertell = ret.data;
+                case 3:
+                  app.workpicturebool = true;
+                  return app.workpicture = ret.data;
+                case 4:
+                  return app.headerimg = ret.data;
+              }
+            } else {
+              toastMsg('已取消修改')
+            }
+          })
+        } else {
+          api.getPicture({
+            sourceType: 'album',
+            encodingType: 'jpg',
+            mediaValue: 'pic',
+            destinationType: 'url',
+            allowEdit: true,
+            quality: 50,
+            saveToPhotoAlbum: true
+          }, function (ret, err) {
+            if (ret) {
+              app.closemkir();
+//            if(index === 0) {app.facepic = ret.data}else{app.thebackpic=ret.data}
+              switch (app.changewhereindex) {
+                case 0:
+                  app.facepicbool = true;
+                  return app.facepic = ret.data;
+                case 1:
+                  app.thebackpicbool = true;
+                  return app.thebackpic = ret.data;
+                case 2:
+                  app.theusertellbool = true;
+                  return app.theusertell = ret.data;
+                case 3:
+                  app.workpicturebool = true;
+                  return app.workpicture = ret.data;
+                case 4:
+                  return app.headerimg = ret.data;
+              }
+            } else {
+              toastMsg('已取消修改');
+              app.closemkir()
+            }
+          })
+        }
+      },
+      //关闭遮罩层
+      closemkir: function () {
+        app.mkirshow = false;
+        api.sendEvent({
+          name: 'ifshoworclevent',
+          extra: {
+            ifshoworcl: 2
+          }
+        });
+      },
+      //上传身份证 打开遮罩层
+      changeuserpic: function (index) {
+        app.changewhereindex = index;
+        app.mkirshow = true;
+        api.sendEvent({
+          name: 'ifshoworclevent',
+          extra: {
+            ifshoworcl: 1
+          }
+        });
+      },
+      //删除照片
+      delthispic: function (index) {
+        switch (index) {
+          case 0:
+            return app.facepic = '';
+          case 1:
+            return app.thebackpic = '';
+          case 2:
+            return app.theusertell = '';
+          case 3:
+            return app.workpicture = '';
+        }
+      },
+      //判断小组名称是否存在
+      groupnameclick: function () {
+        var post = {
+          name: app.form.groupname
+        };
+        sendAjax(this, post, '/Api/Group/checkGroupExist', function (res) {
+          if (res.data) {
+            app.form.groupname = '';
+            toastMsg('该小组名称已存在')
+          }
+        })
+      },
+      //创建小组
+      creatgroup: function () {
+        if (app.form.groupname == '') {
+          return toastMsg('请输入小组名称');
+        } else if (app.form.groupname.length > 12 || app.form.groupname.length < 4) {
+          return toastMsg('小组名字不符合规范,请重新定义')
+        } else if (app.form.username == '') {
+          return toastMsg('请输入负责人姓名')
+        } else if (app.form.username.length > 4) {
+          return toastMsg('名字超出长度限制,请重新输入')
+        } else if (app.form.id_card == '') {
+          return toastMsg('请输入身份证号码')
+        } else if (!(/^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test(app.form.id_card))) {
+          return toastMsg('请输入正确的身份证号码')
+        } else if (app.headerimg == '') {
+          return toastMsg('请先选择小组头像')
+        } else if (app.facepic == '' || app.thebackpic == '') {
+          return toastMsg('请选择身份证照片')
+        } else if (app.theusertell == '') {
+          return toastMsg('请上传手持身份证件照')
+        } else if (app.form.tel == '') {
+          return toastMsg('请输入手机号码')
+        } else if (!(/^1(3[0-9]|4[57]|5[0-35-9]|7[0135678]|8[0-9])\d{8}$/.test(app.form.tel))) {
+          return toastMsg('请输入正确的手机号')
+        } else {
+          api.showProgress({
+            title: '努力加载中...',
+            modal: false
+          });
+          api.ajax({
+            url: baseUrl + 'Api/Group/addGroup',
+            method: 'post',
+            data: {
+              values: {
+                'hash': $api.getStorage('token'),
+                'type': 1,
+                'name': app.form.groupname,
+                'id_card': app.form.id_card,
+                'tel': app.form.tel,
+                'leading': app.form.username
+              },
+              files: {
+                'header': app.headerimg,
+                'id_fphoto': app.facepic,
+                'id_bphoto': app.thebackpic,
+                'id_hphoto': app.theusertell
+              }
+            }
+          }, function (res, err) {
+            if (res.code == 1) {
+              api.hideProgress();
+              toastMsg('创建个人小组成功！');
+              setTimeout(function () {
+                api.closeWin()
+              }, 1000)
+            } else {
+              api.hideProgress();
+              toastMsg(res.message)
+            }
+          });
+        }
+      },
+      //创建企业小组
+      creatCompany: function () {
+        if (app.form.groupname == '') {
+          return toastMsg('请输入小组名称');
+        } else if (app.form.groupname.length > 12 || app.form.groupname.length < 4) {
+          return toastMsg('请重新输入小组名称')
+        } else if (app.form.username == '') {
+          return toastMsg('请输入负责人姓名')
+        } else if (app.form.username.length > 4) {
+          return toastMsg('名字超出长度限制')
+        } else if (app.form.id_card == '') {
+          return toastMsg('请输入身份证号码')
+        } else if (!(/^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/.test(app.form.id_card))) {
+          return toastMsg('请输入正确的身份证号码')
+        } else if (app.headerimg == '') {
+          return toastMsg('请先选择小组头像')
+        } else if (app.facepic == '' || app.thebackpic == '') {
+          return toastMsg('请选择身份证照片')
+        } else if (app.theusertell == '') {
+          return toastMsg('请上传手持身份证件照')
+        } else if (app.form.tel == '') {
+          return toastMsg('请输入手机号')
+        } else if (!(/^1(3[0-9]|4[57]|5[0-35-9]|7[0135678]|8[0-9])\d{8}$/.test(app.form.tel))) {
+          return toastMsg('请输入正确的手机号')
+        } else if (!(/[a-zA-Z0-9]{8}-[a-zA-Z0-9]/.test(app.form.organization_code))) {
+          return toastMsg('请输入正确的组织机构代码')
+        } else if (app.workpicture == '') {
+          return toastMsg('请上传营业执照')
+        } else {
+          api.showProgress({
+            title: '努力加载中...',
+            modal: false
+          });
+          api.ajax({
+            url: baseUrl + 'Api/Group/addGroup',
+            method: 'post',
+            data: {
+              values: {
+                'hash': $api.getStorage('token'),
+                'type': 2,
+                'name': app.form.groupname,
+                'id_card': app.form.id_card,
+                'tel': app.form.tel,
+                'leading': app.form.username,
+                'company_name': app.form.company_name,
+                'organization_code': app.form.organization_code
+              },
+              files: {
+                'header': app.headerimg,
+                'id_fphoto': app.facepic,
+                'id_bphoto': app.thebackpic,
+                'id_hphoto': app.theusertell,
+                'business_licence': app.workpicture
+              }
+            }
+          }, function (res, err) {
+//            alert(JSON.stringify(res));
+            if (res.code == 1) {
+              api.hideProgress();
+              toastMsg('创建公司小组成功！');
+              setTimeout(function () {
+                api.closeWin()
+              }, 1000)
+            } else {
+              api.hideProgress();
+              toastMsg(res.message)
+            }
+          });
+        }
+      }
+    }
+  });
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+</html>

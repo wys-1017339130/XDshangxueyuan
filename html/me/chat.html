@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>官方互动</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+		<script>
+			var frameH = 0;
+			function ref(o){
+				frameH = document.getElementById('chat-banner').offsetHeight+document.querySelector('.z-index-head').offsetHeight;
+			}
+		</script>
+</head>
+<body class="z-fff">
+	<div id="HeadBar" class="chat-head">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<img tapmode="" height="30" class="chat-share-img icon-fenxiang3" src="../../image/share.png">
+		</div>
+	</div>
+	<div id="main">
+		<img id="chat-banner" onload="ref(this)" src="../../image/hdbanner.jpg" width="100%">
+		<ul class="z-index-head clear z-border-bottom">
+			<li tapmode="" class="z-sub fl click1"><span class="z-subfont z-chat-subfont z-dongtai z-active">官方</span></li>
+			<li tapmode="" class="z-sub fl click2"><span class="z-subfont z-chat-subfont z-xiaoyou">互动</span></li>
+			<li class="z-slider"></li>
+		</ul>
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var ONum = 0;//官方消息页码
+	var INum = 0;//互动消息页码
+	var type = 0;
+	var HeadBar = $api.byId('HeadBar');
+	var playID = 0;
+	var isplay = false;
+	var fs,db,UIActionProgress,dialogBox;
+	var messageArray = [];
+	var pattern1 = /[\u4e00-\u9fa5]+/g;
+	var userID;
+	var MostPageNum = 0;
+	var user;
+	var wx;
+	var bar_height;
+	var totalOfficialChat = [];//和官方留言的总数组
+	var totalInteraction = [];//互动留言的总数组
+
+	apiready = function(){
+
+		$api.fixStatusBar(HeadBar);
+		fs = api.require('fs');
+		db = api.require("db");
+		wx = api.require("wx");
+		dialogBox = api.require('dialogBox');
+		api.setStatusBarStyle({
+		    style: 'light'
+		});
+
+		slider();
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('yupan',{'Active':'加载'},'预判');"});
+		//MD End
+
+		var menu1 = document.querySelector(".z-dongtai");
+		var menu2 = document.querySelector(".z-xiaoyou");
+		document.querySelector(".click1").onclick = function(){
+			if(!App.State()){
+				document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">未连接网络</div></li>';
+			}else{
+				var cl = menu1.className;
+				if(/z-active/.test(cl)){
+					return;
+				}else{
+					document.querySelector(".z-active").className = document.querySelector(".z-active").className.replace(/ z-active/,'');
+					menu1.className += ' z-active';
+					type = 0;
+					slider();
+					changeIndexMenu(type);
+				}
+			}
+		}
+		document.querySelector(".click2").onclick = function(){
+			if(!App.State()){
+				document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">未连接网络</div></li>';
+			}else{
+				var cl = menu2.className;
+				if(/z-active/.test(cl)){
+					return;
+				}else{
+					document.querySelector(".z-active").className = document.querySelector(".z-active").className.replace(/ z-active/,'');
+					menu2.className += ' z-active';
+					type = 1;
+					slider();
+					changeIndexMenu(type);
+				}
+			}
+		}
+
+		api.execScript({name: 'root',script: "XO.GetYuPan('"+ $api.getStorage('token') +"',{name:'chat',fun:'GetYuPan'},{name:'chat',fun:'fail'});"});
+
+		if(!App.State()){
+			document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">未连接网络</div></li>';
+		}else{
+			openChatFrame();
+		}
+
+		wx.isInstalled(function(ret, err) {
+			if(ret.installed){
+				var isshare = $api.getStorage('share');
+				if(isshare && (isshare == '1')){
+					document.querySelector('.icon-fenxiang3').style.display = 'block';
+				}else{
+					document.querySelector('.icon-fenxiang3').style.display = 'none';
+				}
+			}
+		});
+
+		setTimeout(function(){
+			api.execScript({name: 'root',script: "XO.GetPromoter('"+ $api.getStorage('token') +"',{name:'chat',fun:'upshare'},{name:'chat',fun:'fail'});"});
+		},1000);
+
+	};
+
+	function slider(){
+		var rect = document.querySelector(".z-active").getBoundingClientRect();
+		document.querySelector(".z-slider").style.width = "50%";
+		document.querySelector(".z-slider").style.left = 50 * type + '%';
+	}
+
+	var changeIndexMenu = function(num){
+		if(num == 1){
+			api.execScript({name: 'chat',frameName: 'chat_g', script: "CloseChat();"});
+			api.execScript({name: 'chat',frameName: 'chat_h', script: "comment();"});
+		}else{
+			api.execScript({name: 'chat',frameName: 'chat_h', script: "CloseChat();"});
+			api.execScript({name: 'chat',frameName: 'chat_g', script: "comment();"});
+		}
+		api.setFrameGroupIndex({
+			name: 'chatFrameGroup',
+			index: num,
+			scroll: true
+		});
+	};
+
+	function GetYuPan(data){
+		if(data && (data.length>9) && (data.indexOf('ttp://')>0) && (data.indexOf('.jpg')>0)){
+			api.imageCache({url: data}, function(ret, err) {
+				document.getElementById("chat-banner").src = data;
+			});
+		}
+	}
+	function fail(){}
+
+	function openChatFrame(){
+		api.openFrameGroup({
+	        name: 'chatFrameGroup',
+	        bounces: true,
+	        index: 0,
+	        rect: {
+            x: 0,
+            y: frameH,
+            w: 'auto',
+            h: api.winHeight-frameH
+	        },
+	        scrollEnabled: false,
+	        preload:2,
+	        customRefreshHeader: 'UIPullRefresh',
+	        frames: [
+	            {
+	                name: 'chat_g',
+	                url: '../../html/me/chat_g.html',
+	                bounces: true,
+									vScrollBarEnabled:true,
+	                bgColor: '#fff'
+	            },{
+	                name: 'chat_h',
+	                url: '../../html/me/chat_h.html',
+	                bounces: true,
+									vScrollBarEnabled:true,
+	                bgColor: '#fff'
+	            }
+	        ]
+	    },function(ret,err){
+	        //var name = ret.name;
+	    });
+	}
+
+	function showChatImg(src){
+		api.openFrame({
+		    name: 'chat_img',
+		    url: '../../html/me/chat_img.html',
+		    rect: {
+		        x: 0,
+		        y: 0,
+		        w: 'auto',
+		        h: 'auto'
+		    },
+		    animation:{
+              	type:"movein",
+				subType:"from_right",
+				duration:300
+              	},
+		    pageParam: {
+		        name: 'chat_img',
+		        des:src
+		    }
+		});
+	}
+
+  //微信分享
+	var dpic = '';
+	var lpic = "widget://res/logo.png";
+	function upviewlittle(data){
+		//小兔地址data+1_,下载下来
+		var _file = App.file(data);
+		fs.exist({
+		    path: (api.fsDir + '/file/' +_file.full)
+		}, function(ret, err) {
+		    if (ret.exist) {
+	    		data = (api.fsDir + '/file/' +_file.full);
+	    		lpic = 'fs://file/' +_file.full;
+		    }else{
+		    	if(data.indexOf('/') == 0){
+					var dface = App.url + data;
+
+				}else{
+					var dface = data;
+				}
+		    		api.download({
+				    url: dface,
+				    savePath: ('fs://file/' +_file.full),
+				    cache: false,
+				    allowResume: false
+				}, function(ret, err) {
+					data = (api.fsDir + '/file/' +_file.full);
+					lpic = 'fs://file/' +_file.full;
+				});
+		    }
+		});
+	}
+
+	function upshare(data){
+		//小兔地址data+1_,下载下来
+
+		var little = data.split('/');
+		var littleURL = '';
+
+		if(little.length>0){
+			for(var i = 1;i<little.length-1;i++){
+				littleURL += '/'+little[i];
+			}
+			littleURL+= '/1_'+little[little.length-1];
+		}
+		upviewlittle(littleURL);
+		// api.imageCache({
+		//     url: App.url+data
+		// }, function(ret, err) {
+		//     document.getElementById("promoter").src = ret.url;
+		//     api.hideProgress();
+		// });
+
+		localStorage.setItem('promoterPIC',data);
+		var _file = App.file(data);
+		fs.exist({
+		    path: (api.fsDir + '/file/' +_file.full)
+		}, function(ret, err) {
+		    if (ret.exist) {
+	    		data = (api.fsDir + '/file/' +_file.full);
+	    		dpic = 'fs://file/' +_file.full;
+	    		api.hideProgress();
+		    }else{
+		    	if(data.indexOf('/') == 0){
+					var dface = App.url + data;
+				}else{
+					var dface = data;
+				}
+		    	api.download({
+				    url: dface,
+				    savePath: ('fs://file/' +_file.full),
+				    cache: false,
+				    allowResume: false
+				}, function(ret, err) {
+					data = (api.fsDir + '/file/' +_file.full);
+					dpic = 'fs://file/' +_file.full;
+					api.hideProgress();
+				});
+		    }
+		});
+	}
+
+	var apiKey = 'wxcfe803c780dc2647';
+	document.querySelector('.icon-fenxiang3').onclick = function(){
+		if($api.getStorage('nickname')){
+			share();
+		}else{
+			var token = $api.getStorage('token');
+	    if(token && (token == App.guest)){
+				api.sendEvent({name: 'IndexEvent',extra: {page: 'login'}});
+				api.openWin({
+				    name:'login',
+				    url: '../../html/me/login.html',
+				    reload:false,
+				    slidBackEnabled:false,
+				    pageParam:{
+		          		name: 'authentication'
+		          	},
+		          	slidBackEnabled:true
+				});
+	      return;
+			}
+			api.toast({
+		    msg: '完善个人资料后才可以分享',
+		    duration: 2000,
+		    location: 'bottom'
+			});
+		}
+	}
+
+	function share(){
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('ChatShare',{'Active':'开始分享'},'预判-开始分享');"});
+		//MD End
+		dialogBox.actionMenu ({
+		    rect:{
+		        h: 170
+		    },
+		    texts:{
+		        cancel: '取消分享'
+		    },
+		    items:[
+		    {
+		        text: '微信好友',
+		        icon: 'widget://res/icon/icon-wx.png'
+		    },
+		    {
+		        text: '微信朋友圈',
+		        icon: 'widget://res/icon/icon-pyq.png'
+		    }
+		    ],
+		    styles:{
+		        bg:'#FFF',
+		        column: 2,
+		        itemText: {
+		            color: '#000',
+		            size: 12,
+		            marginT:8
+		        },
+		        itemIcon:{
+		            size:60
+		        },
+		        cancel:{
+		            bg: '#fff',
+		            color:'#000',
+		            h: 44 ,
+		            size: 14
+		        }
+		    },
+		    tapClose: true
+		}, function(ret){
+			dialogBox.close({dialogName: 'actionMenu'});
+			if(ret.eventType == 'click'){
+				if(dpic.length>0){
+					switch(ret.index){
+						case 0:
+							var wx = api.require('wx');
+							wx.isInstalled(function(ret, err) {
+		    						if(ret.installed) {
+											wx.shareImage({
+											    apiKey: apiKey,
+											    scene: 'session',
+											    thumb:lpic,
+											    contentUrl: dpic
+											}, function(ret, err) {
+												if (ret.status) {
+														api.execScript({name: 'root', script: "ChatAna('ShareChat',{'is_success':true,'sharingMethod':'session','page':'TabPage1'},'商学院-分享成功');"});
+														api.toast({
+															msg: '分享成功',
+															duration: 2000,
+															location: 'bottom'
+													});
+												}else{
+													api.execScript({name: 'root', script: "ChatAna('ShareChat',{'is_success':false,'sharingMethod':'session','page':'TabPage1'},'商学院-取消分享');"});
+												}
+											});
+		    						}
+		    					});
+							break;
+						case 1:
+							var wx = api.require('wx');
+							wx.isInstalled(function(ret, err) {
+		    						if(ret.installed) {
+											wx.shareImage({
+											    apiKey: apiKey,
+											    scene: 'timeline',
+											    thumb: lpic,
+											    contentUrl: dpic
+											}, function(ret, err) {
+												if (ret.status) {
+													api.execScript({name: 'root', script: "ChatAna('ShareChat',{'is_success':true,'sharingMethod':'timeline','page':'TabPage1'},'商学院-分享成功');"});
+														api.toast({
+															msg: '分享成功',
+															duration: 2000,
+															location: 'bottom'
+													});
+												}else{
+													api.execScript({name: 'root', script: "ChatAna('ShareChat',{'is_success':false,'sharingMethod':'timeline','page':'TabPage1'},'商学院-取消分享');"});
+												}
+											});
+		    						}
+		    					});
+							break;
+						default:
+					}
+				}
+			}
+		});
+	}
+
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

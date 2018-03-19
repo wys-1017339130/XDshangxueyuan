@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>学生会</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .mywork {
+            background: white;
+        }
+
+        .leftimg {
+            width: 20%;
+            display: inline-block;
+            float: left;
+        }
+
+        .leftimg img {
+            width: 4rem;
+            border-radius: 4px;
+            height: 5rem;
+            margin: auto;
+        }
+
+        .contentbox {
+            width: 100%;
+            height: 6.5rem;
+            padding: 0.75rem 10px;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .rightcontent {
+            display: inline-block;
+            float: left;
+            margin-left: 0.75rem;
+        }
+
+        .minteclass {
+            color: #666666;
+            font-size: 12px
+        }
+
+        .laberbar {
+            border-left: 3px solid #d9b270;
+            padding-left: 10px;
+            padding-top: 2.5rem;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .learntitle {
+            font-size: 15px;
+        }
+
+        .scorebox {
+            background: #f0f0f0;
+            height: 13px;
+            width: 80%;
+            border-radius: 20px;
+        }
+
+        .scoreminbox {
+            background: #d9b270;
+            height: 100%;
+            border-radius: 20px;
+        }
+
+        .minball {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #d9b270;
+            position: absolute;
+            left: -7.5px;
+            top: 40%;
+        }
+
+        .learnlist {
+            text-align: center;
+            background: #f2f2f2;
+            color: #a6a6a6;
+            margin: 3rem auto;
+        }
+    </style>
+</head>
+<body style="padding-top: 5px">
+<div id="app">
+    <div class="mywork">
+        <div class="contentbox">
+            <div class="leftimg">
+                <img v-if="headerlistmsg.pic!=''" :src='formatImg(headerlistmsg.pic)'>
+                <img v-else src="../../image/kong.png">
+            </div>
+            <div class="rightcontent" style="margin-left: 0.8rem">
+                <div style="padding-bottom: 0.5rem;font-size: 14px">{{headerlistmsg.title}}</div>
+                <div style="padding-bottom: 0.5rem">
+                    <span class="minteclass">{{headerlistmsg.lecturer || '暂无信息'}}</span>
+                    <span class="minteclass">|{{headerlistmsg.fit || '暂无信息'}}</span>
+                </div>
+                <div style="line-height: 1rem">
+                    <span class="minteclass" style="color: #b99561">已经学习：</span>
+                    <span class="minteclass" style="color: #b99561">{{headerlistmsg.total_learn || '0'}}-{{headerlistmsg.percent || '0'}}%</span>
+                </div>
+            </div>
+            <div style="float: right;color: #666666"
+                 v-if="headerlistmsg.how_long_ago == null || headerlistmsg.how_long_ago == ''">暂未开始
+            </div>
+            <div style="float: right;color: #666666" v-else>{{headerlistmsg.how_long_ago}}前</div>
+        </div>
+    </div>
+    <div v-if="learnhistorylist.length==0" class="learnlist">暂无学习记录</div>
+    <div v-else style="padding: 0.75rem 12px 1rem 15px;box-sizing: border-box;background: white">
+        <div class="laberbar" v-for="(item,index) in learnhistorylist">
+            <p class="learntitle">{{item.title}}</p>
+            <div style="padding: 0.5rem 0;color: #d9b270;box-sizing: border-box;font-size: 14px">已学习:{{item.percent}}%
+            </div>
+            <div style="display: flex">
+                <div class="scorebox">
+                    <div class="scoreminbox" :style="{width:item.percent+'%'}"></div>
+                </div>
+                <div style="margin-left: 15px;color: #d9b270">{{item.len | sheng}}</div>
+            </div>
+            <div class="minball"></div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {
+  });
+  var app = new Vue({
+    el: '#app',
+    data: {
+      formatImg:formatImg,
+      courselist: '',
+      headerlistmsg: '',
+      learnhistorylist: ''
+    },
+    created: function () {
+      apiready = function () {
+        app.uid = api.pageParam.uid;
+        app.mid = api.pageParam.mid;
+        //获取课程头部信息
+        app.classhistory();
+        //课程进度
+        app.learnLog()
+      };
+    },
+    filters: {
+      sheng: function (chavaluetime) {
+        var mintime = Math.floor(chavaluetime / 60);
+        var secondtime = chavaluetime % 60;
+        return mintime + ':' + secondtime;
+      }
+    },
+    methods: {
+      //课程头部信息
+      classhistory: function () {
+        var post = {
+          mid: app.mid,
+          uid: app.uid
+        };
+        sendAjax(this, post, '/Api/Group/learnLogHeader', function (res) {
+          app.headerlistmsg = res.data;
+        })
+      },
+      //获取课程进度
+      learnLog: function () {
+        var post = {
+          mid: app.mid,
+          uid: app.uid
+        };
+        sendAjax(this, post, '/Api/Group/learnLog', function (res) {
+          app.learnhistorylist = res.data
+        })
+      }
+    }
+  });
+
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+
+</html>

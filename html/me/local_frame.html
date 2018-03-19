@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>所在位置</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+		<link rel="stylesheet" href="../../iconfont/iconfont.css">
+<style>
+  *{
+    padding: 0;
+    margin: 0;
+  }
+  .addressbox{
+    background: white;
+    border-bottom: 1px solid #ebebeb;
+    padding: 10px 10px 5px 10px;
+    box-sizing: border-box;
+    position: relative;
+  }
+  .addressbox:active{
+    background: gainsboro;
+  }
+  /*分页*/
+  .bottomdiv {
+    width: 100%;
+    height: 3rem;
+    text-align: center;
+    line-height: 3rem;
+    background: white;
+    color: black;
+    margin-top: 2rem;
+  }
+
+  .uptext {
+    color: #bfbfbf;
+    font-size: 13px;
+  }
+  .publicfont {
+    width: 20px;
+    height: 20px;
+    margin: auto;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="addressbox" style="height: 3rem;line-height: 3rem" @click="showthislocal">
+    <p style="line-height: 1.5rem">不显示位置</p>
+    <img v-if="ifshowlocal==true" src='../../image/changethis.png' style="position: absolute;right: 12px;top: 50%;margin-top:-0.6rem;width:1.2rem;height:1.2rem">
+  </div>
+  <div class="addressbox" v-for="(item,index) in addresslist" @click="changeaddresindex(index)">
+    <p style="line-height: 1.5rem">{{item.name}}</p>
+    <p style="font-size: 10px;color: #999">{{item.address}}</p>
+    <img v-if="changelocalindex == index" src='../../image/changethis.png' style="position: absolute;right: 12px;top: 50%;margin-top:-0.6rem;width:1.2rem;height:1.2rem">
+  </div>
+
+  <div class="bottomdiv">
+    <span v-if="rote" class="uptext">---上拉加载---</span>
+    <img v-if="load" class="publicfont" src="../../image/timg.gif">
+    <span v-if="overlate" class="uptext">数据已全部加载</span>
+  </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {});
+  var app = new Vue({
+    el: '#app',
+    data:{
+      lon:'',
+      lat:'',
+      page:1,
+      addresslist:[],
+      rote: false,
+      overlate: false,
+      load: false,
+      changelocalindex:null,
+      ifshowlocal:false,
+      chuanaddress:'',
+      nowaddress:{
+        name:'',
+        address:'不显示当前区域'
+      }
+    },
+    created: function () {
+      apiready = function () {
+        app.lon = api.pageParam.lon;
+        app.lat = api.pageParam.lat;
+        app.nowaddress.name = api.pageParam.nowaddress;
+        app.chuanaddress = api.pageParam.address;
+        app.getaddress(1);
+        //滑动监听
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 30 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+//                滑动时候改变的值
+        }, function (ret, err) {
+//                app.rote = true;
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.getaddress()
+        });
+        //下拉刷新
+        api.setCustomRefreshHeaderInfo({
+          bgColor: '#fff',
+        }, function(ret, err) {
+          app.page = 1;
+          app.getaddress(1,function(){
+            api.refreshHeaderLoadDone()
+          })
+        });
+			};
+    },
+    filters:{},
+    methods: {
+      getaddress:function(ref, callback) {
+        var aMap = api.require('aMap');
+        aMap.searchNearby({
+          keyword: '',
+          lon: app.lon,
+          lat: app.lat,
+          radius: 2000,
+          offset: 15,
+          page: app.page,
+          sortrule: 0
+        }, function(ret, err) {
+          if (ret.status) {
+            if (ref == 1) {
+              app.addresslist = ret.pois;
+              if(app.chuanaddress.name == '不显示当前位置' || app.chuanaddress.name == '所在位置'){
+                app.ifshowlocal = true
+              } else {
+                for(var i=0; i<app.addresslist.length; i++) {
+                  if(app.addresslist[i].name == app.chuanaddress.name) {
+                    app.addresslist.splice(i,1);
+                    break;
+                  }
+                }
+                app.changelocalindex =1;
+                app.addresslist.unshift(app.chuanaddress);
+              }
+              app.addresslist.unshift(app.nowaddress);
+              app.rote = true;
+              app.load = false;
+            } else {
+              app.addresslist = app.addresslist.concat(ret.pois);
+              app.rote = true;
+              app.load = false;
+            }
+            if (ret.pois.length == 0 || ret.pois == null) {
+              app.overlate = true;
+              app.rote = false;
+              app.load = false
+            }
+          }
+          if (callback) {
+            callback()
+          }
+        });
+      },
+      //选择地点
+      changeaddresindex:function(index) {
+        api.sendEvent({
+          name: 'refreslocal',
+          extra: {
+            refreslocalvalue: app.addresslist[index],
+          }
+        });
+        app.ifshowlocal = false;
+        app.changelocalindex = index;
+        api.closeWin()
+      },
+      //显示 不显示
+      showthislocal:function() {
+        api.sendEvent({
+          name: 'refreslocal',
+          extra: {
+            refreslocalvalue: '',
+          }
+        });
+        app.ifshowlocal = true;
+        app.changelocalindex = null;
+        api.closeWin()
+      }
+		}
+  });
+
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+
+</html>

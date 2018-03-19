@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>我要吐槽</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">我要吐槽</div>
+			<div onclick="submit()" class="z-head-preview">提交</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<textarea placeholder="留下宝贵的意见，我们将会不断改进" class="feedback-text box" rows="10"></textarea>
+		<textarea style="display: none" rows="1" placeholder="联系方式(手机/QQ/微信)" class="feedback-qq box" id=""></textarea>
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+	var HeadBar = $api.byId('HeadBar');
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('Feedback',{'Active':'加载'},'意见反馈');"});
+		//MD End
+
+		if(!App.State()){
+			setTimeout(function(){
+				api.closeWin();
+			},2000);
+		}
+		App.openWWW(api.winName);
+		App.init();
+	}
+
+	function submit(){
+		var content = document.querySelector(".feedback-text").value;
+
+		if(!content){
+			api.toast({
+			    msg: "不能发送空信息",
+			    duration: 2000,
+			    location: 'bottom'
+			});
+			return;
+		}
+
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});//数据加载中显示方块
+
+		api.execScript({name: 'root',script: "XO.PostFeedBack('"+ $api.getStorage('token') +"','','"+content+"',{name:'tucao',fun:'upview'},{name:'tucao',fun:'fail'});"});
+	}
+
+	function upview(msg){
+		api.toast({
+		    msg: msg,
+		    duration: 2000,
+		    location: 'bottom'
+		});
+		api.hideProgress();
+
+		api.execScript({name: 'root', script: "ChatAna('Feedback',{'is_success':true},'意见反馈-提交成功');"});
+		setTimeout(function(){
+			api.closeWin();
+		},2000)
+	}
+
+	function fail(msg){
+		api.hideProgress();
+		App.tips(msg);
+		api.execScript({name: 'root', script: "ChatAna('Feedback',{'is_success':false},'意见反馈-提交失败');"});
+	}
+
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

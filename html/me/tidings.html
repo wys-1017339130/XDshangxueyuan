@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>消息</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a style="color: #d2b379" class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div style="color: #d2b379" class="z-ellipsis z-head-text">消息中心</div>
+			<img tapmode="" height="20" style="display:none" class="chat-share-img" src="../../image/t_paixu.png" />
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<ul id="list" class="tidings-wraper"></ul>
+		<div id="isnull" class="nomessage">
+			<img src="../../image/nomessage.png" alt="">
+			<div class="no-tips">暂无消息</div>
+		</div>
+	</div>
+</body>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<li class="clear">
+		<img data-href="{{href}}" data-name="{{name}}" class="fl" src="../../image/t_type_{{type}}.png" onerror="this.src='../../image/t_type_2.png';" width="40" height="40">
+		<div class="t_li_box">
+			<div data-href="{{href}}" data-name="{{name}}" class="t_li_title_box">
+				<span class="t_li_title">{{title}}</span>
+				<span class="fr">{{vtime}}</span>
+			</div>
+			<div data-id="{{id}}" onclick="toggle('{{id}}')" class="t_li_text t_li_hidden_text">{{text}}</div>
+		</div>
+	</li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+	var HeadBar = $api.byId('HeadBar');
+	var type_icon = ['icon-xiaoxi1','icon-iconfont'];
+	var tdata = [];
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('MessageList',{'Active':'加载'},'消息列表');"});
+		//MD End
+
+		api.execScript({name: 'root',frameName: 'home', script: "red(0);"});
+
+		App.openWWW(api.winName);
+
+		if(api.connectionType == 'none'){
+			api.toast({
+			    msg: '未连接网络',
+			    duration: 2000,
+			    location: 'bottom'
+			});
+		}else{
+			Refresh();
+		}
+	};
+
+	function Refresh(){
+		api.execScript({name: 'root',script: "XO.GetTidings('"+ $api.getStorage('token') +"',0,{name:'tidings',fun:'upview'},{name:'tidings',fun:'fail'});"});
+	}
+
+	function upview(data){//这个函数在refresh中触发了，是获取数据的函数
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		tdata=data;
+		data.forEach(function(arg){
+			arg.vtime = App.dateFM(arg.vtime);
+			//arg.vtime =  arg.vtime.toLocaleString().replace(/[\u4e00-\u9fa5]{2}/,'');
+			if(!(/^\.\.\/\.\.\//.test(arg.href))){
+				arg.href = '';
+			}
+		});
+		console.log(JSON.stringify(data));
+		var TM = new T7({tm: document.getElementById("list_Tpl")});
+		var html = TM.Tpl(data);
+		document.getElementById('isnull').style.display = 'none';
+		document.getElementById('list').innerHTML = html;
+		App.init();
+		api.hideProgress();
+	}
+	function fail(msg){
+		//document.getElementById('isnull').style.display = 'black';
+		//document.getElementById('list').innerHTML = '';
+	}
+
+	function toggle(id){
+		return;
+		var dom = document.querySelector('[data-id='+id + ']');
+		if(dom){
+			var name = dom.className;
+			if(/t_li_hidden_text/.test(name)){
+				dom.className = 't_li_text';
+			}else{
+				dom.className = 't_li_text t_li_hidden_text';
+			}
+		}
+	}
+
+	function paixu(){
+		if(tdata.length == 0){
+			return;
+		}
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: true
+		});
+		tdata.reverse();
+		upview(tdata);
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

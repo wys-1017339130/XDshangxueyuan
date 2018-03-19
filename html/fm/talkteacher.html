@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>咨询讲师</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <style>
+        #app {
+
+        }
+        .top_box{
+            padding-top:0.75rem;
+        }
+        .top_box, .top_box div:first-child {
+            -webkit-justify-content: space-between;
+            -moz-justify-content: space-between;
+            -ms-justify-content: space-between;
+            -o-justify-content: space-between;
+            justify-content: space-between;
+            -webkit-align-items: center;
+            -moz-align-items: center;
+            -ms-align-items: center;
+            -o-align-items: center;
+            align-items: center;
+        }
+
+        .top_box img {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            margin-bottom: 0.75rem;
+        }
+
+        .name_box {
+            margin-left: 0.75rem;
+            font-size: 0.75rem;
+            color: #252525;
+        }
+
+        .price_box {
+            font-size: 0.75rem;
+            color: #D9B270;
+        }
+
+        .ul_box {
+            background-color: #fff8eb;
+            padding: 0.75rem 0.5rem;
+        }
+
+        .ul_box li {
+            font-size: 0.675rem;
+            color: #252525;
+            padding-top: 0.5rem;
+            position: relative;
+            padding-left: 0.5rem;
+        }
+
+        .disc_box {
+            width: 0.25rem;
+            height: 0.25rem;
+            border-radius: 50%;
+            background-color: #D9B270;
+            position: absolute;
+            top: 60%;
+            left: 0;
+        }
+
+        .laberbar {
+            /*border-left: 2px solid #d9b270;*/
+            padding-left: 10px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .barlist_title {
+            border-radius: 5px;
+            background-color: #fff8eb;
+            font-size: 0.7rem;
+            color: #000000;
+            margin-top: 0.5rem;
+            padding: 0.5rem 0.5rem 0.5rem 0.75rem;
+        }
+
+        .minball {
+            width: 0.4rem;
+            height: 0.4rem;
+            border-radius: 50%;
+            background: #d9b270;
+            position: absolute;
+            left: -1.6%;
+            top: 48%;
+        }
+
+        /*立即购买*/
+        .nuw_buy_box {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2.5rem;
+            line-height: 2.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #fff;
+            background-color: #D9B270;
+        }
+    </style>
+</head>
+<body style="background-color: #fff;">
+<div id="app">
+    <div id="HeadBar">
+        <div class="z-head">
+            <a class="z-head-left icon iconfont icon-jiantou z-fanhui" @click="openWin()"></a>
+            <div class="z-ellipsis z-head-text">咨询讲师</div>
+        </div>
+    </div>
+    <div id="fixStatus"></div>
+    <div style="padding:0 0.6rem;">
+        <div class="flex-wrap top_box">
+            <div class="flex-wrap">
+                <img src="../../image/logo.png" alt="">
+                <div class="name_box" style="">卫哲</div>
+            </div>
+            <div class="price_box">¥166/次</div>
+        </div>
+        <div class="ul_box">
+            <ul style="" class="">
+                <li><span class="disc_box"></span>32岁成长为史上最年轻的世界500强中国区总裁</li>
+                <li><span class="disc_box"></span>32岁成长为史上最年轻的世界500强中国区总裁</li>
+                <li><span class="disc_box"></span>32岁成长为史上最年轻的世界500强中国区总裁32岁成长为史上最年轻的世界500强中国区总裁</li>
+                <li><span class="disc_box"></span>32岁成长为史上最年轻的世界500强中国区总裁</li>
+                <li><span class="disc_box"></span>32岁成长为史上最年轻的世界500强中国区总裁</li>
+            </ul>
+        </div>
+    </div>
+    <div style="height:2.2rem;line-height:2.2rem;background-color: #fff;border-bottom: none;font-size: 0.9rem;border-top:0.5rem solid rgb(244,244,244);border-bottom:0.5rem solid rgb(244,244,244);"
+         class="z-column2 fm-title-box">
+        接听电话<span class="fr"><span class="mianfei"></span><span class="">13512345678</span></span>
+    </div>
+    <!--咨询流程-->
+    <div style="padding:0.75rem 0.6rem">
+        <div style="padding-bottom: 0.75rem;font-size: 0.9rem;color:#333333;">咨询流程说明</div>
+        <div style="border-left:2px solid #d9b270">
+            <div class="laberbar" v-for="item in learnhistorylist">
+                <div class="barlist_title">{{item}}</div>
+                <div class="minball"></div>
+            </div>
+        </div>
+    </div>
+    <div style="height:2.5rem;"></div>
+    <!--立即购买-->
+    <div class="nuw_buy_box">立即购买</div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/swiper-3.4.2.min.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: {
+      a: '1',
+      learnhistorylist: [
+        '购买咨询服务前,请确认接听电话准确无误.',
+        '支付成功后,将享受与讲师1对1的电话沟通机会(10分钟)',
+        '稍后,将会有客服人员和您预约咨询时间,请保持电话畅通.',
+        '您可以在"我的"咨询订单中查看已经购买的咨询服务情况.'
+      ]
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.byId('HeadBar'));
+      }
+    },
+    methods: {
+      openWin:function () {
+        closeWindow();
+      }
+    }
+  })
+</script>
+</html>

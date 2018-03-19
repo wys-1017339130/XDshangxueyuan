@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <link rel="stylesheet" href="../../css/api.css">
+    <style>
+        * {
+            padding: 0px;
+            margin: 0px;
+        }
+
+        html, body {
+            background-color: #f2f2f2;
+        }
+
+        .lists {
+            background-color: #ffffff;
+            display: -webkit-box;
+            padding: 0.5rem 0;
+            position: relative;
+            width: 100%;
+            border-bottom: 1px solid #f2f2f2;
+        }
+
+        .List_left {
+            -webkit-box-flex: 1;
+            font-size: 14px;
+            padding-top:0.8rem;
+        }
+
+        .List_right {
+            text-align: center;
+            position: relative;
+            display: -webkit-box;
+            -webkit-box-align: center;
+            -webkit-box-pack: center;
+            height: 60px;
+            color: #d2b379;
+            font-size: 24px;
+        }
+
+        .List_left > p {
+            display: -webkit-box;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: break-word;
+            white-space: normal !important;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+    </style>
+</head>
+<body>
+<div style="background-color: #fff;box-sizing:border-box;padding:0 0.5rem;width: 100%;" id="waop">
+        <div style="width:auto;height: 2rem;line-height: 2rem;font-size: 15px;color: #000;background-color: #fff;border-bottom: 1px solid #f2f2f2">
+        <span>
+            <img align="center" style="margin-right: 0.5rem;" width="33" src="../../image/boshi.png"
+                   alt="">当前学分：</span><span class="aui-pull-right" style="font-size: 12px;color: #d3b57d;"><span
+                style="font-size: 18px">{{OverallSituation.user_credit}}</span>分</span></div>
+        <div class="lists" v-for="(item,index) in list.proList">
+            <div class="List_left">
+                <p>{{item.desc}}</p><!--完成xxx课程练习并获得3星评论，奖励1个学分奖励1个学分奖励1个学分-->
+                <p style="font-size: 12px;height:1.5rem;line-height:1.5rem;color: #999999;">{{item.vtime}}</p>
+            </div>
+            <div class="List_right" v-show="item.type==1">+1</div>
+            <div class="List_right" v-show="item.type==0">-1</div>
+        </div>
+        <div v-show="list.proList.length != 0"
+             style="text-align: center;background-color: white;font-size: 12px;color: #c7c7c7;padding: 1rem 0">没有更多了
+        </div>
+        <div v-show="list.proList.length == 0"
+             style="position: absolute;width: 95%;height: 100%;top: 0px;display: -webkit-box;-webkit-box-pack: center;">
+            <div style="margin-top:4.75rem;">
+                <div style="display: -webkit-box;-webkit-box-pack: center;-webkit-box-align: center;"><img
+                        style="width: 7.25rem;" src="../../image/nostudyList.png" alt=""></div>
+                <p style="text-align: center;font-size: 0.6rem;color: #999999;">暂无明细</p>
+            </div>
+        </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#waop',
+    data: {
+      OverallSituation: {},
+      list: {
+        proList: []
+      }
+    },
+    created: function () {
+      apiready = function () {
+        app.u_getCreditDetail()
+      }
+    },
+    methods: {
+      u_getCreditDetail: function () {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token
+        }
+        sendAjax(this, post, '/Api/Ucenter/u_getCreditDetail', function (res) {
+          api.hideProgress();
+          app.OverallSituation = res.data
+          app.list = res.data.list
+        })
+      }
+    }
+  })
+</script>
+</html>

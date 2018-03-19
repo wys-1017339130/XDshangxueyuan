@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<meta name="viewport"
+      content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+<meta name="format-detection" content="telephone=no">
+<link rel="stylesheet" href="../../css/api.css">
+<link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/weui.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/jquery-weui.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/demos.css"/>
+<style>
+    #warp > p {
+        height: 5px;
+        width: 100%;
+        background-color: #f2f2f2;
+    }
+
+    .subject {
+        padding: 0.5rem;
+        background-color: white;
+        font-size: 0.7rem;
+        color: #252525;
+        border-bottom: 10px solid #f2f2f2;
+    }
+
+    .text {
+        width: 94%;
+        height: 7.5rem;
+        resize: none;
+        outline: none;
+        font-size: 0.75rem;
+        background-color: white;
+        color: #252525;
+        padding: 0.5rem 3%;
+    }
+
+    .remind {
+        margin-top: 1rem;
+        font-size: 0.6rem;
+        color: #868686;
+        line-height: 1.5rem;
+        padding: 0 10%;
+    }
+
+    .Submit {
+        padding: 0 0.6rem;
+        margin-top: 1.5rem;
+    }
+
+    .Submit > div {
+        width: 100%;
+        background-color: #d9b270;
+        color: #ffffff;
+        font-size: 0.7rem;
+        font-weight: bold;
+        height: 1.5rem;
+        line-height: 1.5rem;
+        text-align: center;
+        border-radius: 5px;
+    }
+
+    .Number {
+        font-size: 0.675rem;
+        height: 1.25rem;
+        line-height: 1.25rem;
+        padding-right: 0.5rem;
+        color: #a1a1ab;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #f2f2f2;
+    }
+
+    .Number > span {
+        float: right;
+    }
+
+    .size {
+        font-size: 0.6rem;
+    }
+</style>
+<body>
+<div id="warp">
+    <p></p>
+    <div style="background-color: white">
+        <div class="subject" v-html="charToHtml(mYname)"></div>
+        <textarea placeholder="答：留下你的想法，和大家一起交流！" class="text" v-model="mYnumber"></textarea>
+        <div class="Number"><span><span>{{mYnumber.length}}</span>/2000</span></div>
+        <div>
+            <div class="z-column6 z-sets" style="height: 2.2rem;line-height: 2.2rem;color: #666666;font-size: 0.7rem;"
+                 @click="Picker()">
+                <img align="center" src="../../image/jilus.png" width="20" alt="">&nbsp;&nbsp;完成时间
+                <span class="size" style="float:right;">{{Birth_time}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="Submit">
+        <div @click="examine(code)" v-show="code == '3'">提交答案</div>
+        <div v-show="code == '2'">审批中，请耐心等待...</div>
+        <div @click="examine(code)" v-show="code == '1'">重新做题</div>
+    </div>
+    <div class="remind">温馨提醒：首次答题星级越高奖励行币越多年三星以上额外奖励1学分。</div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/jquery-2.1.4.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  $(function () {
+    FastClick.attach(document.body);
+  });
+</script>
+<script type="text/javascript" src="../../script/jquery-weui.min.js"></script>
+<script type="text/javascript" src="../../script/city-picker.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#warp',
+    data: {
+      mYnumber: '',
+      Birth_time: '2017-01-01',
+      code: '3',
+      mYname: '',
+      id: '',
+      rid: '',
+      charToHtml: charToHtml,
+      day: null,
+      month: null,
+      dialogBox: ''
+    },
+    created: function () {
+      apiready = function () {
+        app.dialogBox = api.require('dialogBox');
+        app.mYname = api.pageParam.mYname;
+        app.mYnumber = $api.getStorage('mYnumber') || '';
+        app.id = api.pageParam.id || 0;
+        app.rid = api.pageParam.rid;
+        app.u_getPerPractice()
+      }
+    },
+    methods: {
+      u_completePractice: function (mYtext, callback) {
+        var token = $api.getStorage('token');
+        var post = {
+          hash: token,
+          practice_id: app.id,
+          rid: app.rid,
+          practice_content: mYtext
+        }
+        sendAjax(this, post, '/Api/Ucenter/u_completePractice', function (res) {
+          app.u_getPerPractice()
+          if (callback) {
+            callback();
+          }
+        })
+      },
+
+      u_getPerPractice: function () {
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token,
+          practice_id: app.id,
+          rid: app.rid
+        }
+        sendAjax(this, post, '/Api/Ucenter/u_getPerPractice', function (res) {
+          console.log(JSON.stringify(res));
+          var datas = res.data;
+          if (datas.answer.id) {
+            app.code = datas.answer.state;
+            if (app.code == 2) {
+              api.alert({
+                msg: '练习评审中,请耐心等待',
+              }, function (ret, err) {
+                api.sendEvent({
+                  name: 'completionlist'
+                });
+                setTimeout(function () {
+                  api.closeWin();
+                }, 500)
+              });
+            }
+            if (datas.answer != []) {
+              app.mYnumber = datas.answer.practice_content;
+            }
+            var tiem = datas.answer.finish_time.split(' ');
+            app.Birth_time = tiem[0];
+//            判断考试弹窗
+            var answerState = $api.getStorage('answerState' + app.rid);
+            if (answerState && answerState == '1') {
+              return false;
+            } else {
+              if (datas.answer.state == 1) {
+                $api.setStorage('answerState' + app.rid, '1');
+                app.code = datas.answer.state;
+                api.openFrame({
+                  name: 'Completion_win_02',
+                  url: 'Completion_win_02.html',
+                  rect: {
+                    x: 0,
+                    y: 0,
+                    w: 'auto',
+                    h: 'auto'
+                  },
+                  pageParam: {
+                    title: datas.radio_title,
+                    star: datas.answer.star,
+                    num: datas.get_score
+                  }
+                })
+              } else {
+                $api.rmStorage('answerState' + app.rid)
+              }
+            }
+          } else {
+            app.code = 3;
+            app.mYnumber = ''
+          }
+        })
+      },
+      examine: function (code) {
+        if (code == 1) {
+          app.mYnumber = '';
+          app.code = 3
+        } else if (code == 3) {
+          if (app.mYnumber == '') {
+            api.toast({
+              msg: '内容不能为空',
+              duration: 2000,
+              location: 'bottom'
+            })
+          } else {
+            $api.setStorage('mYnumber', app.mYnumber);
+            app.u_completePractice(app.mYnumber, function () {
+              app.code = 2;
+
+              api.sendEvent({
+                name: 'completionlist'
+              });
+              setTimeout(function () {
+                api.closeWin();
+              }, 500)
+            });
+          }
+        }
+      },
+      Picker: function () {
+        api.openPicker({
+          type: 'date',
+          date: '2017-01-01',
+          title: '选择时间'
+        }, function (ret, err) {
+          if (ret) {
+            app.Birth_time = ret.year + '-' + ret.month + '-' + ret.day;
+          }
+        });
+      }
+    }
+  })
+</script>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>搜索</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body style="background-color:#fff;">
+	<div id="HeadBar">
+
+	</div>
+	<div class="z-border-bottom" id="search_box">
+
+	<form action="" method="get" name="search_form" id="search_form" onsubmit="return gosearch();">
+		<div style="width: 94%" class="flex-wrap z-search-box">
+			<span onclick="gosearch();" class="icon iconfont icon-fangdajing"></span>
+			<input placeholder="搜索我感兴趣的内容" name="search" id="search_input" class="flex-con" type="search">
+			<span onclick="closewin()" class="z-fan">取消</span>
+		</div>
+	</form>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div style="display: none" class="z-column">
+			<div class="search-title" style="padding-top: 15px">
+				分类搜索
+			</div>
+			<div id="content" class="z-change-intreset-box">
+				<span data-int="3001" class="z-change-intreset z-active">互联网</span>
+				<span data-int="3002" class="z-change-intreset">职场</span>
+				<span data-int="3003" class="z-change-intreset">绩效管理</span>
+				<span data-int="3004" class="z-change-intreset">研发</span>
+				<span data-int="3005" class="z-change-intreset">阅读</span>
+				<span data-int="3006" class="z-change-intreset">赢利模式</span>
+				<span data-int="3007" class="z-change-intreset">导购</span>
+				<span data-int="3008" class="z-change-intreset">心理学</span>
+			</div>
+		</div>
+		<div class="z-space8"></div>
+		<div class="z-column" style="padding-bottom: 0">
+			<ul class="search-hot flex-wrap">
+				<li onclick="typeSearch(this,0)" data-type="0" class="flex-con">最新知识</li>
+				<li onclick="typeSearch(this,1)" data-type="1" class="flex-con">播放量</li>
+				<li onclick="typeSearch(this,2)" data-type="2" class="flex-con">点赞量</li>
+				<li onclick="typeSearch(this,3)" data-type="3" class="flex-con">评论量</li>
+			</ul>
+		</div>
+		<ul id="list" class="z-column2 z-news">
+			<!-- <li class="flex-wrap">
+				<span class="icon iconfont icon-bofang"></span>
+				<div class="flex-con z-news-info">
+					<p class="z-news-table-title z-ellipsis">比尔盖茨：四大领域中国有空间</p>
+					<p class="z-news-table-title-below"><span>今天</span><span>时长4:10</span><span>1.69MB</span></p>
+				</div>
+			</li>
+			<li class="flex-wrap z-active">
+				<span class="icon iconfont icon-pause"></span>
+				<div class="flex-con z-news-info">
+					<p class="z-news-table-title z-ellipsis">比尔盖茨：四大领域中国有空间</p>
+					<p class="z-news-table-title-below"><span>今天</span><span>时长4:10</span><span>1.69MB</span></p>
+				</div>
+			</li> -->
+		</ul>
+	</div>
+</body>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<span data-int="{{id}}" class="z-change-intreset">{{title}}</span>
+	{{/data}}
+</script>
+<script id="list2_Tpl" type="text/template">
+	<!-- <li data-des="{{id}}" data-link="../../html/indexgroup/audio.html" data-name="audio" data-path="{{path}}" class="flex-wrap"> -->
+	<!-- <li onclick="playAudio('{{file}}','{{id}}')" class="clear"> -->
+	{{#data}}
+	<li data-tid="{{cid}}" data-category="{{type}}" data-des="{{id}}" data-link="../../html/indexgroup/audio.html" data-name="audio" data-path="{{path}}" class="flex-wrap">
+		<span class="icon iconfont icon-bofang"></span>
+		<div class="flex-con z-news-info">
+			<p data-title="{{id}}" class="z-news-table-title z-ellipsis">{{title}}</p>
+			<p class="z-news-table-title-below"><span>{{vtime}}</span><span>时长{{duration}}</span><span>{{learn}}人在听</span></p>
+		</div>
+		<!-- <span class="icon iconfont icon-wenzhang"></span> -->
+	</li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+	var fs,tag,mnPopups,db;
+	var HeadBar = $api.byId('search_box');
+	var type = 0;
+	var hot = {};
+	var arr = ['news','learns','likes','comments'];
+	var tdata = {};
+	var status = 0;
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+		document.getElementById('list').innerHTML = '';
+		//此处苹果输入框会把窗口顶上去造成fixed失效，打包后再观察
+		id = api.pageParam.des || 0;//api.pageParam是获取到所有data传参的集合对象
+		fs = api.require("fs");
+		db = api.require("db");
+		mnPopups = api.require('MNPopups');
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('SearchPage',{'Active':'加载'},'搜索界面');"});
+		//MD End
+
+		api.addEventListener({
+		    name: 'topause'
+		}, function(ret, err) {
+		    pause(ret.value.key1);
+		});
+
+		api.addEventListener({
+		    name: 'PlayStatus'
+		}, function(ret, err) {
+			if(ret){
+				if(ret.value.id){
+					play(ret.value.id);
+				}else if(ret.value.key1){
+					play(ret.value.key1);
+				}
+			}
+		});
+
+		db.selectSql({
+			name: 'main',
+			sql: ('select * from tag')
+		},function(ret,err){
+			if(ret.status){
+				if(ret.data.length>0){
+					uptag(ret.data);
+				}
+				if(api.connectionType != 'none'){
+					api.execScript({name: 'root',script: "XO.GetTag('"+ $api.getStorage('token') +"',{name:'search',fun:'uptag'},{name:'search',fun:'fail'});"});
+				}
+			}
+		});
+
+		if(api.connectionType != 'none'){
+			api.execScript({name: 'root',script: "XO.HotSearch('"+ $api.getStorage('token') +"',{name:'search',fun:'upview'},{name:'search',fun:'fail'});"});
+		}
+
+		App.openWWW(api.winName);
+		App.init();
+	};
+
+/*
+	function PlayStatus(data){
+		if(typeof data == 'string'){
+			var data = App.JSON(data);
+		}
+		if(data.id){
+			play(data.id);
+		}else if(data.key1){
+			play(data.key1);
+		}
+	}
+*/
+
+	function upview(data){//这个函数在refresh中触发了，是获取数据的函数
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+
+		for(i in data){
+			if(data[i].length>0){
+				data[i].forEach(function(arg){
+					var m = parseInt(arg.duration/60);
+					var s = parseInt(arg.duration%60);
+					if(m != 0 && s != 0){
+						arg.duration = m + '分' + s + '秒';
+					}else if(m !=0 && s == 0){
+						arg.duration = m + '分';
+					}else if(m == 0 && s != 0){
+						arg.duration = s + '秒';
+					}else if(m == 0 && s == 0){
+						arg.duration = "无长度"
+					}
+					arg.vtime = App.dateStr(arg.vtime);
+				})
+			}
+		}
+		tdata = data;
+		typeSearch(document.querySelector("[data-type='0']"),0);
+		App.init();//动态生产html后腰重新绑定事件
+		api.hideProgress();
+	}
+
+	function uptag(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		var sql1 = "delete from tag";
+		db.executeSql({name: 'main',sql: sql1},function(ret, err){
+			//alert(JSON.stringify(ret)+'study'+JSON.stringify(err));
+		});
+		for(var i = 0;i<data.length;i++){
+			var sql2 = "insert into tag (it,title) values ('"+data[i].id+"','"+data[i].title+"')";
+			db.executeSql({name: 'main',sql: sql2},function(ret, err){
+				//alert(JSON.stringify(ret)+'insertstudy'+JSON.stringify(err));
+			});
+		}
+		var TM = new T7({tm: document.getElementById("list_Tpl")});
+		var html = TM.Tpl(data);
+		document.getElementById('content').innerHTML = html;
+		var domarr = document.querySelectorAll(".z-change-intreset");
+		for(i in domarr){
+			if(typeof domarr[i] == 'object'){
+				domarr[i].addEventListener('click',function(){
+					var interest = this.getAttribute("data-int");
+					if(api.connectionType == 'none'){
+						api.toast({
+						    msg: '请连接网络',
+						    duration: 2000,
+						    location: 'bottom'
+						});
+						return false;
+					}
+					var rect = document.getElementById("search_box").getBoundingClientRect();
+					document.getElementById("search_input").value = this.innerHTML;
+
+					status = 1;
+					api.openFrame({
+					    name: 'searchResult',
+					    url: '../../html/fm/searchResult.html',
+					    rect: {
+				        x: 0,
+				        y: rect.bottom,
+				        w: api.winWidth,
+				        h: api.winHeight - rect.bottom
+					    },
+
+					    pageParam: {
+				        name: 'searchResult',
+				        des:0,
+				        interest:interest
+					    }
+					});
+				});
+			}
+		}
+	}
+
+	function typeSearch(dom,_t){
+		var _c = dom.className;
+		if(/active/g.test(_c)){
+			return;
+		}
+		var _a = document.querySelector(".search-hot .active");
+		if(_a){
+			_a.className = "flex-con";
+			dom.className = "flex-con active";
+		}else{
+			dom.className = "flex-con active";
+		}
+		type = _t;
+		var TM = new T7({tm: document.getElementById("list2_Tpl")});
+		var html = TM.Tpl(tdata[arr[_t]]);
+		document.getElementById('list').innerHTML = html;
+		api.execScript({
+        name: 'root',
+        script: "getPlayId();"
+    });//获取播放状态，以后再说
+		App.init();
+	}
+
+	function gosearch(){
+		if(api.connectionType == 'none'){
+			api.toast({
+			    msg: '请连接网络',
+			    duration: 2000,
+			    location: 'bottom'
+			});
+			return false;
+		}
+		var rect = document.getElementById("search_box").getBoundingClientRect();
+		var key = document.getElementById("search_input").value;
+		if(key == ''){
+			api.toast({
+        msg: '搜索内容不能为空',
+        duration: 2000,
+        location: 'bottom'
+      });
+			return;
+		}
+		status = 1;
+		api.openFrame({
+		    name: 'searchResult',
+		    url: '../../html/fm/searchResult.html',
+		    rect: {
+		        x: 0,
+		        y: rect.bottom,
+		        w: api.winWidth,
+		        h: api.winHeight - rect.bottom
+		    },
+		    reload:true,
+		    pageParam: {
+		        name: 'searchResult',
+		        des:0,
+		        key:key
+		    }
+		});
+
+		//api.execScript({name: 'root',script: "XO.Search('"+ $api.getStorage('token') +"','"+key+"',"+interest+","+type+",{name:'search',fun:'upview'},{name:'search',fun:'fail'});"});
+		return false;//阻止重复提交
+	}
+
+	function fail(msg){
+		api.hideProgress();
+		api.alert({
+		    title: '',
+		    msg: msg,
+		});
+	}
+
+	function playAudio(path,id){
+		api.execScript({
+		    name: 'root',
+		    script: "newPlayAudio('"+path+"','"+id+"');"
+		});
+	}
+
+	function cachepics(i,max,data,template,box,callFr){
+		if(i<max){
+			if(data[i].pic){
+				var _file = App.file(data[i].pic);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i].pic = (api.fsDir + '/file/' +_file.full);
+				    		cachepics(i+1,max,data,template,box,callFr);
+				    }else{
+				    	if(data[i].pic.indexOf('/') == 0){
+							var dpic = App.url + data[i].pic;
+						}else{
+							var dpic = data[i].pic;
+						}
+				    	api.download({
+						    url: dpic,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i].pic = (api.fsDir + '/file/' +_file.full);
+							cachepics(i+1,max,data,template,box,callFr);
+						});
+				    }
+				});
+			}else{
+       			cachepics((i + 1),max,data,template,box,callFr);
+       		}
+		}else{
+			//结束
+			var TM = new T7({tm: template});
+			var html = TM.Tpl(data);
+			box.innerHTML = html;
+			App.init();
+			if(callFr){
+				callFr();
+			}
+		}
+	}
+	function showPopups(){
+		var _w = document.querySelector(".z-search-tag").offsetWidth;
+		var rect = document.querySelector(".z-search-tag").getBoundingClientRect();
+		mnPopups.open({
+			rect: {
+				w: _w - 15,
+				h:64
+			},
+			position: {
+				x: 90,
+				y: rect.bottom
+			},
+		    styles: {
+		        mask: 'rgba(0,0,0,0.2)',
+		        bg: '#ddd',
+		        corner: 3,
+		        cell: {
+		            bg: {
+		                normal: '',
+		                highlight: '#f5f5f5'
+		            },
+		            h: 30,
+		            title: {
+		                marginL: 20,
+		                color: '#636363',
+		                size: 12,
+		            },
+		            separateLine: {
+		                width: 1,
+		                marginLR: 0,
+		                bg: "#C0C0C0",
+		                hideLastSeparateLine: true
+		            }
+		        },
+		        pointer: {
+		            size: 7,
+		            xPercent: 90,
+		            yPercent: 0,
+		            orientation: 'downward'
+		        }
+		    },
+		    datas: tag_arr,
+		    animation: true,
+		    border: {
+		    	size: 0.5,
+		    	color: '#fff'
+		    }
+		}, function(ret) {
+		    if (ret.eventType == 'click') {
+		        document.getElementById("tag").innerHTML = tag_arr[ret.index].title;
+		    }
+		});
+	}
+
+	function play(id){
+		var domTitle = document.querySelector("[data-title='"+id+"']");
+		if(document.querySelector(".icon-pause")){
+			document.querySelector(".icon-pause").className = document.querySelector(".icon-pause").className.replace(/pause/g,'bofang');
+		}
+		if(document.querySelector("[data-des='"+id+"']")){
+			var playbtn = document.querySelector("[data-des='"+id+"']").querySelector(".icon-bofang");
+		}
+		var actTitle = document.querySelector('.active');
+		if(actTitle){
+			actTitle.className = actTitle.className.replace(/ active/,'');
+		}
+		if(domTitle){
+			domTitle.className = domTitle.className + ' active';
+		}
+		if(playbtn){
+			playbtn.className = playbtn.className.replace(/bofang/g,'pause');
+		}
+	}
+
+	function pause(id){
+		if(document.querySelector('.active')){
+			document.querySelector('.active').className = document.querySelector('.active').className.replace(/ active/,'');
+		}
+		var playbtn = document.querySelector(".icon-pause");
+		if(playbtn){
+			playbtn.className = playbtn.className.replace(/pause/g,'bofang');
+		}
+	}
+
+	function closewin(){
+		if(status==0){
+			api.closeWin();
+		}else{
+			status = 0;
+			document.getElementById("search_input").value = '';
+			api.closeFrame({
+			    name: 'searchResult'
+			});
+		}
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

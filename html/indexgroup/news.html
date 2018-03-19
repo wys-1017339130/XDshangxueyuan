@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>消息中心</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        ul {
+            background-color: white;
+        }
+
+        .news_list {
+            padding: 0.75rem 0;
+            margin: 0 0.6rem;
+            background-color: white;
+            border-bottom: 1px solid #f4f4f4;
+        }
+
+        .news_li_title {
+        }
+
+        .title_right_box {
+            float: right;
+            color: #999999;
+            font-size: 0.7rem;
+        }
+
+        .news_li_content {
+            color: #999999;
+            font-size: 0.7rem;
+            width: 70%;
+        }
+
+        .num_box {
+            width: 0.8rem;
+            height: 0.8rem;
+            text-align: center;
+            line-height: 0.8rem;
+            font-size: 0.5rem;
+            color: #fff;
+            border-radius: 100%;
+            background-color: #d74c18;
+        }
+
+        .my_left {
+            font-size: 1.4rem;
+            position: absolute;
+            top: 1.1rem;
+            left: 0;
+            color: #a6a6a6;
+        }
+    </style>
+</head>
+<body>
+<div id='app'>
+    <header id="HeadBar">
+        <div class="z-head" style="padding-top:22px;border:none;">
+            <a class="my_left icon iconfont icon-fanhui" @click="closeWindow()"></a>
+            <div class="z-ellipsis z-head-text">消息中心</div>
+        </div>
+    </header>
+    <div id="fixStatus"></div>
+    <div style="height: 10px;background-color: #f5f5f5"></div>
+    <ul>
+        <li class="news_list" @click="openNewchildWin(1)">
+            <div class="news_li_title">
+                <span style="padding-bottom: 0.5rem;font-size: 0.8rem;font-weight: 500">动态</span>
+                <span class="title_right_box " v-show="list.dongtai !=null " v-cloak> <span class="num_box"
+                                                                                            v-show="list.dongtai.unread_count>0">{{list.dongtai.unread_count}}</span> {{list.dongtai | formatMsgTime}}  </span>
+            </div>
+            <div class="news_li_content aui-ellipsis-1" v-show="list.dongtai.newest_message != '' " v-cloak>
+                {{list.dongtai.newest_message |strOrobj}}
+            </div>
+        </li>
+        <li class="news_list" @click="openNewchildWin(2)">
+            <div class="news_li_title">
+                <span style="padding-bottom: 0.5rem;font-size: 0.8rem;font-weight: 500">课程</span>
+                <span class="title_right_box " v-show="list.kecheng !=null" v-cloak> <span class="num_box"
+                                                                                           v-show="list.kecheng.unread_count>0">{{list.kecheng.unread_count}}</span>  {{list.kecheng | formatMsgTime}}  </span>
+            </div>
+            <div class="news_li_content aui-ellipsis-1" v-cloak>{{list.kecheng.newest_message |strOrobj}}</div>
+        </li>
+        <li class="news_list" @click="openNewchildWin(3)">
+            <div class="news_li_title">
+                <span style="padding-bottom: 0.5rem;font-size: 0.8rem;font-weight: 500">奖励消息</span>
+                <span class="title_right_box " v-show="list.yaoqing !=null" v-cloak> <span class="num_box"
+                                                                                           v-show="list.yaoqing.unread_count>0">{{list.yaoqing.unread_count}}</span>  {{list.yaoqing | formatMsgTime}}   </span>
+            </div>
+            <div class="news_li_content aui-ellipsis-1" v-cloak>{{list.yaoqing.newest_message |strOrobj}}</div>
+        </li>
+
+        <li class="news_list" @click="openNewchildWin(5)">
+            <div class="news_li_title">
+                <span style="padding-bottom: 0.5rem;font-size: 0.8rem;font-weight: 500">邀请记录</span>
+                <span class="title_right_box " v-show="list.invite !=null" v-cloak> <span class="num_box"
+                                                                                          v-show="list.invite.unread_count>0">{{list.invite.unread_count}}</span>{{list.invite | formatMsgTime}}</span>
+            </div>
+            <div class="news_li_content aui-ellipsis-1" v-cloak>{{list.invite.text |strOrobj}}</div>
+        </li>
+
+        <li class="news_list" @click="openNewchildWin(4)" style="border:none;">
+            <div class="news_li_title">
+                <span style="padding-bottom: 0.5rem;font-size: 0.8rem;font-weight: 500">系统通知</span>
+                <span class="title_right_box" v-show="list.xitong !=null" v-cloak> <span class="num_box"
+                                                                                         v-show="list.xitong.unread_count>0"
+                                                                                         v-cloak>{{list.xitong.unread_count}}</span>  {{list.xitong | formatMsgTime}}   </span>
+            </div>
+            <div class="news_li_content aui-ellipsis-1" v-cloak>{{list.xitong.newest_message | objFun}}</div>
+        </li>
+    </ul>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: {
+      list: {
+        dongtai: {
+          addtime: '',
+          newest_message: {
+            yourComment: '',
+            nickname: ''
+          },
+          unread_count: 0
+        },
+        kecheng: {
+          addtime: '',
+          newest_message: {
+            content: ''
+          },
+          unread_count: 0
+        },
+        yaoqing: {
+          addtime: '',
+          newest_message: '',
+          unread_count: 0
+        },
+        xitong: {
+          addtime: '',
+          unread_count: 0
+        },
+        invite: {
+          unread_count: ''
+        }
+      }
+    },
+    filters: {
+      formatMsgTime: function (timespan) {
+        if (timespan && (timespan.addtime) && timespan.addtime != '') {
+          if (timespan.addtime.indexOf('-') === -1) {
+            timespan = timespan.addtime;
+            var now = new Date();
+            var diff = now.getTime() / 1000 - Number(timespan);
+            return jitianqian(Math.round(diff));
+          } else {
+            return timespan.addtime
+          }
+        } else {
+          return '';
+        }
+      },
+      strOrobj: function (data) {
+        if (typeof data == 'object') {
+          if (data.nickname) {
+            return data.nickname + '评论了你'
+          }
+          return data.message;
+        }
+        if (typeof data == 'string') {
+          return data;
+        }
+      },
+      objFun: function (data) {
+        if (typeof data == 'object') {
+          if (data.title) {
+            return data.title;
+          }
+          if (data.content) {
+            return data.content;
+          }
+        } else {
+          return data;
+        }
+      }
+    },
+    created: function () {
+      apiready = function () {
+//        $api.fixStatusBar($api.dom('z-head'));
+        app.getMessageCenter();
+        api.addEventListener({
+          name: 'newsUp'
+        }, function (ret, err) {
+          location.reload();
+//          app.getMessageCenter();
+        })
+      }
+    },
+    methods: {
+      closeWindow: function () {
+        closeWindow();
+      },
+//        获取消息
+      getMessageCenter: function () {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var post = {
+          hash: $api.getStorage('token')
+//          hash: 'OTE5NTE3Nzg1YjdmZTAyMTE3NTAzNDVkMGIwOTdlYTk0ODA5'
+        };
+        sendAjax(this, post, '/Api/Message/getMessageCenter', function (res) {
+          console.log(JSON.stringify(res));
+          api.hideProgress();
+          app.list.dongtai = res.data.dongtai;
+          app.list.kecheng = res.data.kecheng;
+          app.list.yaoqing = res.data.yaoqing;
+          app.list.xitong = res.data.xitong;
+          app.list.invite = res.data.invite;
+        })
+      },
+//        消息子栏目
+      openNewchildWin: function (i) {
+        var name = '',
+          url = '';
+        switch (i) {
+          case 1:
+            name = 'dynamic';
+            url = '../newscommon/dynamic.html';
+            break;
+          case 2:
+            name = 'classNew';
+            url = '../newscommon/classNew.html';
+            break;
+          case 3:
+            name = 'Invitation';
+            url = '../newscommon/Invitation.html';
+            break;
+          case 4:
+            name = 'sysWin';
+            url = '../newscommon/sysWin.html';
+            break;
+          case 5:
+            name = 'invite';
+            url = '../newscommon/invite.html';
+            break;
+        }
+        api.openWin({
+          name: name,
+          url: url,
+          pageParam: {}
+        });
+      }
+    }
+  })
+
+</script>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>搜索结果</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body class="z-fff">
+	<div id="main">
+		<ul id="list" class="box-wraper">
+			<!-- <li class="box z-column clear">
+				<div class="fl list-img-box">
+					<img width="60" height="60" src="../../image/download.png" class="list-img-box-back">
+					<img width="42" height="42" src="../../image/play_btn.png" class="list-img-box-front">
+				</div>
+				<div class="download-font-box">
+					<div class="list-title">掌握品牌定位的三个关键</div>
+					<div class="list-text"><span class="tags">2017年</span><span class="tags">栏目名称</span><span class="tags">4456人点赞</span></div>
+				</div>
+			</li> -->
+		</ul>
+	</div>
+</body>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<li data-des="{{id}}" data-tid="{{cid}}" data-category="{{type}}" data-link="../../html/indexgroup/audio.html" data-name="audio" data-path="{{file}}" data-id="{{id}}"  class="box z-column clear">
+		<div class="fl list-img-box">
+			<img width="60" height="60" src="{{pic}}" class="list-img-box-back">
+			<img width="42" height="42" src="../../image/play_btn.png" class="list-img-box-front">
+		</div>
+		<div class="list-font-box">
+			<div data-active="{{id}}" class="list-title">{{title}}</div>
+			<div class="list-text"><span class="tags">{{vtime}}</span><span class="tags">时长{{duration}}</span><span class="tags">{{learn}}人在听</span></div>
+		</div>
+	</li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var PageNum = 0;
+	var type = 0;
+	var fs;
+	apiready = function(){
+		key = api.pageParam.key || '';
+		interest = api.pageParam.interest || '';
+		fs = api.require('fs');
+
+		api.addEventListener({
+		    name: 'topause'
+		}, function(ret, err) {
+		    pause(ret.value.key1);
+		});
+
+		api.addEventListener({
+		    name: 'PlayStatus'
+		}, function(ret, err) {
+			if(ret){
+				if(ret.value.id){
+					play(ret.value.id);
+				}else if(ret.value.key1){
+					play(ret.value.key1);
+				}
+			}
+		});
+
+		if(api.connectionType != 'none'){
+			Refresh();
+		}else{
+			App.tips('未连接网络');
+		}
+	}
+
+	/*
+	function PlayStatus(data){
+		if(typeof data == 'string'){
+			var data = App.JSON(data);
+		}
+		if(data.id){
+			play(data.id);
+		}else if(data.key1){
+			play(data.key1);
+		}
+	}
+	*/
+
+	function Refresh(type){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});//数据加载中显示方块
+
+		api.execScript({name: 'root',script: "XO.Search('"+ $api.getStorage('token') +"','"+key+"','"+interest+"',{name:'searchResult',fun:'upview'},{name:'searchResult',fun:'fail'});"});
+	}
+
+	function upview(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('search',{'keyword': '"+ key.replace("'","") +"','hasResult':true},'搜索结果');"});
+		//MD End
+
+		data.forEach(function(arg){
+			var m = parseInt(arg.duration/60);
+			var s = parseInt(arg.duration%60);
+			if(m != 0 && s != 0){
+				arg.duration = m + '分' + s + '秒';
+			}else if(m !=0 && s == 0){
+				arg.duration = m + '分';
+			}else if(m == 0 && s != 0){
+				arg.duration = s + '秒';
+			}else if(m == 0 && s == 0){
+				arg.duration = "无长度"
+			}
+			arg.vtime = App.dateStr(arg.vtime);
+		})
+		cachepics(0,data.length,data,document.getElementById("list_Tpl"),document.getElementById('list'));
+		// api.execScript({
+  //           name: 'root',
+  //           script: "getPlayId();"
+  //       });
+		App.init();
+		api.hideProgress();
+	}
+
+	function fail(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('search',{'keyword': '"+ key.replace("'","") +"','hasResult':false},'搜索结果');"});
+		//MD End
+
+		document.getElementById('list').innerHTML = '';
+		api.hideProgress();
+		App.tips(data.msg);
+
+	}
+
+
+	function play(id){
+		if(document.querySelector(".active")){
+			document.querySelector(".active").className = "list-title";
+		}
+		if(document.querySelector("[data-active='"+id+"']")){
+			document.querySelector("[data-active='"+id+"']").className = "list-title active";
+		}
+	}
+
+	function pause(id){
+		if(document.querySelector(".active")){
+			document.querySelector(".active").className = "list-title";
+		}
+	}
+
+
+	function cachepics(i,max,data,template,box){
+		if(i<max){
+			if(data[i].pic){
+				var _file = App.file(data[i].pic);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i].pic = (api.fsDir + '/file/' +_file.full);
+				    		cachepics(i+1,max,data,template,box);
+				    }else{
+				    	if(data[i].pic.indexOf('/') == 0){
+							var dpic = App.url + data[i].pic;
+						}else{
+							var dpic = data[i].pic;
+						}
+				    		api.download({
+						    url: dpic,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i].pic = (api.fsDir + '/file/' +_file.full);
+							cachepics(i+1,max,data,template,box);
+						});
+				    }
+				});
+			}else{
+       			cachepics((i + 1),max,data,template,box);
+       		}
+		}else{
+			//结束
+			var TM = new T7({tm: template});
+			var html = TM.Tpl(data);
+			box.innerHTML = html;
+			api.execScript({
+	            name: 'root',
+	            script: "getPlayId();"
+	        });
+			App.init();
+			api.hideProgress();
+		}
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

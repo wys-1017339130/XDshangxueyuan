@@ -1,0 +1,3397 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>行动在线商学院</title>
+    <link rel="stylesheet" type="text/css" href="./css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="./css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="./css/stylewz.css"/>
+</head>
+<body>
+<div id="wrap">
+    <div id="HeadBar"></div>
+    <div id="main"></div>
+    <div style="height: 49px;width: 100%;position: absolute;left:0;bottom: 0;border-top: 1px solid #ddd"></div>
+</div>
+</body>
+<script type="text/javascript" src="./script/api.js"></script>
+<script type="text/javascript" src="./script/config.js"></script>
+<script type="text/javascript" src="./script/xiaoo.cn.js"></script>
+<script type="text/javascript" src="./script/md5.js"></script>
+<script type="text/javascript" src="./script/com.js"></script>
+<script type="text/javascript" src="./script/jquery.min.js"></script>
+<script>
+  var HeadBar = $api.byId('HeadBar');
+  var push, fs, db, NVTabBar, UIChatBox, audioCover, audioPlayer, UIActionProgress, zhuge, td, saAPICloud, ajpush;
+</script>
+<script type="text/javascript" src="./script/xo.xiaoo.cn.js"></script>
+<script type="text/javascript" src="./script/App.js"></script>
+<script type="text/javascript">
+  var buffer = 0;
+  var audiojump = false;
+  var resume = 0;
+  var selectedIndex = 0;
+  var checkID = new Date();
+  checkID = String(checkID.getTime()).slice(0, 11);
+  var IS;// = XO.IS;
+  var ISS;// = XO.ISS;
+  var Will = 0;
+  var pattern1 = /[\u4e00-\u9fa5]+/g;
+  var isTab = false;
+  var playingID = 0;//要区分是否是同一个音频，不同的全都是播放
+  var playIndex = 0;//列表循环索引
+  var playId = 0;
+  var isplay = false;//是否在播放
+  var total_list = [];//存放播放列表,必须是数组，用来合并
+  var hasList;
+  var mode = '';
+  var drag = true;
+  var index;
+  var audioIndex;
+  var BlocksCache = false;
+  var BlocksCurrent = 0;
+  var BlocksIndex = 0;
+  var BlocksDuration = 0;
+  var current = 0;//播放时改变audio进度时一秒变四次，为了优化进行判断是否真的改变了，改变了再触发
+  var isStorage = 0;//本地存储时减少存储次数
+  var audioArray = [];//构建新数组用来查找audio索引
+  var token;
+  var currentAudio = {};
+  var pause = false;
+  var currentPlay;
+  var tabBarHeight;
+  var dialogBox;
+  var recordProgress = 0;//当切换和播放音频时，记录音频进度，播放完毕和播放上一首下一首时清零，因为如果当audio页面频繁切换时暂停，播放统一首音频会出现明明有进度但却是重新播放,//并没有解决
+  var FilePath = '';
+  var isBENDI = false;//播放逻辑新字段
+  var AudioPause = false;
+  var ErrIndex = 0;
+  var isIDLE = false;
+  var IDLEIndex = 0;
+  var IDLEIndec = 0;
+  var mp3volume = 0;
+  var AutoErr = false;
+  var Plistener = false;
+  var AgIndex = 0;
+  var DeIndex = 0;
+  var DownUrl = '';
+  var HasTask = false;
+  var Tasks;
+  var au__ = {};
+  var id__ = 0;
+  var num__ = 0;
+  var len__ = 0;
+  var autoplay__ = false;
+  var bloks_ = [];
+  var hsDown = false;
+  var CoverProgress = 0;
+  var noIdentifyPlayNum = parseInt($api.getStorage("noIdentifyPlayNum")) || 0;
+  var registrationId = '';
+
+  var AudioTime = 0;
+  var AudioId = 0;
+  var JProgress = 0;
+  var NowProgress = 0;
+  var AudioErrid = 0;
+  var AudioErrlen = 0;
+  var AudioErrindex = 0;
+
+  var sett;
+  var duration = 0;
+  var lv = 0;
+  var storagePath = '';
+  var isNext = false;
+  var first_play = true;
+  var rebot = true;
+  var Browsered = false;
+
+  var BlockDown = '';
+  var pauseAr = [];
+
+  var sload = false;
+  var CachePath = '';
+  var BufferRatio = true;
+  var audioCoverPro = 0;
+  var TBlock = '';
+
+  var sqls = [
+    'CREATE TABLE user ( id int, nickname varchar(255), face varchar(255), level varchar(255), dex int, score int, duration int, sex int, birthday int, industry varchar(255), company varchar(255), province varchar(255), stage int, profession varchar(255), address varchar(255), info varchar(255), record varchar(255))',
+    'CREATE TABLE weekly ( id int, cid int, title varchar(255), pic varchar(255), file varchar(255), blocks text, content text, lecturer varchar(255), des varchar(255), des1 carchar(255), learn int, likenum int, commentnum int, duration int, size int, sort int, vtime int, status int, tid int, classify varchar(255),progress int,type int, islike int,path varchar(255), cache varchar(255),cachedur varchar(100),text text,ilock int)',
+    'CREATE TABLE profession (banner text,newest text,course text)',
+    'CREATE TABLE course ( id int, title varchar(255), introduction varchar(255),  content text,banner varchar(255), people int,hour int,price varchar(255))',
+    'CREATE TABLE coursecontent ( id int,title varchar(255), file varchar(255),  blocks text, pic varchar(255), note varchar(255), text varchar(255), `date` int, size int, duration int, tid int, type int, progress int, islike int, likenum int, classify varchar(255), speaker varchar(255),path varchar(255),vtime int, cache varchar(255),cachedur varchar(100),ilock int,hearnum int)',
+    'CREATE TABLE audiotask ( id int, rid int, uid int, ilike int, likenum int, date int, text text, class int, name varchar(255), face varchar(255))',
+    'CREATE TABLE audiomessage ( face varchar(255), id int, name varchar(255), class int, text text, date int, ilike int, likenum int, file varchar(255), len int, uid int, rid int)',
+    'CREATE TABLE gp ( member int, top text, article text)',
+    'CREATE TABLE groupDetail ( id int, title varchar(255), face varchar(255), nickname varchar(255), stage int, vtime int, utime int, content text, commentsnum int, cid int, uid int, type int, pic text, color int, views int, likenum int, status int, tsort int, `delete` varchar(255))',
+    'CREATE TABLE mymessage ( id int, rid int, text varchar(255), vtime int, file varchar(255), len int, uid int)',
+    'CREATE TABLE mytask ( id int, rid int, text varchar(255), vtime int, uid int)', 'CREATE TABLE faq (text text)',
+    'CREATE TABLE plan ( master int, completed int, interest varchar(255), time int)',
+    'CREATE TABLE rank ( id int, face varchar(255), `index` int, nickname varchar(255), dur int, coin int)',
+    'CREATE TABLE mylike ( id int, file varchar(255), pic varchar(255), date int, likenum int, column varchar(255), title varchar(255), duration int, progress int)',
+    'CREATE TABLE mostlike ( id int, file varchar(255), pic varchar(255), date int, likenum int, column varchar(255), title varchar(255), duration int, progress int)',
+    'CREATE TABLE mall ( id int, type int, title varchar(255), rid int, cid int, banner varchar(255), pic varchar(255), score int, num int, used int, tsort int, status int, vtime int)',
+    'CREATE TABLE study ( uid int, everydaytime text, everyday text)',
+    'CREATE TABLE currentaudio ( id int,title varchar(255), pic varchar(255), sid int, text varchar(255), note varchar(255), file varchar(255),  blocks text, tid int, type int, path varchar(255), duration int, progress int, islike int, likenum int, classify varchar(255),storagePath varchar(255), des varchar(255),`time` int,lecturer varchar(255),columnTitle varchar(255))',
+    'CREATE TABLE downfile ( id int, blocks int,size varchar(20), file varchar(255),hash varchar(255),at int,status int,type int,uptime int)',
+    'CREATE TABLE fm ( everyweek text, profession text )',
+    'CREATE TABLE tag ( id int, title varchar(255))',
+    'CREATE TABLE emba (banner varchar(255),content text,people int,hour int,lecturer varchar(255))',
+    'CREATE TABLE studylist (uid int,`list` text)',
+    'CREATE TABLE ppt (`ppt` text,id int,type int, tid int)',
+    'CREATE TABLE audioinfo (id int,title text,pic varchar(255),des text,vtime int,size int,path varchar(255),duration int,likenum int,blocks text,ilike int,type int,tid int,columnTitle text,hearnum int,lecturer varchar(255),message text,task text)'
+  ];
+
+  function exec(i, max) {
+    if (i < max) {
+      db.executeSql({
+        name: 'main',
+        sql: sqls[i]
+      }, function (ret, err) {
+        //console.log(sqls[i]);
+        if (ret.status) {
+          exec(i + 1, max);
+        } else {
+          alert('应用崩溃，请重新安装本应用');
+        }
+      });
+    } else {
+      isLogin(openIndexFrameGroup);
+    }
+  }
+
+  /********* 初始化 Start ***********/
+  Tasks = function () {
+  };
+  var unupdate = false;
+  apiready = function () {
+    console.log("启动中...");
+    api.setStatusBarStyle({
+      style: 'dark'
+    });
+
+    api.addEventListener({
+      name: 'appintent'
+    }, function (ret, err) {
+      var appParam = ret.appParam;
+      if (appParam) {
+        if (appParam.type == 1) {
+//          api.openWin({
+//            name: 'courseInfo_win',
+//            url: './html/fm/courseInfo_win.html',
+//            pageParam: {
+//              des: appParam.id,
+//              title: appParam.title
+//            }
+//          });
+        }
+        if (appParam.type == 2) {
+          api.openWin({
+            name: 'alltokenmessage_win',
+            url: './html/me/alltokenmessage_win.html',
+            pageParam: {
+              reid: appParam.id
+            }
+          })
+        }
+      }
+    });
+    api.addEventListener({
+      name: 'pause'
+    }, function (ret, err) {
+//      api.execScript({
+//        name: 'audio',
+//        script: "playAudio();"
+//      });
+      alert('应用进入后台');
+    });
+    App.ver = api.appVersion;
+    IS = XO.IS;
+    ISS = XO.ISS;
+
+    window.wW = api.winWidth;
+    window.wH = api.winHeight;
+    audioPlayer = api.require('audioPlayer');
+    push = api.require('push');
+    fs = api.require('fs');
+    db = api.require('db');
+    UIChatBox = api.require('UIChatBox');
+    dialogBox = api.require('dialogBox');
+    ajpush = api.require('ajpush');
+    saAPICloud = api.require('sensorsAnalyticsAPICloudSDK');
+    NVTabBar = api.require('NVTabBar');
+    UIActionProgress = api.require('UIActionProgress');
+    audioCover = api.require('audioCover');
+    $api.fixStatusBar(HeadBar);
+    var headerH = $api.offset(HeadBar).h;
+    var footerH = 49;
+    //frame的高度为当前window高度减去header和footer的高度
+    var frameH = api.winHeight - headerH - footerH;
+
+    //App.Analysis();
+    trackinit();
+
+    api.getPrefs({
+      sync: false,
+      key: 'firstStart' + api.appVersion
+    }, function (ret, err) {
+      var Frist = ret.value;
+      if (!Frist) {
+        ChatAna('AppStart', {'is_first_day': true, 'is_first_time': true}, '启动App');
+        api.setPrefs({key: 'firstStart' + api.appVersion, value: '1'});
+        $api.setStorage('firstStart' + api.appVersion, true);
+      } else {
+        ChatAna('AppStart', {'is_first_day': false, 'is_first_time': false}, '启动App');
+        localStorage.removeItem('mp3');
+        $api.rmStorage('mp3');
+        api.setPrefs({key: 'firstStart', value: '1'});
+        $api.setStorage('firstStart', true);
+      }
+    });
+
+    if (App.iphone) {
+      tabBarHeight = 4;
+    } else {
+      tabBarHeight = 2;
+    }
+
+    var tk = $api.getStorage('token');
+    if (tk && (tk == App.guest)) {
+      $api.clearStorage();
+    }
+    init();
+//    api.bringFrameToFront({
+//      from: 'FM'
+//    });
+    var dbname = 'com.xdjy100.xdsxy.0930.db';
+    //删除数据库
+    // KillCache();
+    // Clear(dbname);
+    // return;
+    fs.exist({
+      path: 'fs://data/' + dbname
+    }, function (ret, err) {
+      if (ret.exist) {
+        db.closeDatabase({
+          name: 'main'
+        }, function (ret, err) {
+          db.openDatabase({
+            name: 'main',
+            path: 'fs://data/' + dbname
+          }, function (ret, err) {
+            if (ret && ret.status) {
+                /*
+                 db.selectSql({
+                 name: 'main',
+                 sql: ('select * from currentaudio')
+                 }, function(ret, err) {
+                 console.log(JSON.stringify(ret.data))k;
+                 });
+                 */
+
+              api.getPrefs({
+                sync: false,
+                key: 'firstStart' + api.appVersion
+              }, function (ret, err) {
+                var Frist = ret.value;
+                if (!Frist) {
+                  db.executeSql({name: 'main', sql: "delete from currentaudio"}, function (ret, err) {
+                  });
+                  db.executeSql({name: 'main', sql: "delete from user"}, function (ret, err) {
+                  });
+                }
+                isLogin(openIndexFrameGroup);
+              });
+            } else {
+              api.clearCache();
+              fs.rmdir({path: 'fs://data/'}, function (ret, err) {
+                api.rebootApp();
+              });
+            }
+          });
+        });
+      } else {
+        api.clearCache();
+        fs.rmdir({path: 'fs://blocks/'}, function (ret, err) {
+        });
+        fs.rmdir({path: 'fs://data/'}, function (ret, err) {
+          db.closeDatabase({
+            name: 'main'
+          }, function (ret, err) {
+            db.openDatabase({
+              name: 'main',
+              path: 'fs://data/' + dbname
+            }, function (ret, err) {
+              if (ret && ret.status) {
+                exec(0, sqls.length);
+              }
+            });
+          });
+        });
+      }
+    });
+  };
+
+  function setUserId() {
+
+  }
+  function KillCache() {
+    fs.rmdir({path: 'fs://blocks'}, function (ret, err) {
+    });
+    db.selectSql({name: 'main', sql: ('delete from downfile')}, function (ret, err) {
+      //console.log(JSON.stringify(ret));
+      //console.log(JSON.stringify(err));
+    });
+  }
+
+  function Clear(dbname) {
+    api.clearCache();
+    $api.clearStorage();
+    fs.remove({
+      path: 'fs://data/' + dbname
+    }, function (ret, err) {
+      alert('Clear');
+    });
+  }
+
+  function trackinit() {
+    saAPICloud.sharedInstance({
+      serverURL: "http://hdcg100.cloud.sensorsdata.cn:8006/sa?project=default&token=cf0cf8102cae7d05",
+      configureURL: "http://hdcg100.cloud.sensorsdata.cn:8006/config/?project=default",
+      debugMode: "debugOff"
+    });
+    //zhuge.initZhuge();
+
+    if (!App.iphone) {
+      ajpush.init();
+    }
+
+    ajpush.getRegistrationId(function (ret) {
+      registrationId = ret.id;
+      console.log('极光注册码 ' + registrationId);
+    });
+
+    api.addEventListener({
+      name: 'launchviewclicked'
+    }, function (ret, err) {
+      ChatAna('AppAds', {'Active': '点击'}, '启动页点击');
+    });
+  }
+
+  var AppRunTime = 0;
+  var Ase;
+  Ase = setInterval(function () {
+    AppRunTime++;
+  }, 1000);
+  function EndPage() {
+    clearInterval(Ase);
+    if (isplay) {
+      console.log(total_list[audioIndex].columnTitle);
+      ChatAna('playCourse', {
+        'courseFirstCate': total_list[audioIndex].columnTitle,
+        'tid': total_list[audioIndex].tid,
+        'learnLength': AudioTime,
+        'courseTitle': total_list[audioIndex].title,
+        'courseID': parseInt(total_list[audioIndex].id)
+      }, '切换课程');
+      saAPICloud.flush();
+      AudioTime = 0;
+    }
+    ChatAna('AppEnd', {'event_duration': AppRunTime}, '退出App');
+    saAPICloud.flush();
+  }
+
+  function init() {
+    api.addEventListener({
+      name: 'keyback'
+    }, function (ret, err) {
+      if (Browsered) {
+        api.execScript({name: 'root', frameName: 'FM', script: "browserBack();"});
+        return;
+      }
+      if (Will == 0) {
+        Will = Will + 1;
+        api.toast({
+          msg: '再次返回将退出应用',
+          duration: 2000,
+          location: 'bottom'
+        });
+      } else {
+        EndPage();
+        setTimeout(function () {
+          api.closeWidget({silent: true});
+        }, 300);
+      }
+    });
+
+    api.addEventListener({
+      name: 'pause'
+    }, function (ret, err) {
+
+        /*
+         if(typeof total_list[audioIndex] == 'object'){
+         if(typeof total_list[audioIndex].blockc != 'object'){
+         total_list[audioIndex].blockc = total_list[audioIndex].blocks.split('|');
+         }
+         if(total_list[audioIndex].blockc.length>0){
+         var temp = total_list[audioIndex].blockc[0].split(',');
+
+         if(('||' + BlockDown + '|').indexOf('|' + temp[1] + '|')<1){
+         BlockDown = BlockDown + '|' + temp[1] + '|';
+         var uptime =App.time();
+         //downfile ( id int, blocks int,size varchar(20), file varchar(255),hash varchar(255),at int,status int,type int,uptime int,
+         pauseAr.push({'hash':temp[1],id:total_list[audioIndex].id,'sql':"INSERT INTO downfile VALUES(" + total_list[audioIndex].id + ",0,'[size]','','"+temp[1]+"',100,3,"+ total_list[audioIndex].type +","+ uptime.stamp +")"});
+         fs.exist({
+         path: (api.fsDir + '/blocks/' +temp[1] + '.db')
+         }, function(ret, err) {
+         if(!ret.exist) {
+         if(DownUrl.length>3){api.cancelDownload({url: DownUrl});}
+         var url = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + temp[1];
+         DownUrl = url;
+         api.download({
+         url: url,
+         savePath: 'fs://blocks/' + temp[1] + '.db',
+         report: true,
+         cache: false,
+         allowResume: true
+         }, function(ret, err) {
+         console.log(JSON.stringify(ret));
+         if (ret.state == 1) {
+         BlockDown = BlockDown.replace('|'+ temp[1] +'|','|');
+         if(pauseAr.length>0){
+         for(var i in pauseAr){
+         if(ret.savePath.indexOf(pauseAr[i].hash + '.db')>0){
+         db.executeSql({name: 'main',sql: ('delete from downfile where id=' + pauseAr[i].id)},function(ret, err){
+         var sql1 = pauseAr[i].sql.replace('[size]',ret.fileSize);
+         db.executeSql({name: 'main',sql:sql1},function(ret, err){});
+         });
+         break;
+         }
+         }
+         }
+         //alert(ret.savePath + '|' + JSON.stringify(pauseAr));
+         }else if (ret.state == 2) {
+         BlockDown = BlockDown.replace('|'+ temp[1] +'|','|');
+         console.log('HASH:'+ temp[1] + '下载失败!');
+         }
+         });
+         }
+         });
+         }
+         }
+         }
+         */
+
+      resume = 1;
+      SysPause();
+      ajpush.onPause();
+    });
+
+    api.addEventListener({
+      name: 'resume'
+    }, function (ret, err) {
+      if (!App.iphone) {
+        if (isIDLE) {
+          if (current > 3) {
+            current = current - 3;
+          } else {
+            current = 0;
+          }
+          //isIDLE = false;
+          ToPlay(playingID);
+        }
+      }
+      resume = 2;
+      SysResume();
+      ajpush.onResume();
+    });
+
+    api.addEventListener({
+      name: 'smartupdatefinish'
+    }, function (ret, err) {
+      api.confirm({
+        title: '应用提醒',
+        msg: '应用刚刚修复了一些小问题，但不影响您当前的使用。',
+        buttons: ['立即重启应用', '暂不重启(继续使用)']
+      }, function (ret, err) {
+        var index = ret.buttonIndex;
+        if (index == 1) {
+          api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '重启中...',
+            modal: false
+          });
+          EndPage();
+          setTimeout(function () {
+            api.rebootApp();
+          }, 500);
+        }
+      });
+    });
+
+    api.addEventListener({
+      name: 'online'
+    }, function (ret, err) {
+      saAPICloud.flush();
+      //alert(HasTask);
+      if (HasTask) {
+        Tasks();
+        HasTask = false;
+        au__ = {};
+        id__ = 0;
+        num__ = 0;
+        len__ = 0;
+        autoplay__ = false;
+        Tasks = function () {
+        }
+      }
+      SysOnline();
+    });
+
+    api.addEventListener({
+      name: 'offline'
+    }, function (ret, err) {
+      SysOffline();
+    });
+
+    api.addEventListener({
+      name: 'noticeclicked'
+    }, function (ret) {
+      //alert(JSON.stringify(ret));
+    });
+
+      /*
+       audioPlayer.addEventListener({
+       name: "buffering"
+       }, function(ret) {
+       console.log(JSON.stringify(ret));
+       });
+       */
+
+  }
+
+  function Badge(res) {
+    if (typeof res == 'string') {
+      var res = JSON.parse(res);
+    }
+    var Tcontent = res.data.toString().split('[|]');
+    api.notification({
+      vibrate: [300, 500],
+      sound: 'default',
+      light: true,
+      notify: {
+        title: '行动在线商学院',
+        content: Tcontent[2],
+        extra: Tcontent[0] + '|' + Tcontent[1]
+      }
+    }, function (ret, err) {
+      if (ret) {
+      }
+    });
+
+    var ibadge = $api.getStorage('badge');
+    if (XO.SysBg) {
+      if (ibadge) {
+        ibadge = ibadge + 1;
+      } else {
+        ibadge = 1;
+      }
+      $api.setStorage('badge', ibadge);
+      api.setAppIconBadge({
+        badge: ibadge
+      });
+    }
+  }
+
+  function SysPause() {
+    XO.SysBg = true;
+    var token = $api.getStorage('token');
+    if (token) {
+      XO.ST(token, 1);
+    }
+    push.removeListener();
+  }
+
+  function SysResume() {
+    XO.SysBg = false;
+    //XO.SysFun();
+    var token = $api.getStorage('token');
+    if (token) {
+      XO.ST(token, 0);
+    }
+
+    XO.popOpen({name: 'root', fun: 'Badge'});
+  }
+
+  function SysOnline() {
+    if (!XO.Online) {
+      api.toast({
+        msg: '已连接到网络',
+        duration: 2000,
+        location: 'bottom'
+      });
+    }
+    XO.Online = true;
+  }
+
+  function SysOffline() {
+    if (XO.Online) {
+      XO.Offline();
+      api.execScript({name: 'root', frameName: 'FM', script: "App.State();"});
+      //api.execScript({name: 'root',frameName:'home',script: "App.State();"});
+      for (var i in App.pages) {
+        if ((App.pages[i] != '') && (App.pages[i] == 'audio')) {
+          api.execScript({name: App.pages[i], script: "App.State();"});
+        }
+      }
+    }
+    XO.Online = false;
+  }
+
+  function openIndexFrameGroup() {
+    XO.CheckShare(api.appVersion, {name: 'root', fun: 'CheckSharea'}, {name: 'root', fun: 'CheckShareb'});
+    api.setWinAttr({
+      bounces: true
+    });
+    $api.setStorage('indexFrameGroup', '1');
+    api.openFrameGroup({
+      name: 'indexFrameGroup',
+      bounces: true,
+      index: 0,
+      rect: {
+        x: 0,
+        y: 0,
+        w: 'auto',
+        h: wH - 50
+      },
+      scrollEnabled: false,
+      preload: 0,
+      customRefreshHeader: 'UIPullRefresh',
+      frames: [
+        {
+          name: 'FM',
+          url: './html/indexgroup/FM.html',
+          bounces: true,
+          animation: {},
+          opaque: true,
+          bgColor: '#fff'
+        }, {
+          name: 'group',
+          url: './html/me/group.html',
+          reload: true,
+          slidBackEnabled: true,
+          animation: {},
+          bounces: false,
+          opaque: true,
+          bgColor: '#fff',
+          pageParam: {
+            name: 'group',
+            des: 0
+          }
+        }, {
+          name: 'home',
+          url: './html/indexgroup/home.html',
+          animation: {},
+          bounces: false,
+          opaque: true,
+          bgColor: '#fff'
+        }
+      ]
+    }, function (ret, err) {
+//      api.setFrameAttr({
+//        name: 'group',
+//        hidden: true
+//      });
+//      if (ret.index == 0){
+//        api.setFrameGroupIndex({
+//          name: 'indexFrameGroup',
+//          index: 0
+//        });
+//        api.sendFrameToBack({
+//          from: 'groupframe'
+//        });
+//      }
+      index = ret.index;
+      var name = ret.name;
+      if (isTab) {
+        return;
+      } else {
+        isTab = true;
+        IndexOpenWWW();
+        menuOpen();
+      }
+    });
+  }
+
+  var status = false;
+  var SwipeState = 0;
+  function IndexOpenWWW() {
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from currentaudio order by `time` desc')
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          status = true;
+          SwipeState = 1;
+          api.openFrame({
+            name: 'smallcontroller',
+            url: './html/indexgroup/smallcontroller.html',
+            rect: {
+              x: 0,
+              y: api.winHeight - 49,
+              w: api.winWidth,
+              h: 50
+            },
+            pageParam: {
+              name: 'smallcontroller',
+            }
+          });
+          setTimeout(function () {
+            NVTabBar.bringToFront();
+            api.execScript({
+              name: 'root',
+              frameName: 'FM',
+              script: "(document.querySelector('#hsminiplay').style.height = '40px');"
+            });
+            api.execScript({
+              name: 'root',
+              frameName: 'home',
+              script: "(document.querySelector('#hsminiplay').style.height = '60px');"
+            });
+            api.animation({
+              name: 'smallcontroller',
+              delay: 0,
+              duration: 500,
+              curve: 'ease_in',
+              repeatCount: 0,
+              translation: {
+                x: 0,
+                y: -50,
+                z: 0
+              }
+            }, function (ret, err) {
+            });
+            if (total_list[audioIndex] && (typeof total_list[audioIndex].tid == 'number')) {
+              api.execScript({
+                name: 'root',
+                frameName: 'smallcontroller',
+                script: "play(" + playingID + "," + total_list[audioIndex].tid + ");"
+              });
+            }
+          }, 500);
+        }
+      }
+    });
+  }
+
+  function Swipeup() {
+    return;
+    if (status && (SwipeState == 1)) {
+      SwipeState = 2;
+      api.animation({
+        name: 'smallcontroller',
+        delay: 0,
+        duration: 500,
+        curve: 'ease_in',
+        repeatCount: 0,
+        translation: {
+          x: 0,
+          y: 50,
+          z: 0
+        }
+      }, function (ret, err) {
+        SwipeState = 3;
+      });
+    }
+  }
+
+  function Swipedown() {
+    if (status && (SwipeState == 3)) {
+      SwipeState = 2;
+      api.animation({
+        name: 'smallcontroller',
+        delay: 0,
+        duration: 500,
+        curve: 'ease_in',
+        repeatCount: 0,
+        translation: {
+          x: 0,
+          y: -50,
+          z: 0
+        }
+      }, function (ret, err) {
+        SwipeState = 1;
+      });
+    }
+  }
+
+  var changeIndexMenu = function (num) {
+    api.setFrameGroupIndex({
+      name: 'indexFrameGroup',
+      index: num,
+      scroll: false
+    });
+  };
+  function CheckSharea() {
+    $api.setStorage('share', '1');
+  }
+
+  function CheckShareb() {
+    $api.setStorage('share', '0');
+  }
+
+  /*
+   function YuPana(str){
+   if(typeof str == 'string'){
+   var str = App.JSON(str);
+   }
+   if(str.data){
+   var temp = str.data.split('|');
+   if(temp.length>4){
+   $api.setStorage('yupanad', '1');
+   }else{
+   $api.setStorage('yupanad', '0');
+   }
+   api.execScript({
+   frameName: 'FM',
+   script: "YuPan(1,'" + temp[0] + "','" + temp[1] + "','" + temp[2] + "','" + temp[3] + "');"
+   });
+   }
+   }
+
+   function YuPanb(){
+   api.execScript({
+   frameName: 'FM',
+   script: "YuPan(0,'','','');"
+   });
+   }
+   */
+
+  /********* 初始化 End ***********/
+
+  /********* 分析事件 Start ***********/
+  var CAt = false;
+  var HasUid = false;
+  function ChatAna(title, objs, desc) {
+    if (!HasUid) {
+      var uuid = $api.getStorage('user_id');
+      var token = $api.getStorage('token');
+      if (uuid && !isNaN(uuid)) {
+        HasUid = true;
+        ajpush.bindAliasAndTags({alias: uuid}, function (ret) {
+          var statusCode = ret.statusCode;
+        });
+        console.log(uuid);
+        saAPICloud.login({loginId: uuid});
+      } else if (uuid && (typeof token == 'string') && (token.length > 6)) {
+        $api.clearStorage();
+        api.removePrefs({key: 'face'});
+        api.removePrefs({key: 'token'});
+        api.removePrefs({key: 'user_id'});
+        api.removePrefs({key: 'nickname'});
+        api.removePrefs({key: 'company'});
+        api.removePrefs({key: 'position'});
+        api.removePrefs({key: 'tel'});
+        api.rebootApp();
+        return;
+      }
+    }
+    console.log('[' + title + ']');
+    console.log(JSON.stringify(objs));
+
+    saAPICloud.track({
+      event: title,
+      properties: objs
+    });
+    if (objs && objs.tabs == '简介') {
+      $api.setStorage('courseID_rid', objs.courseID);
+      $api.setStorage('classID_cid', objs.tid);
+    }
+      /*
+       zhuge.track({
+       eventName: desc,
+       eventPro: objs
+       });
+       */
+  }
+
+  function identify(objs) {
+    //zhuge.identify(objs);
+  }
+  /********* 分析事件 End ***********/
+
+  /********* 播放逻辑 Start ***********/
+  function isplaying(id) {
+    console.log('====================>' + id);
+    if (id > 0) {
+      if (playingID != id) {
+        BlocksIndex = 0;
+        current = 0
+        BlocksCurrent = 0;
+        //if(App.iphone){audioCover.cancel();}
+
+        //AudioId = playingID;
+
+        api.execScript({name: 'audio', script: "setProgress(0,0);"});
+
+        if (typeof audioArray[playingID] == 'object') {
+          console.log('AudioTime' + AudioTime);
+          console.log(audioArray[playingID].columnTitle);
+          ChatAna('playCourse', {
+            'courseFirstCate': audioArray[playingID].columnTitle,
+            'tid': audioArray[playingID].tid,
+            'learnLength': AudioTime,
+            'courseTitle': audioArray[playingID].title,
+            'courseID': parseInt(audioArray[playingID].id)
+          }, '切换课程');
+          saAPICloud.flush();
+        }
+        AudioTime = 0;
+        audioPlayer.stop();
+      }
+    }
+
+    console.log('isplay ' + isplay + ' ' + id + ' ' + playingID);
+
+    if (isplay) {
+      if (typeof audioArray[id] == 'object') {
+        api.execScript({
+          name: 'audio',
+          script: "getData('" + JSON.stringify(audioArray[id]) + "','" + total_list.length + "'," + isplay + ");"
+        });
+
+        if (isplay) {
+          if (typeof audioArray[id] == 'object') {
+            if ((id != 0) && (playingID != id)) {
+              api.execScript({name: 'audio', script: "setProgress(0,0);"});
+              Play(audioArray[id], id);
+            }
+          }
+        }
+      } else {
+        getList(id, 0);
+      }
+    } else {
+      if ((arguments.length == 1) || ((arguments.length == 2) && (arguments[1] == 0))) {
+        getList(id, 0);
+      } else {
+        getList(id, arguments[1]);
+      }
+    }
+  }
+
+  function getList(id, type) {
+    api.execScript({
+      name: 'audio',
+      script: "showLoad();"
+    });
+    hasList = '';
+    console.log('getlist', id);
+    if (id == 0) {
+      var sql = 'select * from currentaudio order by `time` desc';
+    } else {
+      var sql = 'select * from currentaudio where id=' + id + ' order by `time` desc';
+    }
+    db.selectSql({
+      name: 'main',
+      sql: sql
+    }, function (ret, err) {
+      //意外中断
+      if (ret.status) {
+        console.log('getList' + ret.data.length);
+        if (ret.data.length > 0) {
+          id = ret.data[0].id;
+          console.log('id' + id);
+          hasList = ret.data[0];
+          console.log('now ' + JSON.stringify(hasList));
+          AudioPause = true;
+
+          for (var i in App.pages) {
+            if (App.pages[i] != '') {
+              if (App.pages[i] == 'audio') {
+                api.execScript({
+                  name: 'audio',
+                  script: "resID('" + id + "');"
+                });
+              }
+            }
+          }
+
+          if (App.State()) {
+            console.log('communicate' + hasList.id + '|' + hasList.type + '|' + hasList.tid);
+            hasList.type = hasList.type || ((hasList.tid > 1) ? 1 : 0);
+            XO.GetList($api.getStorage('token'), hasList.id, hasList.type, hasList.tid, {
+              name: 'root',
+              fun: 'communicate'
+            }, {name: 'root', fun: 'nolist'});
+          } else {
+            if (type) {
+              var sql = 'select * from coursecontent where id=' + id;
+            } else {
+              var sql = 'select * from weekly where id=' + id;
+            }
+            db.selectSql({
+              name: 'main',
+              sql: sql
+            }, function (ret, err) {
+              if (ret.status) {
+                if (ret.data.length > 0) {
+                  communicate(ret.data);
+                } else {
+                  App.tips('当前无网络');
+                  //if(App.iphone){audioCover.cancel();}
+                  audioPlayer.stop();
+                  setAudioProgress(0, 1);
+                }
+              }
+            });
+          }
+        } else {
+          if (App.State()) {
+            if (id > 0) {
+              playId = id;
+            }
+            console.log('playId  ==>' + playId);
+            XO.GetList($api.getStorage('token'), id, 0, 0, {name: 'root', fun: 'communicate'}, {
+              name: 'root',
+              fun: 'nolist'
+            });
+          } else {
+            if (type) {
+              var sql = 'select * from coursecontent where id=' + id;
+            } else {
+              var sql = 'select * from weekly where id=' + id;
+            }
+            db.selectSql({
+              name: 'main',
+              sql: sql
+            }, function (ret, err) {
+              if (ret.status) {
+                if (ret.data.length > 0) {
+                  communicate(ret.data);
+                } else {
+                  App.tips('当前无网络');
+                  //if(App.iphone){audioCover.cancel();}
+                  audioPlayer.stop();
+                  setAudioProgress(0, 1);
+                }
+              }
+            });
+          }
+        }
+      }
+    });
+  }
+
+  function communicate(data) {
+    api.execScript({
+      name: 'audio',
+      script: "hideLoad();"
+    });
+
+    console.log(data);
+    //已获取到播放列表数组
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+
+    var transfer = [];
+    data.forEach(function (arg) {
+
+      updateSql(arg);
+      if (arg.progress == 0 || !arg.progress) {
+        arg.progress = false;
+        arg.pro = '0:00';
+      } else {
+        var pm = parseInt(arg.progress / 60);
+        var ps = parseInt(arg.progress % 60);
+        ps = ps < 10 ? '0' + ps : ps;
+        arg.pro = pm + ':' + ps;
+      }
+      var dm = parseInt(arg.duration / 60);
+      var ds = parseInt(arg.duration % 60);
+      ds = ds < 10 ? '0' + ds : ds;
+      arg.dur = dm + ':' + ds;
+      if (arg.ilock == 1) {
+        transfer.push(arg);
+      }
+      if (!arg.columnTitle) {
+        arg.columnTitle = '';
+      }
+    });
+
+    //对data进行处理，添加展示duration和progress的字段
+    if (transfer.length > 0) {
+      data = transfer;
+    }
+
+    total_list = data;
+    //页面效果让play去分发，如果有记录，audio则已经在播放，如果没有记录，播放第一个,列表长度那两个页面过来取
+
+    //alert('3|' + JSON.stringify(total_list));
+
+    audioArray = [];
+    total_list.forEach(function (arg, index) {
+      arg.index = index;
+      audioArray[arg.id] = arg;
+    });
+
+    //console.log('hasList|'+ JSON.stringify(hasList));
+    if ((typeof hasList == 'string') && (hasList.length > 10)) {
+      JSON.parse(hasList);
+    }
+
+    if (hasList && !isNext && audioArray && audioArray[hasList.id]) {
+      //console.log(JSON.stringify(hasList));
+
+      audioIndex = audioArray[hasList.id].index;
+      hasList.index = audioIndex;
+      changeformat(hasList);
+
+      duration = parseInt(hasList.duration);
+      //alert('1009 ' + isplay);
+
+      var pathfile = '';
+      if (isplay) {
+        var blocks_temp = hasList.blocks.split('|');
+        total_list[audioIndex].blockc = blocks_temp;
+        var temp = blocks_temp[BlocksIndex].split(',');
+
+        api.execScript({
+          name: 'root',
+          frameName: 'foot',
+          script: "setpic('" + total_list[audioIndex].pic + "');"
+        });
+
+        fs.exist({
+          path: (api.fsDir + '/blocks/' + temp[1] + '.db')
+        }, function (ret, err) {
+          if (ret.exist) {
+            audioPlayer.getAttr({
+              path: 'fs://blocks/' + temp[1] + '.db',
+            }, function (ret) {
+
+              console.log('1053 ' + JSON.stringify(ret));
+
+              if (ret && ret.duration) {
+                if (Math.abs(parseInt(ret.duration / 1000) - parseInt(hasList.duration)) < 3) {
+                  var pathfile = 'fs://blocks/' + temp[1] + '.db';
+                  TBlock = temp[1];
+                  PlayBlocks(hasList, hasList.id, 0, hasList.progress, true, pathfile);
+                } else {
+
+                  if (total_list[audioIndex] && total_list[audioIndex].id) {
+                    db.selectSql({
+                      name: 'main',
+                      sql: ('select * from downfile where id=' + total_list[audioIndex].id)
+                    }, function (ret, err) {
+                      if (ret.status) {
+                        if (ret.data.length > 0) {
+                          if (ret.data[0].status == 3) {
+                            fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                          }
+                        } else {
+                          fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                        }
+                      } else {
+                        fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                      }
+                    });
+                  }
+                  TBlock = temp[1];
+                  var pathfile = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + temp[1];
+                  PlayBlocks(hasList, hasList.id, 0, hasList.progress, true, pathfile);
+                }
+              } else {
+
+                if (total_list[audioIndex] && total_list[audioIndex].id) {
+                  db.selectSql({
+                    name: 'main',
+                    sql: ('select * from downfile where id=' + total_list[audioIndex].id)
+                  }, function (ret, err) {
+                    if (ret.status) {
+                      if (ret.data.length > 0) {
+                        if (ret.data[0].status == 3) {
+                          fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                        }
+                      } else {
+                        fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                      }
+                    } else {
+                      fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                    }
+                  });
+                }
+                TBlock = temp[1];
+                var pathfile = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + temp[1];
+                PlayBlocks(hasList, hasList.id, 0, hasList.progress, true, pathfile);
+              }
+            });
+          } else {
+            TBlock = temp[1];
+            var pathfile = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + temp[1];
+            PlayBlocks(hasList, hasList.id, 0, hasList.progress, true, pathfile);
+          }
+        });
+      } else {
+        PlayBlocks(hasList, hasList.id, 0, hasList.progress, true, pathfile);
+        api.execScript({
+          name: 'audio',
+          script: "getData('" + JSON.stringify(hasList) + "','" + total_list.length + "'," + isplay + ");"
+        });
+      }
+    } else {
+      //alert('isNext ' + isNext);
+      if (isNext) {
+        isNext = false;
+        if (data[audioIndex + 1]) {
+          playNext();
+        } else {
+          api.execScript({
+            name: 'audio',
+            script: "toast('没有更多的课程!');"
+          });
+          ToPause(playId);
+        }
+      } else {
+        if (!App.State()) {
+          audioArray = [];
+          playId = 0;
+          total_list.forEach(function (arg, index) {
+            arg.index = index;
+            audioArray[0] = arg;
+          });
+        }
+
+        console.log('playId', playId);
+
+        if (playId > 0) {
+          if (typeof audioArray[playId] == 'undefined') {
+            api.execScript({
+              name: 'audio',
+              script: "nullplay();"
+            });
+            return;
+          }
+
+          audioIndex = audioArray[playId].index;
+        } else {
+          audioIndex = 0;
+        }
+
+        console.log('audioIndex ' + audioIndex);
+
+        var c = data[audioIndex];
+        c.index = audioIndex;
+        duration = parseInt(c.duration);
+
+        if (c.classify.length > 0) {
+          c.classify = JSON.stringify(c.classify);
+        } else {
+          c.classify = 0;
+        }
+
+        db.executeSql({
+          name: 'main',
+          sql: "delete from currentaudio where tid=" + total_list[audioIndex].tid
+        }, function (ret, err) {
+          var sql1 = "INSERT INTO currentaudio (id,title,progress,pic,file,blocks,tid,type,path,duration,classify,des,`time`,lecturer,columnTitle) VALUES ('" + c.id + "','" + c.title + "',0,'" + c.pic + "','" + c.path + "','" + c.blocks + "','" + c.tid + "','" + c.type + "','" + c.path + "','" + c.duration + "','" + c.classify + "','" + c.des + "'," + parseInt(new Date().getTime() / 1000) + ",'" + c.lecturer + "','" + c.columnTitle + "')";
+          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+            //alert(JSON.stringify(ret) + '|' + JSON.stringify(err));
+            api.execScript({
+              name: 'audio',
+              script: "getData('" + JSON.stringify(c) + "','" + total_list.length + "'," + isplay + ");"
+            });
+          });
+        });
+
+        if ((c.id != playingID) && (c.id > 0) && (playingID > 0)) {
+          Play(c, c.id);
+        } else {
+          PlayBlocks(c, c.id, 0, 0, true);
+        }
+      }
+    }
+  }
+
+  function PlayBlocks(au, id, num, len, autoplay, pathfile) {
+
+    //alert(pathfile);
+
+    if (App.iphone) {
+      audioCover.cancel();
+    }
+    if (pathfile && (pathfile.length > 9)) {
+      if (typeof total_list[audioIndex].Cover == 'string') {
+        var Cover = total_list[audioIndex].Cover;
+      } else {
+        var Cover = 'widget://res/Cover.png';
+      }
+
+      if (App.iphone) {
+//        alert(JSON.stringify(audioArray[playingID]))
+        if (audioArray[playingID]) {
+          if (audioArray[playingID].duration) {
+            if (JProgress > 0) {
+              audioCoverPro = parseInt((JProgress / audioArray[playingID].duration) * 100);
+            } else {
+              audioCoverPro = 0;
+            }
+          }
+          audioCover.set({
+            totalTime: audioArray[playingID].duration,
+            progress: audioCoverPro,
+            audio: audioArray[playingID].title,
+            author: audioArray[playingID].des,
+            cover: Cover
+          }, function (ret, err) {
+            if (ret) {
+              if (ret.eventType == 'next') {
+                playNext();
+              } else if (ret.eventType == 'previous') {
+                playPrev();
+              } else if (ret.eventType == 'play') {
+                console.log('222');
+                audioPlayer.play();
+                isplay = true;
+              } else if (ret.eventType == 'pause') {
+                console.log('111');
+                audioPlayer.pause();
+                isplay = false;
+              }
+            }
+          });
+        }
+      }
+
+      isplay = true;
+      playingID = id;
+      ToPlay(playingID);
+      BlocksCache = false;
+      $api.rmStorage('noIdentifyPlayNumTips');
+
+      audioPlayer.clearCache();
+      var setblocks = $api.getStorage('blocks');
+      if (setblocks && (pathfile.indexOf(setblocks + '.db') < 1)) {
+        $api.rmStorage('blocks')
+      }
+
+      CachePath = '';
+      BufferRatio = true;
+
+      if ((pathfile.indexOf('/blocks/') > 0) && (pathfile.indexOf('.db') > 0)) {
+        BufferRatio = false;
+      } else {
+        BufferRatio = true;
+      }
+
+      audioPlayer.initPlayer({
+        path: pathfile
+      }, function (ret) {
+        if (ret.status) {
+
+          api.execScript({name: 'audio', script: "hideLoad();"});
+
+          dragToTrue();
+          WillJump = false;
+          isplay = true;
+          duration = parseInt(ret.duration);
+          if (BufferRatio) {
+            CachePath = ret.path;
+          }
+
+          if (JProgress > 0) {
+            audioPlayer.setCurrent({
+              current: parseInt(JProgress)
+            });
+            JProgress = 0;
+          }
+
+          audioPlayer.addEventListener({
+            name: "state"
+          }, function (ret) {
+            //console.log(JSON.stringify(ret));
+            if (ret.state == 'paused') {
+            } else if (ret.state == 'playing') {
+              sload = false;
+              api.execScript({name: 'audio', script: "hideLoad();"});
+            } else if (ret.state == 'idle') {
+              sload = false;
+              api.execScript({name: 'audio', script: "hideLoad();"});
+            } else if (ret.state == 'finished') {
+              sload = false;
+              //              听完了
+              api.execScript({name: 'root', frameName: 'FM', script: "app.radioComplete();"});
+              api.execScript({name: 'audio', script: "hideLoad();"});
+
+              console.log('finished ==<');
+
+              if (current > (duration - 10)) {
+
+                console.log('finished ==>' + current + ' -' + duration);
+
+                var popTips = $api.getStorage('noIdentifyPlayNumTips');
+                var popNum = $api.getStorage("noIdentifyPlayNum");
+                console.log(popTips + '|' + popNum);
+                if (!popTips && (!popNum || (popNum == 0))) {
+                  var nickname = $api.getStorage("nickname");
+                  var profession = $api.getStorage("profession");
+                  var company = $api.getStorage("company");
+                  if (!nickname || !profession || !company || (nickname && (nickname.length < 2)) || (profession && (profession.length < 2)) || (company && (company.length < 2))) {
+                    console.log('noIdentifyPlayNumTips');
+                    $api.setStorage('noIdentifyPlayNumTips', '1');
+                    audioPlayer.pause();
+                    api.confirm({
+                      title: '温馨提示',
+                      msg: '请完善信息，学习更多课程。',
+                      buttons: ['取消', '前去完善']
+                    }, function (ret, err) {
+                      var index = ret.buttonIndex;
+                      if (index == 2) {
+                        $api.setStorage('now_current', current);
+                        toRegister();
+                      } else {
+                        playNext();
+                        setTimeout(function () {
+                          $api.rmStorage('noIdentifyPlayNumTips');
+                        }, 5000);
+                      }
+                    });
+                    return;
+                  } else {
+                    playNext();
+                    $api.setStorage('noIdentifyPlayNumTips', '1');
+                    $api.setStorage("noIdentifyPlayNum", 2)
+                  }
+                } else {
+                  playNext();
+                }
+              }
+            } else if (ret.state == 'buffering') {
+              sload = true;
+              api.execScript({name: 'audio', script: "showLoad();"});
+            } else if (ret.state == 'error') {
+
+            }
+          });
+
+          audioPlayer.addEventListener({
+            name: "playing"
+          }, function (ret) {
+            if (ret) {
+              ret.current = parseInt(ret.current);
+              if (current != ret.current) {
+                current = ret.current;
+                  /*
+                   audioPlayer.getVolume(function(ret) {
+                   console.log(ret.volume);
+                   audioPlayer.getState(function(ret) {
+                   console.log(ret.state);
+                   });
+                   });
+                   */
+
+                if (BufferRatio) {
+                  audioPlayer.getBufferRatio(function (ret) {
+                    console.log('缓存占比:' + ret.ratio + '%');
+                    if (ret.ratio == 100) {
+                      BufferRatio = false;
+                      if (CachePath.length > 10) {
+                        audioPlayer.getAttr({
+                          path: CachePath
+                        }, function (ret) {
+
+                          if (ret && ret.length && !isNaN(total_list[audioIndex].size)) {
+                            var ArLength = parseFloat(ret.length / 1024 / 1024);
+                            var ArSize = parseFloat(total_list[audioIndex].size);
+                            console.log(ArLength + '|' + ArSize);
+
+                            if (Math.abs(ArLength - ArSize) < 1) {
+                              var blocks_temp = total_list[audioIndex].blocks.split('|');
+                              var temp = blocks_temp[num].split(',');
+                              fs.exist({
+                                path: (api.fsDir + '/blocks/' + temp[1] + '.db')
+                              }, function (ret, err) {
+                                if (!ret.exist) {
+                                  if (!isNaN(temp[0])) {
+                                    db.selectSql({
+                                      name: 'main',
+                                      sql: ("select * from downfile where `hash`='" + temp[1] + "'")
+                                    }, function (ret, err) {
+                                      if (ret.data.length == 0) {
+                                        fs.copyTo({
+                                          oldPath: CachePath,
+                                          newPath: 'fs://blocks'
+                                        }, function (ret, err) {
+                                          if (ret.status) {
+                                            var _CachePath = CachePath.split('/');
+                                            fs.rename({
+                                              oldPath: ('fs://blocks/' + _CachePath[_CachePath.length - 1]),
+                                              newPath: ('fs://blocks/' + temp[1] + '.db')
+                                            }, function (ret, err) {
+                                              if (ret.status) {
+                                                console.log('缓存文件 ' + _CachePath[_CachePath.length - 1] + ' 搬迁结束 ==> ' + ('fs://blocks/' + temp[1] + '.db'));
+                                                audioPlayer.getAttr({
+                                                  path: ('fs://blocks/' + temp[1] + '.db')
+                                                }, function (ret) {
+                                                  if (ret && ret.length && !isNaN(total_list[audioIndex].size)) {
+                                                    var ArLength = parseFloat(ret.length / 1024 / 1024);
+                                                    var ArSize = parseFloat(total_list[audioIndex].size);
+                                                    console.log(ArLength + '|' + ArSize);
+                                                    if (Math.abs(ArLength - ArSize) < 1) {
+
+                                                      var uptime = App.time();
+
+                                                      var sql1 = "INSERT INTO downfile VALUES(" + total_list[audioIndex].id + ",0,'" + total_list[audioIndex].size + "','','" + temp[1] + "',100,3," + total_list[audioIndex].type + "," + uptime.stamp + ")";
+                                                      db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                                                        audioPlayer.getCurrent(function (ret) {
+                                                          if (ret && ret.current) {
+                                                            current = ret.current + 1;
+                                                            JProgress = current;
+//                                                            audioPlayer.stop();
+//                                                            setTimeout(function () {
+//                                                              TBlock = temp[1];
+//                                                              PlayBlocks(total_list[audioIndex], total_list[audioIndex].id, 0, 0, true, ('fs://blocks/' + temp[1] + '.db'));
+//                                                            }, 1000);
+                                                          }
+                                                        });
+                                                      });
+                                                    }
+                                                  }
+                                                });
+                                              }
+                                            });
+                                          }
+                                        });
+                                      }
+                                    });
+                                  }
+                                } else {
+
+                                }
+                              });
+                            }
+                          }
+
+
+                        });
+                      }
+                    }
+                  });
+                }
+
+                if (WillJump) {
+                  dragToTrue();
+                  WillJump = false;
+                  api.execScript({
+                    name: 'audio',
+                    script: "hideLoad();"
+                  });
+                }
+
+                if (App.iphone) {
+                  if (Math.abs(parseFloat(audioCoverPro) - parseFloat((current / duration) * 100)) > 5) {
+                    audioCoverPro = parseInt((current / duration) * 100);
+                    audioCover.update({progress: parseInt((current / duration) * 100)});
+                  }
+                }
+
+                if (current % 12 == 0) {
+                  if (!isplay) {
+                    isplay = true;
+                  }
+                  console.log('Learn');
+                  XO.Learn($api.getStorage('token'), total_list[audioIndex].id, current, duration, checkID);
+//                  判断播放界面显隐
+                  api.execScript({
+                    name: 'audio',
+                    script: "checkPlayCover();"
+                  });
+                }
+                AudioTime++;
+
+                if (drag && !WillJump) {
+                  //console.log('@WillJump: ' + current + ',' + duration);
+                  api.execScript({
+                    name: 'audio',
+                    script: "setProgress('" + current + "','" + duration + "');"
+                  });
+                  SendEv('PlayStatus');
+                }
+
+                if ((duration - current) < 180) {
+                  if (!BlocksCache) {
+                    if (typeof total_list[audioIndex + 1] == 'object') {
+                      var blocks_temp = total_list[audioIndex + 1].blocks.split('|');
+                      var temp = blocks_temp[num].split(',');
+                      if (!isNaN(temp[0])) {
+                        BlocksCache = true;
+                        if (('||' + BlockDown + '|').indexOf('|' + temp[1] + '|') < 1) {
+                          BlockDown = BlockDown + '|' + temp[1] + '|';
+                          var uptime = App.time();
+                          pauseAr.push({
+                            'hash': temp[1],
+                            id: total_list[audioIndex + 1].id,
+                            'sql': "INSERT INTO downfile VALUES(" + total_list[audioIndex + 1].id + ",0,'[size]','','" + temp[1] + "',100,3," + total_list[audioIndex + 1].type + "," + uptime.stamp + ")"
+                          });
+                          fs.exist({
+                            path: (api.fsDir + '/blocks/' + temp[1] + '.db')
+                          }, function (ret, err) {
+                            if (!ret.exist) {
+                              if (DownUrl.length > 3) {
+                                api.cancelDownload({url: DownUrl});
+                              }
+                              var url = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + temp[1];
+                              DownUrl = url;
+                              api.download({
+                                url: url,
+                                savePath: 'fs://blocks/' + temp[1] + '.db',
+                                report: true,
+                                cache: false,
+                                allowResume: true
+                              }, function (ret, err) {
+                                console.log(JSON.stringify(ret));
+                                if (ret.state == 1) {
+                                  BlockDown = BlockDown.replace('|' + temp[1] + '|', '|');
+                                  if (pauseAr.length > 0) {
+                                    for (var i in pauseAr) {
+                                      if (ret.savePath.indexOf(pauseAr[i].hash + '.db') > 0) {
+                                        db.executeSql({
+                                          name: 'main',
+                                          sql: ('delete from downfile where id=' + pauseAr[i].id)
+                                        }, function (ret, err) {
+                                          var sql1 = pauseAr[i].sql.replace('[size]', ret.fileSize);
+                                          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                                          });
+                                        });
+                                        break;
+                                      }
+                                    }
+                                  }
+                                } else if (ret.state == 2) {
+                                  BlockDown = BlockDown.replace('|' + temp[1] + '|', '|');
+                                  console.log('HASH:' + temp[1] + '下载失败!');
+                                }
+                              });
+                            }
+                          });
+                        }
+                      }
+                    }
+                  }
+                }
+
+                total_list[audioIndex].progress = current;//为了存储播放进度
+                if (current > (duration - 10)) {
+                  var sql1 = "UPDATE currentaudio SET progress=0,`time`='" + new Date().getTime() + "',lecturer='" + total_list[audioIndex].lecturer + "' where tid=" + total_list[audioIndex].tid + " and id=" + total_list[audioIndex].id;
+                } else {
+                  var sql1 = "UPDATE currentaudio SET progress = " + current + ",`time`=" + parseInt(new Date().getTime() / 1000) + ",lecturer='" + total_list[audioIndex].lecturer + "' where tid=" + total_list[audioIndex].tid + " and id=" + total_list[audioIndex].id;
+                }
+                db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                });
+
+              }
+            }
+          });
+
+        }
+      });
+    } else {
+      if ((len != current) && (len < duration)) {
+        audioPlayer.setCurrent({
+          current: parseInt(len)
+        });
+      }
+    }
+
+  }
+
+  function PlayBlocks1(au, id, num, len, autoplay, pathfile) {
+    if (pathfile && (pathfile.length > 9)) {
+      isplay = true;
+      playingID = id;
+      ToPlay(playingID);
+      BlocksCache = false;
+      $api.rmStorage('noIdentifyPlayNumTips');
+
+      audioPlayer.clearCache();
+      var setblocks = $api.getStorage('blocks');
+      if (setblocks && (pathfile.indexOf(setblocks + '.db') < 1)) {
+        $api.rmStorage('blocks')
+      }
+
+      CachePath = '';
+      BufferRatio = true;
+
+      if ((pathfile.indexOf('/blocks/') > 0) && (pathfile.indexOf('.db') > 0)) {
+        acache = false;
+        BufferRatio = false;
+      } else {
+        BufferRatio = true;
+        acache = true;
+      }
+
+      audioPlayer.initPlayer({
+        path: pathfile,
+        cache: acache
+      }, function (ret) {
+        if (ret.status) {
+
+          api.execScript({name: 'audio', script: "hideLoad();"});
+
+          dragToTrue();
+          WillJump = false;
+          isplay = true;
+          duration = parseInt(ret.duration);
+          if (acache) {
+            CachePath = ret.path;
+          }
+
+          if (JProgress > 0) {
+            audioPlayer.setCurrent({
+              current: parseInt(JProgress)
+            });
+            JProgress = 0;
+          }
+
+          audioPlayer.addEventListener({
+            name: "playing"
+          }, function (ret) {
+            if (ret) {
+              ret.current = parseInt(ret.current);
+              if (current != ret.current) {
+                current = ret.current;
+
+                if (BufferRatio) {
+                  audioPlayer.getBufferRatio(function (ret) {
+                    console.log('缓存占比:' + ret.ratio + '%');
+                    if (ret.ratio == 100) {
+                      BufferRatio = false;
+                      if (CachePath.length > 10) {
+                        audioPlayer.getAttr({
+                          path: CachePath
+                        }, function (ret) {
+                          if (ret && ret.length && !isNaN(total_list[audioIndex].size)) {
+                            var ArLength = parseFloat(ret.length / 1024 / 1024);
+                            var ArSize = parseFloat(total_list[audioIndex].size);
+                            //console.log(ArLength + '|' + ArSize);
+                            if (Math.abs(ArLength - ArSize) < 1) {
+                              var blocks_temp = total_list[audioIndex].blocks.split('|');
+                              var temp = blocks_temp[num].split(',');
+                              if (!isNaN(temp[0])) {
+                                fs.copyTo({
+                                  oldPath: CachePath,
+                                  newPath: 'fs://blocks'
+                                }, function (ret, err) {
+                                  if (ret.status) {
+                                    var _CachePath = CachePath.split('/');
+                                    fs.rename({
+                                      oldPath: ('fs://blocks/' + _CachePath[_CachePath.length - 1]),
+                                      newPath: ('fs://blocks/' + temp[1] + '.db')
+                                    }, function (ret, err) {
+                                      if (ret.status) {
+                                        console.log('缓存文件搬迁结束 ==> ' + ('fs://blocks/' + temp[1] + '.db'));
+                                        audioPlayer.getAttr({
+                                          path: ('fs://blocks/' + temp[1] + '.db')
+                                        }, function (ret) {
+                                          if (ret && ret.length && !isNaN(total_list[audioIndex].size)) {
+                                            var ArLength = parseFloat(ret.length / 1024 / 1024);
+                                            var ArSize = parseFloat(total_list[audioIndex].size);
+                                            console.log(ArLength + '|' + ArSize);
+                                            if (Math.abs(ArLength - ArSize) < 1) {
+                                              var uptime = App.time();
+                                              var sql1 = "INSERT INTO downfile VALUES(" + total_list[audioIndex].id + ",0,'" + total_list[audioIndex].size + "','','" + temp[1] + "',100,3," + total_list[audioIndex].type + "," + uptime.stamp + ")";
+                                              db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                                                audioPlayer.getCurrent(function (ret) {
+                                                  if (ret && ret.current) {
+                                                    current = ret.current + 1;
+                                                    JProgress = current;
+                                                    //audioPlayer.stop();
+//                                                    setTimeout(function () {
+//                                                      TBlock = temp[1];
+//                                                      PlayBlocks(total_list[audioIndex], total_list[audioIndex].id, 0, 0, true, ('fs://blocks/' + temp[1] + '.db'));
+//                                                    }, 1000);
+                                                  }
+                                                });
+                                              });
+                                            }
+                                          }
+                                        });
+                                      }
+                                    });
+                                  }
+                                });
+                              }
+                            }
+                          }
+
+
+                        });
+                      }
+                    }
+                  });
+                }
+
+                if (WillJump) {
+                  dragToTrue();
+                  WillJump = false;
+                  api.execScript({
+                    name: 'audio',
+                    script: "hideLoad();"
+                  });
+                }
+
+                if (current % 12 == 0) {
+                  if (!isplay) {
+                    isplay = true;
+                  }
+                  console.log('Learn');
+                  XO.Learn($api.getStorage('token'), total_list[audioIndex].id, current, duration, checkID);
+                }
+                AudioTime++;
+
+                if ((duration - current) < 180) {
+                  if (!BlocksCache) {
+                    if (typeof total_list[audioIndex + 1] == 'object') {
+                      var blocks_temp = total_list[audioIndex + 1].blocks.split('|');
+                      var temp = blocks_temp[num].split(',');
+                      if (!isNaN(temp[0])) {
+                        BlocksCache = true;
+                        if (('||' + BlockDown + '|').indexOf('|' + temp[1] + '|') < 1) {
+                          BlockDown = BlockDown + '|' + temp[1] + '|';
+                          var uptime = App.time();
+                          pauseAr.push({
+                            'hash': temp[1],
+                            id: total_list[audioIndex + 1].id,
+                            'sql': "INSERT INTO downfile VALUES(" + total_list[audioIndex + 1].id + ",0,'[size]','','" + temp[1] + "',100,3," + total_list[audioIndex + 1].type + "," + uptime.stamp + ")"
+                          });
+                          fs.exist({
+                            path: (api.fsDir + '/blocks/' + temp[1] + '.db')
+                          }, function (ret, err) {
+                            if (!ret.exist) {
+                              if (DownUrl.length > 3) {
+                                api.cancelDownload({url: DownUrl});
+                              }
+                              var url = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + temp[1];
+                              DownUrl = url;
+                              api.download({
+                                url: url,
+                                savePath: 'fs://blocks/' + temp[1] + '.db',
+                                report: true,
+                                cache: false,
+                                allowResume: true
+                              }, function (ret, err) {
+                                console.log(JSON.stringify(ret));
+                                if (ret.state == 1) {
+                                  BlockDown = BlockDown.replace('|' + temp[1] + '|', '|');
+                                  if (pauseAr.length > 0) {
+                                    for (var i in pauseAr) {
+                                      if (ret.savePath.indexOf(pauseAr[i].hash + '.db') > 0) {
+                                        db.executeSql({
+                                          name: 'main',
+                                          sql: ('delete from downfile where id=' + pauseAr[i].id)
+                                        }, function (ret, err) {
+                                          var sql1 = pauseAr[i].sql.replace('[size]', ret.fileSize);
+                                          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                                          });
+                                        });
+                                        break;
+                                      }
+                                    }
+                                  }
+                                } else if (ret.state == 2) {
+                                  BlockDown = BlockDown.replace('|' + temp[1] + '|', '|');
+                                  console.log('HASH:' + data.hash + '下载失败!');
+                                }
+                              });
+                            }
+                          });
+                        }
+                      }
+                    }
+                  }
+                }
+
+                if (drag && !WillJump) {
+                  console.log('@WillJump: ' + current + ',' + duration);
+                  api.execScript({
+                    name: 'audio',
+                    script: "setProgress('" + current + "','" + duration + "');"
+                  });
+
+                  SendEv('PlayStatus');
+
+                }
+
+                total_list[audioIndex].progress = current;//为了存储播放进度
+                if (current > (duration - 10)) {
+                  var sql1 = "UPDATE currentaudio SET progress=0,`time`='" + new Date().getTime() + "',lecturer='" + total_list[audioIndex].lecturer + "' where tid=" + total_list[audioIndex].tid + " and id=" + total_list[audioIndex].id;
+                } else {
+                  var sql1 = "UPDATE currentaudio SET progress = " + current + ",`time`=" + parseInt(new Date().getTime() / 1000) + ",lecturer='" + total_list[audioIndex].lecturer + "' where tid=" + total_list[audioIndex].tid + " and id=" + total_list[audioIndex].id;
+                }
+                db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                });
+
+              }
+            }
+          });
+
+          audioPlayer.addEventListener({
+            name: "state"
+          }, function (ret) {
+            console.log(JSON.stringify(ret));
+            if (ret.state == 'paused') {
+            } else if (ret.state == 'playing') {
+              sload = false;
+              api.execScript({name: 'audio', script: "hideLoad();"});
+            } else if (ret.state == 'idle') {
+              sload = false;
+              api.execScript({name: 'audio', script: "hideLoad();"});
+            } else if (ret.state == 'finished') {
+              sload = false;
+              api.execScript({name: 'root', frameName: 'FM', script: "app.radioComplete();"});
+              api.execScript({name: 'audio', script: "hideLoad();"});
+
+              console.log('finished ==<');
+
+              if (current > (duration - 5)) {
+
+                console.log('finished ==>' + current + ' -' + duration);
+
+                var popTips = $api.getStorage('noIdentifyPlayNumTips');
+                var popNum = $api.getStorage("noIdentifyPlayNum");
+                console.log(popTips + '|' + popNum);
+                if (!popTips && (!popNum || (popNum == 0))) {
+                  var nickname = $api.getStorage("nickname");
+                  var profession = $api.getStorage("profession");
+                  var company = $api.getStorage("company");
+                  if (!nickname || !profession || !company || (nickname && (nickname.length < 2)) || (profession && (profession.length < 2)) || (company && (company.length < 2))) {
+                    console.log('noIdentifyPlayNumTips');
+                    $api.setStorage('noIdentifyPlayNumTips', '1');
+                    audioPlayer.pause();
+                    api.confirm({
+                      title: '温馨提示',
+                      msg: '请完善信息，学习更多课程。',
+                      buttons: ['取消', '前去完善']
+                    }, function (ret, err) {
+                      var index = ret.buttonIndex;
+                      if (index == 2) {
+                        toRegister();
+                      } else {
+                        playNext();
+                        setTimeout(function () {
+                          $api.rmStorage('noIdentifyPlayNumTips');
+                        }, 5000);
+                      }
+                    });
+                    return;
+                  } else {
+                    $api.setStorage('noIdentifyPlayNumTips', '1');
+                    $api.setStorage("noIdentifyPlayNum", 2)
+                  }
+                } else {
+                  playNext();
+                }
+              }
+            } else if (ret.state == 'buffering') {
+              sload = true;
+              api.execScript({name: 'audio', script: "showLoad();"});
+            } else if (ret.state == 'error') {
+
+            }
+          });
+
+        }
+      });
+    } else {
+      if ((len != current) && (len < duration)) {
+        audioPlayer.setCurrent({
+          current: parseInt(len)
+        });
+      }
+    }
+  }
+
+  var Pagelist = " controller study list message column hot change interest plan rank set search ";
+
+  var isPause = false;
+  function reayplay(id) {
+    if (App.iphone) {
+      audioCover.cancel();
+    }
+    if (rebot) {
+      ToPause(id);
+      setTimeout(function () {
+        api.execScript({
+          name: 'audio',
+          script: "pause('" + id + "');"
+        });
+      }, 500);
+      return;
+    }
+
+    //alert(playingID + '|' + id + '|' + TBlock + '|' + JSON.stringify(total_list[audioIndex]));
+    if (!isplay && (playingID > 0) && (playingID == id) && (total_list[audioIndex].blocks.indexOf(TBlock)) < 1) {
+      playingID = 0;
+    }
+
+    console.log('音频块缓存完毕,播放音频|事件分发 ==>' + playingID + '|' + id + '|' + isplay);
+    if (playingID == id && isplay == true) {
+      console.log('=====>1');
+      //if(App.iphone){audioCover.cancel();}
+
+      //console.log(JSON.stringify(total_list[audioIndex]));
+      ChatAna('playCourse', {
+        'courseFirstCate': total_list[audioIndex].columnTitle,
+        'tid': total_list[audioIndex].tid,
+        'learnLength': AudioTime,
+        'courseTitle': total_list[audioIndex].title,
+        'courseID': parseInt(total_list[audioIndex].id)
+      }, '切换课程');
+
+      saAPICloud.flush();
+      AudioTime = 0;
+      ToPause(id);
+
+    } else if ((playingID == id) && (isplay == false)) {
+      console.log('=====>2');
+      ToPlay(id);
+    } else {
+      console.log('=====>3');
+      playingID = id;
+      console.log('playingID 1==>' + playingID);
+      //alert(JSON.stringify(audioArray));
+      currentAudio = total_list[audioIndex];
+      if (total_list[audioIndex].pic) {
+        cachepic(total_list[audioIndex].pic, audioIndex);
+        Play(currentAudio, id);
+      }
+    }
+  }
+
+  function CheckList() {
+    if (typeof total_list[audioIndex] != 'object') {
+      getList(playingID, 0);
+    }
+  }
+
+  function Play(data, id) {
+    setNewId();
+    if (first_play) {
+      api.execScript({name: 'root', script: "XO.CheckReg('" + $api.getStorage('token') + "');"});
+    }
+    first_play = false;
+    duration = parseInt(data.duration);
+
+    console.log('Play ' + duration);
+    console.log(JSON.stringify(data.blocks));
+    if (data.blocks.length > 10) {
+      playingID = id;
+      isplay = true;
+      BlocksCurrent = 0;
+      BlocksIndex = 0;
+      var blocks_temp = data.blocks.split('|');
+      total_list[audioIndex].blockc = blocks_temp;
+      var temp = blocks_temp[BlocksIndex].split(',');
+
+      api.execScript({
+        name: 'root',
+        frameName: 'foot',
+        script: "setpic('" + total_list[audioIndex].pic + "');"
+      });
+
+      console.log('blocks ' + temp[1]);
+
+      fs.exist({
+        path: (api.fsDir + '/blocks/' + temp[1] + '.db')
+      }, function (ret, err) {
+        if (ret.exist) {
+          audioPlayer.getAttr({
+            path: 'fs://blocks/' + temp[1] + '.db',
+          }, function (ret) {
+
+            console.log('1495 ' + JSON.stringify(ret) + ' - ' + parseInt(total_list[audioIndex].duration));
+
+            if (ret && ret.duration) {
+              if (Math.abs(parseInt(ret.duration / 1000) - parseInt(total_list[audioIndex].duration)) < 3) {
+
+                if (rebot) {
+                  ToPause(playingID);
+                  return;
+                }
+                console.log('menuToPause');
+                api.execScript({name: 'audio', script: "hideLoad();"});
+                isplay = false;
+                var ck_blocks = $api.getStorage('blocks');
+                if (ck_blocks && (ck_blocks.length > 5) && (ck_blocks != temp[1])) {
+                  audioPlayer.stop();
+                }
+
+                $api.setStorage('blocks', temp[1]);
+                console.log('HASH:' + temp[1]);
+                BlocksDuration = parseInt(temp[0]);
+                var pathfile = 'fs://blocks/' + temp[1] + '.db';
+                if (typeof total_list[audioIndex].Cover == 'string') {
+                  var Cover = total_list[audioIndex].Cover;
+                } else {
+                  var Cover = 'widget://res/Cover.png';
+                }
+                if (!drag) {
+                  NowProgress = 1;
+                  drag = true;
+                }
+                TBlock = temp[1];
+                PlayBlocks(data, data.id, 0, 0, true, pathfile);
+
+              } else {
+
+                if (total_list[audioIndex] && total_list[audioIndex].id) {
+                  db.selectSql({
+                    name: 'main',
+                    sql: ('select * from downfile where id=' + total_list[audioIndex].id)
+                  }, function (ret, err) {
+                    if (ret.status) {
+                      if (ret.data.length > 0) {
+                        if (ret.data[0].status == 3) {
+                          fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                        }
+                      } else {
+                        fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                      }
+                    } else {
+                      fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                    }
+                  });
+                }
+                TBlock = temp[1];
+                var pathfile = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + temp[1];
+                PlayBlocks(data, data.id, 0, 0, true, pathfile);
+              }
+            } else {
+
+              if (total_list[audioIndex] && total_list[audioIndex].id) {
+                db.selectSql({
+                  name: 'main',
+                  sql: ('select * from downfile where id=' + total_list[audioIndex].id)
+                }, function (ret, err) {
+                  if (ret.status) {
+                    if (ret.data.length > 0) {
+                      if (ret.data[0].status == 3) {
+                        fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                      }
+                    } else {
+                      fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                    }
+                  } else {
+                    fs.removeSync({path: 'fs://blocks/' + temp[1] + '.db'});
+                  }
+                });
+              }
+              TBlock = temp[1];
+              var pathfile = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + temp[1];
+              PlayBlocks(data, data.id, 0, 0, true, pathfile);
+            }
+          });
+        } else {
+          TBlock = temp[1];
+          var pathfile = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + temp[1];
+          PlayBlocks(data, data.id, 0, 0, true, pathfile);
+        }
+      });
+    } else {
+      JProgress = 0;
+      App.tips('该音频尚未开放，无法收听本音频!');
+      api.execScript({name: 'audio', script: "App.tips('该音频尚未开放，无法收听本音频!');"});
+      api.execScript({name: 'audio', script: "setProgress(0,0);"});
+    }
+  }
+
+  function JumpProgress(cur, id) {
+    //alert(id + '|' + playingID + '|' + isplay);
+    if (isNaN(id)) {
+      return;
+    }
+    if ((id == playingID) || (playingID == 0)) {
+      if (!isplay) {
+        JProgress = cur;
+        api.execScript({name: 'audio', script: "setProgress(" + cur + "," + duration + ");"});
+      } else {
+        JProgress = 0;
+      }
+    }
+    JProgress = cur;
+  }
+
+  var WillJump = false;
+  function setAudioProgress(cur) {
+    if (cur > duration) {
+      dragToFalse();
+      return;
+    }
+//    拖动进度条
+    console.log('Jump ==>' + cur);
+//    api.execScript({name: 'audio', script: "setProgress('" + cur + "','" + duration + "');"});
+    WillJump = true;
+    dragToFalse();
+    PlayBlocks(total_list[audioIndex], total_list[audioIndex].id, 0, cur, true);
+  }
+
+  function playNext() {
+    if (audioIndex >= total_list.length - 1) {
+      if (typeof total_list[audioIndex] == 'object') {
+        console.log('AudioTime' + AudioTime);
+        console.log(total_list[audioIndex].columnTitle);
+        ChatAna('playCourse', {
+          'courseFirstCate': total_list[audioIndex].columnTitle,
+          'tid': total_list[audioIndex].tid,
+          'learnLength': AudioTime,
+          'courseTitle': total_list[audioIndex].title,
+          'courseID': parseInt(total_list[audioIndex].id)
+        }, '切换课程');
+        setNewId();
+        saAPICloud.flush();
+      }
+      AudioTime = 0;
+      isNext = true;
+      XO.GetList($api.getStorage('token'), total_list[audioIndex].id, total_list[audioIndex].type, total_list[audioIndex].tid, {
+        name: 'root',
+        fun: 'communicate'
+      }, {name: 'root', fun: 'nolist'});
+    } else {
+      //if(App.iphone){audioCover.cancel();}
+      initPlay();
+      api.execScript({name: 'audio', script: "showLoad();"});
+      api.execScript({name: 'audio', script: "setProgress(0,0);"});
+
+      if (typeof total_list[audioIndex] == 'object') {
+        console.log('AudioTime' + AudioTime);
+        console.log(total_list[audioIndex].columnTitle);
+        ChatAna('playCourse', {
+          'courseFirstCate': total_list[audioIndex].columnTitle,
+          'tid': total_list[audioIndex].tid,
+          'learnLength': AudioTime,
+          'courseTitle': total_list[audioIndex].title,
+          'courseID': parseInt(total_list[audioIndex].id)
+        }, '切换课程');
+        saAPICloud.flush();
+      }
+
+      AudioTime = 0;
+
+      audioPlayer.stop();
+      current = 0;
+      var newDate = new Date();
+      checkID = String(newDate.getTime()).slice(0, 11);
+      audioIndex++;
+      api.sendEvent({
+        name: 'unlock',
+        extra: {
+          id: total_list[audioIndex].id
+        }
+      });
+
+      //console.log(JSON.stringify(total_list[audioIndex]));
+      //total_list[audioIndex].lecturer = total_list[audioIndex].lecturer;
+      db.executeSql({
+        name: 'main',
+        sql: "delete from currentaudio where tid=" + total_list[audioIndex].tid
+      }, function (ret, err) {
+        var sql1 = "INSERT INTO currentaudio (id,title,progress,pic,file,blocks,tid,type,path,duration,classify,des,`time`,lecturer,columnTitle) VALUES ('" + total_list[audioIndex].id + "','" + total_list[audioIndex].title + "',0,'" + total_list[audioIndex].pic + "','" + total_list[audioIndex].path + "','" + total_list[audioIndex].blocks + "','" + total_list[audioIndex].tid + "','" + total_list[audioIndex].type + "','" + total_list[audioIndex].path + "','" + total_list[audioIndex].duration + "','" + total_list[audioIndex].classify + "','" + total_list[audioIndex].des + "','" + new Date().getTime() + "','" + total_list[audioIndex].lecturer + "','" + total_list[audioIndex].columnTitle + "')";
+        db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+
+          if (!rebot) {
+            WillJump = true;
+            console.log(1414);
+            Play(total_list[audioIndex], total_list[audioIndex].id);
+          }
+
+          api.execScript({
+            name: 'audio',
+            script: "getData('" + JSON.stringify(total_list[audioIndex]) + "','" + total_list.length + "'," + isplay + ");"
+          });
+        });
+      });
+    }
+  }
+
+  function playPrev() {
+    if (audioIndex <= 0) {
+      api.execScript({
+        name: 'audio',
+        script: "toast('这是第一条');"
+      });
+    } else {
+      //if(App.iphone){audioCover.cancel();}
+      initPlay();
+      api.execScript({name: 'audio', script: "showLoad();"});
+      api.execScript({name: 'audio', script: "setProgress('0','0');"});
+
+      if (typeof total_list[audioIndex] == 'object') {
+        console.log('AudioTime' + AudioTime);
+        console.log(total_list[audioIndex].columnTitle);
+        ChatAna('playCourse', {
+          'courseFirstCate': total_list[audioIndex].columnTitle,
+          'tid': total_list[audioIndex].tid,
+          'learnLength': AudioTime,
+          'courseTitle': total_list[audioIndex].title,
+          'courseID': parseInt(total_list[audioIndex].id)
+        }, '切换课程');
+        saAPICloud.flush();
+      }
+      AudioTime = 0;
+
+      audioPlayer.stop();
+      current = 0;
+      var newDate = new Date();
+      checkID = String(newDate.getTime()).slice(0, 11);
+      audioIndex--;
+      total_list[audioIndex].lecturer = total_list[audioIndex].lecturer || '';
+      db.executeSql({
+        name: 'main',
+        sql: "delete from currentaudio where tid=" + total_list[audioIndex].tid
+      }, function (ret, err) {
+        var sql1 = "INSERT INTO currentaudio (id,title,progress,pic,file,blocks,tid,type,path,duration,classify,des,`time`,lecturer,columnTitle) VALUES ('" + total_list[audioIndex].id + "','" + total_list[audioIndex].title + "',0,'" + total_list[audioIndex].pic + "','" + total_list[audioIndex].path + "','" + total_list[audioIndex].blocks + "','" + total_list[audioIndex].tid + "','" + total_list[audioIndex].type + "','" + total_list[audioIndex].path + "','" + total_list[audioIndex].duration + "','" + total_list[audioIndex].classify + "','" + total_list[audioIndex].des + "','" + parseInt(new Date().getTime() / 1000) + "','" + total_list[audioIndex].lecturer + "','" + total_list[audioIndex].columnTitle + "')";
+        db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+          if (!rebot) {
+            WillJump = true;
+            Play(total_list[audioIndex], total_list[audioIndex].id);
+          }
+          api.execScript({
+            name: 'audio',
+            script: "getData('" + JSON.stringify(total_list[audioIndex]) + "','" + total_list.length + "'," + isplay + ");"
+          });
+        });
+      });
+    }
+  }
+
+  function initPlay() {
+    BlocksIndex = 0;
+    current = 0
+    BlocksCurrent = 0;
+    isplay = false;
+    WillJump = false;
+    api.execScript({
+      name: 'audio',
+      script: "setProgress(0,0);"
+    });
+
+    SendEv('PlayStatus');
+  }
+
+
+  function SendEv(name) {
+    if ((typeof audioArray == 'object') && (typeof audioArray[playingID] == 'object')) {
+      var opt = {
+        id: audioArray[playingID].id,
+        key1: audioArray[playingID].id,
+        key2: audioArray[playingID].title,
+        key3: audioArray[playingID].des,
+        pic: audioArray[playingID].pic,
+        lecturer: audioArray[playingID].lecturer,
+        columnTitle: audioArray[playingID].columnTitle,
+        duration: audioArray[playingID].duration,
+        pro: audioArray[playingID].progress
+      };
+    } else {
+      var opt = {
+        id: total_list[audioIndex].id,
+        key1: total_list[audioIndex].id,
+        key2: total_list[audioIndex].title,
+        key3: total_list[audioIndex].des,
+        pic: total_list[audioIndex].pic,
+        lecturer: total_list[audioIndex].lecturer,
+        columnTitle: total_list[audioIndex].columnTitle,
+        duration: total_list[audioIndex].duration,
+        pro: total_list[audioIndex].progress
+      };
+    }
+
+    api.sendEvent({
+      name: 'PlayStatus',
+      extra: opt
+    });
+
+    return;
+
+
+    api.execScript({
+      name: 'root',
+      frameName: 'smallcontroller',
+      script: name + "('" + JSON.stringify(opt) + "');"
+    });
+
+    for (var i in App.pages) {
+      if (App.pages[i] != '') {
+        //console.log(App.pages[i]);
+        api.execScript({
+          name: App.pages[i],
+          script: name + "('" + JSON.stringify(opt) + "');"
+        });
+        api.execScript({
+          name: App.pages[i],
+          frameName: 'smallcontroller',
+          script: name + "('" + JSON.stringify(opt) + "');"
+        });
+      }
+    }
+  }
+
+  function cachepic(path, index) {
+    var _file = App.file(path);
+    fs.exist({
+      path: (api.fsDir + '/file/' + _file.full)
+    }, function (ret, err) {
+      if (!ret.exist) {
+        if (path.indexOf('/') == 0) {
+          var dpic = App.url + path;
+        } else {
+          var dpic = path;
+        }
+        api.download({
+          url: dpic,
+          savePath: ('fs://file/' + _file.full),
+          cache: true,
+          allowResume: true
+        }, function (ret, err) {
+//          alert(JSON.stringify(ret));
+          if (ret.status) {
+            total_list[audioIndex].Cover = 'fs://file/' + _file.full;
+          }
+        });
+      }
+    });
+  }
+
+  /********* 播放逻辑 End ***********/
+
+  /********* 下载逻辑 Start ***********/
+
+  var firstDown = true;
+  var DS = true;
+  function DownS() {
+    if (DS) {
+      DS = false;
+      var sql1 = "update downfile set `status`=1 where status=2";
+      db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+        db.selectSql({
+          name: 'main',
+          sql: ('select * from downfile where status=1 order by uptime asc')
+        }, function (ret, err) {
+          if (ret.status) {
+            if (ret.data.length > 0) {
+              var data = ret.data[0];
+              var url = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + data.hash;
+              if (DownUrl.length > 3) {
+                api.cancelDownload({url: DownUrl});
+              }
+              DownUrl = url;
+              api.download({
+                url: url,
+                savePath: 'fs://blocks/' + data.hash + '.db',
+                report: true,
+                cache: false,
+                allowResume: true
+              }, function (ret, err) {
+                if (ret.state == 1) {
+                  //DownUrl = '';
+                  var uptime = App.time();
+                  var sql1 = "update downfile set `size`='" + ret.fileSize + "',`at`='100',`status`=3,`uptime`='" + uptime.stamp + "' where id=" + data.id + " and blocks=" + data.blocks;
+                  db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                    DownManage(0, 'doit');
+                  });
+                } else if (ret.state == 2) {
+
+                  console.log('HASH:' + data.hash + '下载失败!');
+                } else {
+                  console.log(JSON.stringify(ret));
+                  if (window.navigator.userAgent.indexOf('iPhone') > 0) {
+                    var progress = ret.percent;
+                  } else {
+                    var progress = ret.progress;
+                  }
+                  var sql1 = "update downfile `size`='" + ret.fileSize + "',`at`='" + parseInt(progress) + "',`status`=2 where id=" + data.id + " and blocks=" + data.blocks;
+                  db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                  });
+                }
+              });
+            }
+          }
+        });
+      });
+    }
+  }
+
+  var onerrdownset;
+  function DownManage(id, type) {
+    console.log('DownManage');
+    //status 1 待下载 2进行中 3已完成  4已取消
+    switch (type) {
+      case 'cancel':
+        db.selectSql({
+          name: 'main',
+          sql: ('select * from downfile where id=' + id)
+        }, function (ret, err) {
+          if (ret.status) {
+            if (ret.data.length > 0) {
+              for (var i in ret.data) {
+                if (ret.data[i].status != 3) {
+                  var url = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + ret.data[i].hash;
+                  if (DownUrl.length > 3) {
+                    api.cancelDownload({url: DownUrl});
+                  }
+                  DownUrl = url;
+                  var uptime = App.time();
+                  var sql1 = "update downfile set `status`=4,`uptime`='" + uptime.stamp + "' where id=" + ret.data[i].id + " and blocks=" + ret.data[i].blocks;
+                  db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                    DownManage(0, 'doit');
+                  });
+                }
+              }
+            }
+          }
+        });
+        break;
+      case 'pause':
+        break;
+      case 'start':
+        db.selectSql({
+          name: 'main',
+          sql: ('select * from downfile where id=' + id + " and `status`<>3")
+        }, function (ret, err) {
+          if (ret.status) {
+            if (ret.data.length > 0) {
+              var sql1 = "update downfile set `status`=1 where id=" + id + " and `status`<>3";
+              db.executeSql({name: 'main', sql: sql1}, function (rets, errs) {
+                var sql1 = "select * from downfile where status=2";
+                db.executeSql({name: 'main', sql: sql1}, function (rets, errs) {
+                  if (rets.status) {
+                    if (!rets.hasOwnProperty('data') || (rets.data.length == 0)) {
+                      DS = true;
+                      DownS();
+                    }
+                  }
+                });
+              });
+            }
+          }
+        });
+        break;
+      case 'doit':
+        if (firstDown) {
+          var sql1 = "update downfile set `status`=1 where status=2";
+          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+            firstDown = false;
+            db.selectSql({
+              name: 'main',
+              sql: ('select * from downfile where `status`=1 order by uptime asc')
+            }, function (ret, err) {
+              if (ret.status) {
+                if (ret.data.length > 0) {
+                  var data = ret.data[0];
+                  var url = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + data.hash;
+                  if (DownUrl.length > 3) {
+                    api.cancelDownload({url: DownUrl});
+                  }
+                  DownUrl = url;
+                  api.download({
+                    url: url,
+                    savePath: 'fs://blocks/' + data.hash + '.db',
+                    report: true,
+                    cache: true,
+                    allowResume: true
+                  }, function (ret, err) {
+                    console.log(data.hash + '[:]' + JSON.stringify(ret));
+                    if (ret.state == 1) {
+                      //DownUrl = '';
+                      var sql1 = "update downfile set `size`='" + ret.fileSize + "',`at`='100',`status`=3 where id=" + data.id + " and blocks=" + data.blocks;
+                      db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                        DownManage(0, 'doit');
+                      });
+                    } else if (ret.state == 2) {
+                      console.log('HASH:' + data.hash + '下载失败!');
+                      var sql1 = "update downfile set `status`=5 where id=" + data.id + " and blocks=" + data.blocks;
+                      db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                        DownManage(0, 'doit');
+                      });
+                      //onerrdownset
+                    } else {
+                      if (window.navigator.userAgent.indexOf('iPhone') > 0) {
+                        var progress = ret.percent;
+                      } else {
+                        var progress = ret.progress;
+                      }
+                      var sql1 = "update downfile set `size`='" + ret.fileSize + "',`at`='" + parseInt(progress) + "',`status`=2 where id=" + data.id + " and blocks=" + data.blocks;
+                      db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                      });
+                    }
+                  });
+                }
+              }
+            });
+          });
+        } else {
+          db.selectSql({
+            name: 'main',
+            sql: ('select * from downfile where status=2 order by uptime,id asc')
+          }, function (ret, err) {
+            if (ret.status) {
+              if (ret.data.length == 0) {
+                db.selectSql({
+                  name: 'main',
+                  sql: ('select * from downfile where `status`=1 order by uptime asc')
+                }, function (ret, err) {
+                  if (ret.status) {
+                    if (ret.data.length > 0) {
+                      var data = ret.data[0];
+                      var url = App.url + '/?r=cdn&a=file&token=' + $api.getStorage('token') + '&hash=' + data.hash;
+                      if (DownUrl.length > 3) {
+                        api.cancelDownload({url: DownUrl});
+                      }
+                      DownUrl = url;
+                      api.download({
+                        url: url,
+                        savePath: 'fs://blocks/' + data.hash + '.db',
+                        report: true,
+                        cache: false,
+                        allowResume: true
+                      }, function (ret, err) {
+                        console.log(data.hash + ':' + JSON.stringify(ret));
+                        if (ret.state == 1) {
+                          var sql1 = "update downfile set `size`='" + ret.fileSize + "',`at`='100',`status`=3 where id=" + data.id + " and blocks=" + data.blocks;
+                          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                            DownManage(0, 'doit');
+                          });
+                        } else if (ret.state == 2) {
+                          console.log('HASH:' + data.hash + '下载失败!');
+                          var sql1 = "update downfile set `at`='0',`status`=4 where id=" + data.id + " and blocks=" + data.blocks;
+                          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                            DownManage(0, 'doit');
+                          });
+                        } else {
+                          if (window.navigator.userAgent.indexOf('iPhone') > 0) {
+                            var progress = ret.percent;
+                          } else {
+                            var progress = ret.progress;
+                          }
+                          var sql1 = "update downfile set `size`='" + ret.fileSize + "',`at`='" + parseInt(progress) + "',`status`=2 where id=" + data.id + " and blocks=" + data.blocks;
+                          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                          });
+                        }
+                      });
+                    }
+                  }
+                });
+              }
+            }
+          });
+        }
+        break;
+      default:
+    }
+  }
+
+  /********* 下载逻辑 End ***********/
+
+  function fail(data) {
+  }
+  function dragToFalse() {
+    drag = false;
+  }
+
+  function dragToTrue() {
+    drag = true;
+  }
+
+
+  function getPlayId() {
+    //每个有列表的页面获取当前播放音频ID函数
+    if (isplay) {
+      api.execScript({
+        name: 'audio',
+        script: "AuTo(1);"
+      });
+    } else {
+      api.execScript({
+        name: 'audio',
+        script: "AuTo(0);"
+      });
+    }
+    if (isplay) {
+      // api.execScript({
+      //     name: 'zoot',
+      //     frameName: 'FM',
+      //     script: "play('"+playingID+"');"
+      // });
+      api.execScript({
+        name: 'likes',
+        script: "play('" + playingID + "');"
+      });
+      api.execScript({
+        name: 'weekly',
+        script: "play('" + playingID + "');"
+      });
+      api.execScript({
+        name: 'studylist',
+        script: "play('" + playingID + "');"
+      });
+      api.execScript({
+        name: 'audio',
+        frameName: 'list',
+        script: "play('" + playingID + "');"
+      });
+      api.execScript({
+        name: 'searchResult',
+        script: "play('" + playingID + "');"
+      });
+      api.execScript({
+        name: 'profession',
+        script: "play('" + playingID + "');"
+      });
+      api.execScript({
+        name: 'professionDetail',
+        script: "play('" + playingID + "');"
+      });
+      api.execScript({
+        name: 'message',
+        script: "play('" + playingID + "');"
+      });
+      api.execScript({
+        name: 'column',
+        script: "play();"
+      });
+      api.execScript({
+        name: 'change',
+        script: "play();"
+      });
+      api.execScript({
+        name: 'interest',
+        script: "play();"
+      });
+      api.execScript({
+        name: 'plan',
+        script: "play();"
+      });
+        /*
+         api.execScript({
+         name: 'audio',
+         frameName: 'controller',
+         script: "play();"
+         });
+         */
+      api.execScript({
+        name: 'audio',
+        frameName: 'audioContent',
+        script: "play('" + playingID + "');"
+      });
+      api.execScript({
+        name: 'study',
+        script: "play('" + playingID + "');"
+      });
+      api.execScript({
+        name: 'search',
+        script: "play('" + playingID + "');"
+      });
+    } else {
+      api.execScript({
+        name: 'weekly',
+        script: "showbottom();"
+      });
+      api.execScript({
+        name: 'professionDetail2',
+        script: "showbottom();"
+      });
+    }
+  }
+
+  function nolist(msg) {
+    audioPlayer.stop();
+    isplay = false;
+    //分发事件在每次点击播放，下一首上一首时都会分发一次，每个页面刚打开时也需要先来问下是否正在播放，并做出对应改变，list播放列表是通过audio传值做的
+    api.execScript({
+      name: 'audio',
+      script: "pause();"
+    });
+  }
+
+  function getPlayStatus(win) {
+    var n = 0;
+    if (isplay) {
+      n = 1;
+    }
+    api.execScript({
+      name: win,
+      frameName: 'smallcontroller',
+      script: "setPlayStatus('" + n + "');"
+    });
+  }
+
+  function updateSql(data) {
+    //console.log(JSON.stringify(data));
+    if (data.type == 0) {
+      db.selectSql({
+        name: 'main',
+        sql: ('select * from weekly where id=' + data.id)
+      }, function (ret, err) {
+        if (ret.status) {
+          if (ret.data.length > 0) {
+            data.progress = ret.data[0].progress;
+            data.classify = '';
+            //data.classify = JSON.stringify(data.classify);
+            var sql2 = "update weekly set title='" + data.title + "', pic='" + data.pic + "', des='" + data.des + "',vtime='" + data.vtime + "',size='" + data.size + "',blocks='" + data.blocks + "',path='" + data.path + "',file='" + data.path + "',duration='" + data.duration + "',tid='" + data.tid + "',type=0,classify='" + data.classify + "' where id=" + data.id;
+            db.executeSql({name: 'main', sql: sql2}, function (ret, err) {
+            });
+          } else {
+            data.classify = '';
+            //data.classify = JSON.stringify(data.classify);
+            var sql2 = "insert into weekly ( id , title, pic,blocks, des, vtime, size, path, file, duration, tid, type, classify) values ('" + data.id + "','" + data.title + "','" + data.pic + "','" + data.blocks + "','" + data.des + "','" + data.vtime + "','" + data.size + "','" + data.path + "','" + data.path + "','" + data.duration + "','" + data.tid + "','" + data.type + "','" + data.classify + "')";
+            db.executeSql({name: 'main', sql: sql2}, function (ret, err) {
+            });
+          }
+        }
+      });
+    } else if (data.type == 1) {
+      db.selectSql({
+        name: 'main',
+        sql: ('select * from coursecontent where id=' + data.id)
+      }, function (ret, err) {
+        if (ret.status) {
+          if (ret.data.length > 0) {
+            data.classify = '';
+            //data.classify = JSON.stringify(data.classify);
+            data.progress = ret.data[0].progress;
+            if (typeof data.blocks == 'undefined') {
+              data.blocks = '';
+            }
+            var sql2 = "update coursecontent set title='" + data.title + "', pic='" + data.pic + "', des='" + data.des + "',vtime='" + data.vtime + "',blocks='" + data.blocks + "',size='" + data.size + "',blocks='" + data.blocks + "',path='" + data.path + "',file='" + data.path + "',duration='" + data.duration + "',tid='" + data.tid + "',type=1,classify='" + data.classify + "' where id=" + data.id;
+            db.executeSql({name: 'main', sql: sql2}, function (ret, err) {
+            });
+          } else {
+            data.classify = '';
+            //data.classify = JSON.stringify(data.classify);
+            if (typeof data.blocks == 'undefined') {
+              data.blocks = '';
+            }
+            var sql2 = "insert into coursecontent ( id , title, pic, des, vtime, size, blocks, path, file, duration, tid, type, classify) values ('" + data.id + "','" + data.title + "','" + data.pic + "','" + data.des + "','" + data.vtime + "','" + data.size + "','" + data.blocks + "','" + data.path + "','" + data.path + "','" + data.duration + "','" + data.tid + "','" + data.type + "','" + data.classify + "')";
+            db.executeSql({name: 'main', sql: sql2}, function (ret, err) {
+            });
+          }
+        }
+      });
+    }
+  }
+
+  function changeformat(arg) {
+    if (arg.progress == 0) {
+      arg.progress = false;
+      arg.pro = '0:00';
+    } else {
+      var pm = parseInt(arg.progress / 60);
+      var ps = parseInt(arg.progress % 60);
+      ps < 10 ? '0' + ps : ps;
+      arg.pro = pm + ':' + ps;
+    }
+    var dm = parseInt(arg.duration / 60);
+    var ds = parseInt(arg.duration % 60);
+    ds < 10 ? '0' + ds : ds;
+    arg.dur = dm + ':' + ds;
+  }
+
+  function Closeupdate() {
+    document.getElementById('update').style.display = 'none';
+  }
+
+  function Audioinit() {
+    api.execScript({
+      name: 'audio',
+      script: "getData('" + JSON.stringify(audioArray[playingID]) + "','" + total_list.length + "'," + isplay + ");"
+    });
+    isplay = false;
+  }
+
+  function setNewId() {
+    var newDate = new Date();
+    checkID = String(newDate.getTime()).slice(0, 11);
+  }
+
+  var firstjump = 0;
+  var jumpset;
+  function isNewOrNot(type) {
+    return;
+    openIndexFrameGroup();
+    firstjump = 0;
+    clearInterval(jumpset);
+    jumpset = setInterval(function () {
+      firstjump++;
+      if (firstjump > 6) {
+        $api.clearStorage();
+        api.rebootApp();
+      }
+    }, 1000);
+    if (!arguments[0]) {
+      XO.GetUinfo($api.getStorage('token'), {name: 'root', fun: 'getUinfoUpview'}, {name: 'root', fun: 'getUinfoFail'});
+    }
+  }
+
+  var Gop = false;
+  function willGetUinfo(tken, ggop) {
+    Gop = ggop;
+    setTimeout(function () {
+      XO.GetUinfo(tken, {name: 'root', fun: 'getUinfoUpview'}, {name: 'root', fun: 'getUinfoFail'});
+    }, 500);
+  }
+
+  function getUinfoUpview(data) {
+    var token = $api.getStorage('token');
+    if (token && (token.length > 10) && (token != App.guest)) {
+      if (Gop) {
+        Gop = false;
+        openIndexFrameGroup();
+        ToFront();
+        setTimeout(function () {
+          api.execScript({
+            frameName: 'FM',
+            script: "CheckBD();"
+          });
+        }, 800);
+      } else {
+        api.execScript({
+          frameName: 'FM',
+          script: "CheckBD();"
+        });
+      }
+      // api.execScript({name: 'root',frameName:'home',script: "Refresh();"});
+    }
+  }
+
+  function getUinfoFail(msg) {
+  }
+
+  function ToFront() {
+    api.bringFrameToFront({
+      from: 'foot',
+      to: 'indexFrameGroup'
+    });
+  }
+
+  function toRegister() {
+    var name = 'register';
+    var href = "./html/me/register.html";
+    var animation = {};
+    if (!App.iphone) {
+      animation = {
+        type: "movein",
+        subType: "from_right",
+        duration: 300
+      };
+      api.openWin({
+        name: name,
+        url: href,
+        slidBackEnabled: false,
+        pageParam: {
+          name: name
+        },
+        reload: true,
+        animation: animation,
+        bounces: false,
+        customRefreshHeader: 'UIPullRefresh',
+        rect: {
+          x: 0,
+          y: 0,
+          w: 'auto',
+          h: 'auto'
+        },
+        allowEdit: true
+      });
+    } else {
+      api.openWin({
+        name: name,
+        url: href,
+        reload: true,
+        slidBackEnabled: true,
+        pageParam: {
+          name: name
+        },
+        allowEdit: true
+      });
+    }
+  }
+  function file_fexid(old_file) {
+    var file_fix = old_file.split('.');
+    var file_md5 = hex_md5(old_file);
+    file_fix = file_fix[file_fix.length - 1];
+    var file = hex_md5(old_file) + '.' + file_fix;
+    return {full: file, fix: file_fix, md5: file_md5};
+  }
+
+  function changeMode(value) {
+    mode = value;
+  }
+
+  function hideInput() {
+    UIChatBox.closeKeyboard();
+    UIChatBox.close();
+  }
+  //  wdfqwf
+  /** 按钮变化 **/
+  function MenuClick(type, evevtIndex) {
+    var NVTabBar = api.require('NVTabBar');
+    NVTabBar.setSelect({
+      index: type,
+      selected: true
+    });
+    if (type == 0) {
+      api.closeFrame({
+        name: 'groupframe'
+      });
+      api.closeFrame({
+        name: 'groupframe2'
+      });
+      api.sendEvent({
+        name: 'accepts',
+        extra: {
+          'titleindex': 0
+        }
+      });
+      changeIndexMenu(0);
+      selectedIndex = 0;
+      api.setStatusBarStyle({
+        style: 'dark'
+      });
+    } else if (type == 2) {
+//      openWWW(api.winName);
+      api.closeFrame({
+        name: 'groupframe'
+      });
+      api.closeFrame({
+        name: 'groupframe2'
+      });
+      api.sendEvent({
+        name: 'accepts',
+        extra: {
+          'titleindex': 0,
+        }
+      });
+      changeIndexMenu(2);
+      if (App.iphone) {
+        api.setStatusBarStyle({
+          style: 'dark'
+        });
+      }
+      // api.execScript({
+      //   frameName: 'home',
+      //   script: "Refresh();"
+      // });
+      selectedIndex = 2;
+    } else if (type == 1) {
+      changeIndexMenu(1);
+      api.setStatusBarStyle({
+        style: 'dark'
+      });
+      selectedIndex = 1;
+      api.openFrame({
+        name: 'groupframe',
+        url: './html/me/groupframe.html',
+        rect: {
+          x: 0,
+          y: 64,
+          width: 'auto',
+          h: api.winHeight - 115
+        },
+        pageParam: {
+          evevtIndex: evevtIndex
+        },
+        bounces: true,
+        hScrollBarEnabled: false,
+        vScrollBarEnabled: false
+      });
+      api.sendEvent({
+        name: 'myEvent',
+        extra: {
+          'titleindex': 0
+        }
+      });
+      if (evevtIndex == 1) {
+//        setTimeout(function () {
+//          api.sendEvent({
+//            name: 'myEvent',
+//            extra: {
+//              'titleindex': 1
+//            }
+//          });
+//        }, 300);
+//        api.execScript({name: 'root', frameName: 'group', script: "app.changetitle(1);"});
+      }
+    } else {
+      var token = $api.getStorage('token');
+      if (token && (token == App.guest)) {
+        api.sendEvent({name: 'IndexEvent', extra: {page: 'login'}});
+        api.openWin({
+          name: 'login',
+          url: './html/me/login.html',
+          reload: false,
+          slidBackEnabled: true,
+          pageParam: {
+            name: 'authentication'
+          }
+        });
+        return;
+      }
+      api.setStatusBarStyle({
+        style: 'dark'
+      });
+      NVTabBar.setSelect({
+        index: selectedIndex,
+        selected: true
+      });
+    }
+  }
+  function openGroup() {
+    api.closeFrame({
+      name: 'groupframe2'
+    });
+    var NVTabBar = api.require('NVTabBar');
+    NVTabBar.setSelect({
+      index: 1,
+      selected: true
+    });
+    changeIndexMenu(1);
+    selectedIndex = 1;
+    setTimeout(function () {
+      api.execScript({name: 'root', frameName: 'group', script: "app.changetitle(1)"});
+      api.sendEvent({
+        name: 'mynewEvent',
+        extra: {
+          'titleindex': 3
+        }
+      });
+    }, 500)
+  }
+
+  function ToPause(id) {
+    console.log('暂停');
+    api.execScript({name: 'audio', script: "hideLoad();"});
+    isplay = false;
+    audioPlayer.pause();
+    isPause = true;
+
+    if ((typeof total_list == 'object') && (typeof total_list[audioIndex] == 'object')) {
+      api.sendEvent({
+        name: 'topause',
+        extra: {
+          key1: id,
+          key2: total_list[audioIndex].title,
+          key3: total_list[audioIndex].des
+        }
+      });
+    } else {
+      console.log('数据结构异常 ==> 2852');
+    }
+
+    for (var i in App.pages) {
+      if (App.pages[i] != '') {
+        if (Pagelist.indexOf(' ' + App.pages[i] + ' ') > -1) {
+          if (App.pages[i] == 'controller') {
+              /*
+               api.execScript({
+               name: 'audio',
+               frameName: App.pages[i],
+               script: "pause();"
+               });
+               */
+          } else {
+            api.execScript({
+              name: App.pages[i],
+              script: "pause('" + id + "');"
+            });
+          }
+        }
+      }
+    }
+  }
+
+  function ToPlay(id) {
+    if (rebot) {
+      ToPause(id);
+      setTimeout(function () {
+        api.execScript({
+          name: 'audio',
+          script: "pause('" + id + "');"
+        });
+      }, 500);
+      return;
+    }
+    getPlayId();
+    if ((typeof total_list != 'object') && (typeof total_list[audioIndex] != 'object')) {
+      console.log('数据结构异常 ==> 2890');
+      return;
+    }
+//    console.log('继续播放', isplay, id, playId, playingID, total_list[audioIndex].title, audioIndex, BlocksIndex, current);
+    api.execScript({name: 'audio', script: "showLoad();"});
+    if (typeof total_list[audioIndex].blockc == 'undefined') {
+      var blocks_temp = total_list[audioIndex].blocks.split('|');
+      total_list[audioIndex].blockc = blocks_temp;
+    }
+
+    if (!isplay) {
+      isplay = true;
+      //alert(id + '|' + playingID);
+      if ((id != 0) && (id == playingID)) {
+        audioPlayer.play();
+      } else {
+        if (id == 0) {
+          Play(total_list[audioIndex], total_list[audioIndex].id);
+        } else {
+          PlayBlocks(total_list[audioIndex], BlocksIndex, current);
+        }
+      }
+    }
+
+    isplay = true;
+
+    SendEv('PlayStatus', {
+      key1: total_list[audioIndex].id,
+      key2: total_list[audioIndex].title,
+      key3: total_list[audioIndex].des,
+      pic: total_list[audioIndex].pic,
+      lecturer: total_list[audioIndex].lecturer,
+      columnTitle: total_list[audioIndex].columnTitle,
+      duration: total_list[audioIndex].duration,
+      pro: total_list[audioIndex].progress
+    });
+
+    IndexOpenWWW();
+
+    for (var i in App.pages) {
+      if (App.pages[i] != '') {
+        if (Pagelist.indexOf(' ' + App.pages[i] + ' ') > -1) {
+          api.execScript({
+            name: App.pages[i],
+            script: "play('" + id + "');"
+          });
+        }
+      }
+    }
+  }
+
+  function menuOpen() {
+    NVTabBar.close();
+    NVTabBar.open({
+      styles: {
+        bg: 'rgb(255,255,255)',
+        h: 49,
+        dividingLine: {
+          width: 0,
+          color: '#dfdfdf'
+        }
+      },
+      items: [{
+        w: api.winWidth / 3,
+        bg: {
+          marginB: -tabBarHeight,
+          image: 'rgba(0,0,0,0)'
+        },
+        iconRect: {
+          w: 28.0,
+          h: 24.0,
+        },
+        icon: {
+          normal: 'widget://res/NVTabBar/sxy_normal.png',
+          highlight: 'widget://res/NVTabBar/sxy_selected.png',
+          selected: 'widget://res/NVTabBar/sxy_selected.png'
+        },
+        title: {
+          text: '商学院',
+          size: 10,
+          normal: '#999',
+          selected: '#d2b379',
+          marginB: 4.0
+        }
+      }, {
+        w: api.winWidth / 3,
+        bg: {
+          marginB: -tabBarHeight,
+          image: 'rgba(0,0,0,0)'
+        },
+        iconRect: {
+          w: 28.0,
+          h: 24.0,
+        },
+        icon: {
+          normal: 'widget://res/NVTabBar/bj_normal.png',
+          highlight: 'widget://res/NVTabBar/bj_selected.png',
+          selected: 'widget://res/NVTabBar/bj_selected.png'
+        },
+        title: {
+          text: '互动',
+          size: 10,
+          normal: '#999',
+          selected: '#d2b379',
+          marginB: 4.0
+        }
+      }, {
+        w: api.winWidth / 3,
+        bg: {
+          marginB: -tabBarHeight,
+          image: 'rgba(0,0,0,0)'
+        },
+        iconRect: {
+          w: 28.0,
+          h: 24.0,
+        },
+        icon: {
+          normal: 'widget://res/NVTabBar/my_normal.png',
+          highlight: 'widget://res/NVTabBar/my_selected.png',
+          selected: 'widget://res/NVTabBar/my_selected.png'
+        },
+        title: {
+          text: '我的',
+          size: 10,
+          normal: '#999',
+          selected: '#d2b379',
+          marginB: 4.0
+        }
+      }],
+      selectedIndex: 0
+    }, function (ret, err) {
+      NVTabBar.bringToFront();
+      if (ret) {
+        if (ret.eventType == "click") {
+          MenuClick(ret.index);
+        }
+//       FM 行币监听
+        if (ret.index == 0) {
+          api.sendEvent({
+            name: 'barIndex'
+          });
+        }
+      }
+    });
+  }
+
+  function reverseAudio(tid) {
+    if (total_list[audioIndex] && (total_list[audioIndex].tid == tid)) {
+      audioArray = [];
+      total_list.reverse();
+      total_list.forEach(function (arg, index) {
+        arg.index = index;
+        audioArray[arg.id] = arg;
+      });
+      audioIndex = audioArray[playingID].index;
+    }
+  }
+
+  function getPlayList() {
+    api.execScript({
+      name: 'audio',
+      frameName: 'list',
+      script: "upview('" + JSON.stringify(total_list) + "');"
+    });
+  }
+</script>
+</html>

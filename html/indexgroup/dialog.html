@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>营销课程</title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <style>
+        /*系统通知*/
+        .dialog_box_sys_father {
+            /*padding-top:40%;*/
+            /*text-align: center;*/
+            /*display: flex;*/
+            /*justify-content: center;*/
+            /*align-items: center;*/
+        }
+
+        .dialog_box_sys {
+            /*position: relative;*/
+            /*width:14rem;*/
+            /*height:20rem;*/
+            /*margin: 0 auto;*/
+            /*border-radius: 5px;*/
+            /*border:1px solid red;*/
+            /*background-color: white;*/
+        }
+
+        .aaa {
+            /*position: relative;*/
+            text-align: center;
+        }
+
+        .bbb {
+            /*border:1px solid red;*/
+            border-radius: 5px;
+            width: 14rem;
+            height: 20rem;
+            background-color: white;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+
+        .sys_img {
+            width: 100%;
+            height: 17.8rem;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /*.sys_img img{*/
+        /*display:block;*/
+        /*width: 100%;*/
+        /*height: 17.8rem;*/
+        /*}*/
+
+        .sys_btn {
+            border-top: 1px solid #ddd;
+            height: 2.2rem;
+            line-height: 2.2rem;
+            font-size: 0.8rem;
+            color: #000;
+        }
+
+        .sys_close_box {
+            width: 1.6rem;
+            height: auto;
+            position: absolute;
+            top: -0.8rem;
+            right: -0.8rem;
+        }
+    </style>
+</head>
+<body style="margin:0">
+<div id="app">
+    <!--系统通知-->
+    <div class="dialog_box_sys_father aaa">
+        <div class="dialog_box_sys bbb">
+            <div class="sys_img" :style="{'background-image': 'url(' + formatImg(imgUrl) + ')'}"
+                 @click="openClassInfo()"></div>
+            <div class="sys_btn" @click="openClassInfo()">立即查看</div>
+            <div class="" @click="closeBox('1')"><img class="sys_close_box" src="../../image/close_icon.png" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      imgUrl: '', //通知图片 FM页获取
+      des: '',   //通知课程id
+      homeData: {},  //是否购买过通知课程
+      title: '',  //营销课程名字
+      formatImg: formatImg
+    },
+    created: function () {
+      apiready = function () {
+//        课程
+        if (api.pageParam.des) {
+          app.type = api.pageParam.type;
+          app.imgUrl = api.pageParam.imgUrl;
+          app.des = api.pageParam.des;
+          app.title = api.pageParam.title;
+          app.getCourses();
+
+        }
+
+        if (app.type == 3) {
+          app.getUserInfo();
+        }
+      }
+    },
+    methods: {
+//      获取用户信息
+      getUserInfo: function () {
+        var post = {
+          hash: $api.getStorage('token')
+        }
+        sendAjax(this, post, '/Api/Ucenter/getUserInfo', function (res) {
+          localStorage.setItem('userID', res.data.id);
+        })
+      },
+//      获取课程详情
+      getCourses: function () {
+        var post = {
+          hash: $api.getStorage('token'),
+          id: app.des
+        }
+        sendAjax(this, post, '/Api/Data/getCourse', function (res) {
+          app.homeData = res.data;
+        })
+      },
+      closeBox: function () {
+//          系统通知
+        api.execScript({name: 'root', frameName: 'FM', script: "app.closeBox();"});
+      },
+      openClassInfo: function () {
+        if (app.type == 1) {
+          //        买过或者价格为零
+//          if (app.homeData.buyed == 1 || app.homeData.price == '0.00') {
+            api.openWin({
+              name: 'professionDetail2',
+              url: '../fm/professionDetail3.html',
+              pageParam: {
+                des: app.homeData.id,
+                price: app.homeData.price,
+                buyed: app.homeData.buyed,
+                title: app.homeData.title
+              }
+            });
+//没买过
+//          } else {
+//            课程详情
+//            api.openWin({
+//              name: 'courseInfo_win',
+//              url: '../fm/courseInfo_win.html',
+//              pageParam: {
+//                des: app.des,
+//                title: app.title
+//              }
+//            });
+//          }
+        } else if (app.type == 2) {
+//          外部链接
+          api.openWin({
+            name: 'outLink_win',
+            url: '../fm/outLink_win.html',
+            pageParam: {
+              url: app.des,
+              type: app.type
+            }
+          });
+        } else {
+          //        营销课程类型为3的时候 判断用户是否登录
+          var token = $api.getStorage('token');
+          if (token && (token == App.guest)) {
+            toastMsg('请先登录');
+            api.closeFrame();
+            api.sendEvent({name: 'IndexEvent', extra: {page: 'login'}});
+            api.openWin({
+              name: 'login',
+              url: '../../html/me/login.html',
+              pageParam: {
+                name: 'authentication'
+              }
+            });
+            return;
+          }
+          api.openWin({
+            name: 'outLink_win',
+            url: '../fm/outLink_win.html',
+            pageParam: {
+              url: app.des,
+              type: app.type
+            }
+          });
+        }
+      }
+    }
+  })
+</script>
+</body>
+</html>

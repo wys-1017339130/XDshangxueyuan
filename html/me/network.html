@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>网络无法连接</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+    <style>
+    	html,body,#wrap{background-color: #fff;}
+    	.main-info{
+    		padding: 0 3%;
+    	}
+    	.main-info p{
+    		font-size: 0.75rem;
+    		line-height: 1.4;
+    		margin: 15px 0;
+    	}
+    	.main-info img{
+    		width: 100%
+    	}
+    </style>
+</head>
+<body>
+<div>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">网络无法连接</div>
+		</div>
+	</div>
+  <div id="main" class="warp">
+  	<div id="fixStatus"></div>
+    <div style="background-color: #f3f3f3;line-height: 50px;padding-left: 3%;font-size: 0.8rem">建议按照以下方法检查网络链接</div>
+    <div class="main-info">
+    	<p>1.打开手机“设置”并把“Wi-Fi”开关保持开启状态.</p>
+    	<p>2.打开手机“设置”-“通用”-“蜂窝数据网络”，并把“蜂窝移动数据”开关保持开启状态。</p>
+    	<img src="../../image/nonet.jpg" alt="">
+    	<p>3.如果仍无法链接网络，请检查手机接入的“Wi-Fi”是否已接入互联网或者咨询网络运营商。</p>
+    </div>
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+<script type="text/javascript" src="../../script/t.xiaoo.cn.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript">
+	var HeadBar = $api.byId('HeadBar');
+	apiready = function(){
+       $api.fixStatusBar(HeadBar);
+
+			//MD Start
+			//api.execScript({name: 'root', script: "ChatAna('About',{'Active':'加载'},'关于我们');"});
+ 			//MD End
+ 	}
+</script>
+</html>

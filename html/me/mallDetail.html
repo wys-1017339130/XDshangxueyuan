@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>积分商城</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body class="z-fff">
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div class="mall-detail-btn" onclick="exchange(this)">立即兑换</div>
+		<img class="mall-detail-back" onerror="this.src='../../image/mall_detail_default.jpg'">
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var HeadBar = $api.byId('HeadBar');
+	var fs,db;
+	var Uscore=0;
+	var ma = {};
+	var dialogBox;
+	var arr,score;
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+		arr = api.pageParam.des.split('/') || 0;
+		id = arr[0];
+		score = arr[1];
+		fs = api.require("fs");
+		db = api.require("db");
+		dialogBox = api.require('dialogBox');
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('商品详情',true,{'行为':'打开'},'商品详情');"});
+		//MD End
+
+		//从数据库中获取封面并渲染,包含是否已兑换,文字切换,兑换成功后又一系列变化，兑换成功返回id
+		db.selectSql({
+		    name: 'main',
+		    sql: ('select * from mall where id='+id)
+		}, function(ret, err) {
+			if(ret.data.length>0){
+				ma=ret.data[0];
+				document.querySelector('.mall-detail-back').src = ma.pic;
+			}
+		});
+
+		db.selectSql({
+		    name: 'main',
+		    sql: ('select * from user')
+		}, function(ret, err) {
+			if(ret.data.length>0){
+				Uscore = ret.data[0].score || 0;
+				if(ma.score>Uscore){
+					var btn = document.querySelector('.mall-detail-btn');
+					btn.className = 'mall-detail-btn disabled';
+					btn.innerHTML = '积分不足';
+				}
+			}
+		});
+	}
+
+	function exchange(btn){
+		if(/disabled/g.test(btn.className)){
+			return;
+		}
+        dialogBox.alert({
+            texts: {
+                content: '确定兑换？',
+                leftBtnTitle: '再逛逛',
+                rightBtnTitle: '直接兑换'
+            },
+            styles: {
+                bg: '#fff',
+                w: 300,
+                corner: 3,
+                title: {
+                    marginT: 20,
+                    titleSize: 16,
+                    titleColor: '#000'
+                },
+                content: {
+                    color: '#000',
+                    size: 14
+                },
+                left: {
+                    marginB: 7,
+                    marginL: 20,
+                    w: 130,
+                    h: 35,
+                    corner: 3,
+                    color: '#8f99b2',
+                    bg: '#fff',
+                    size: 12
+                },
+                right: {
+                    marginB: 7,
+                    marginL: 10,
+                    w: 130,
+                    h: 35,
+                    corner: 3,
+                    color: '#3b8efc',
+                    bg: '#fff',
+                    size: 12
+                }
+            }
+        }, function(ret) {
+            if (ret.eventType == 'right') {
+                var dialogBox = api.require('dialogBox');
+                dialogBox.close({
+                    dialogName: 'alert'
+                });
+                exc();
+            }
+            if(ret.eventType == 'left'){
+                var dialogBox = api.require('dialogBox');
+                dialogBox.close({
+                    dialogName: 'alert'
+                });
+            }
+
+        });
+	}
+
+	function exc(){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});
+
+		api.execScript({name: 'root', script: "ChatAna('商品详情',false,{'行为':'兑换','商品':"+ma.id+"},'商品详情-兑换');"});
+
+		api.execScript({name: 'root',script: "XO.Exchange('"+ $api.getStorage('token') +"','"+ma.id+"',{name:'mallDetail',fun:'upview'},{name:'mallDetail',fun:'fail'});"});
+	}
+
+	function Refresh(){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});//数据加载中显示方块
+
+		//api.execScript({name: 'root',script: "XO.GetMall('"+ $api.getStorage('token') +"',0,{name:'likes',fun:'upview'},{name:'likes',fun:'fail'});"});
+	}
+
+	function upview(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		var newscore = Uscore-ma.score;
+		if(newscore>ma.score){
+			var btn = document.querySelector('.mall-detail-btn');
+			btn.className = 'mall-detail-btn disabled';
+			btn.innerHTML = '积分不足';
+		}
+		var sql1 = "update user set score='"+newscore+"'";
+		db.executeSql({
+		    name: 'main',
+		    sql: sql1
+		}, function(ret, err) {
+			//alert(JSON.stringify(ret)+':'+JSON.stringify(ret));
+		});
+
+		api.execScript({name: 'root', script: "ChatAna('商品详情',false,{'行为':'兑换成功','商品':"+ma.id+"},'商品详情-兑换成功');"});
+
+		api.hideProgress();
+		api.toast({
+		    msg: '兑换成功',
+		    duration: 2000,
+		    location: 'bottom'
+		});
+	}
+
+
+	function fail(msg){
+		api.hideProgress();
+		App.tips(msg);
+	}
+
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

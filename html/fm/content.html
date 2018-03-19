@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html style="height: auto">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>详情</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+        }
+    </style>
+</head>
+<body style="height: auto;background-color: #fff">
+<div id="main">
+    <div class="z-position-full">
+        <div style="width: 100%;position: fixed;top: 0;left: 0;z-index: 9999;background-color: #fff;">
+            <div style="margin-top: 20px;position: relative;">
+                <div id="title" class="z-content-title" style="margin-bottom:0;"></div>
+                <span tapmode='true' onclick="closeFrame()" class="z-content-quxiao icon iconfont icon-quxiao"></span>
+            </div>
+        </div>
+        <div id="content" style="margin-top: 66px;z-index: 1;" class="z-content-info"></div>
+    </div>
+</div>
+</body>
+<script id="content_Tpl" type="text/template">
+    {{#data}}
+    <div class="z-content-title">{{title}}</div>
+    <div class="z-content-info">{{text}}</div>
+    {{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+  var id = 0;
+  var title, db;
+  apiready = function () {
+    App.openWWW(api.winName);
+    id = api.pageParam.des || 0;
+    if (isNaN(id)) {
+      document.getElementById('title').innerHTML = "关于「浓缩」EMBA";
+      document.getElementById('content').innerHTML = id;
+      App.init();
+    } else {
+      title = api.pageParam.title || '';
+      db = api.require("db");
+      db.selectSql({
+        name: 'main',
+        sql: ('select * from course where id=' + id)
+      }, function (ret, err) {
+        if (ret.status) {
+          if (ret.data.length > 0) {
+            document.getElementById('title').innerHTML = title;
+            document.getElementById('content').innerHTML = ret.data[0].content;
+          }
+        }
+      });
+      if (api.connectionType != 'none') {
+        Refresh();
+      }
+    }
+  };
+
+  function Refresh() {
+    api.showProgress({
+      style: 'default',
+      animationType: 'fade',
+      title: '加载中...',
+      modal: false
+    });//数据加载中显示方块
+    api.execScript({
+      name: 'root',
+      script: "XO.GetContent('" + $api.getStorage('token') + "','" + id + "',{name:'content',fun:'upview'},{name:'content',fun:'fail'});"
+    });
+  }
+
+  function upview(data) {
+    console.log(data);
+    if (typeof data == 'string') {
+      localStorage.setItem('content' + id, data);
+      data = JSON.parse(data);
+    }
+    document.getElementById('title').innerHTML = title;
+    document.getElementById('content').innerHTML = data.data;
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from course where id=' + id)
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          var sql1 = "update course set content='" + data.data + "' where id=" + id;
+          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+          });
+        }
+      }
+    });
+    App.init();
+    api.hideProgress();
+  }
+
+  function fail(msg) {
+    api.hideProgress();
+    App.tips(msg);
+  }
+
+  function closeFrame() {
+    if (api.winName == "content") {
+      api.closeWin();
+    } else {
+      api.execScript({
+        name: 'professionDetail',
+        script: "closeFrame();"
+      });
+    }
+  }
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

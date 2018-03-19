@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <link rel="stylesheet" href="../../css/api.css">
+</head>
+<style type="text/css">
+    .subject {
+        font-size: 0.75rem;
+        background-color: #fff8eb;
+        color: #252525;
+        padding: 0.75rem 10px;
+    }
+
+    .li {
+        padding: 0.75rem 0px;
+        font-size: 0.75rem;
+        color: #636363;
+        border-bottom: 1px solid #f2f2f2;
+    }
+
+    .Submit {
+        height: 2.5rem;
+        line-height: 2.5rem;
+        background-color: #d9b270;
+        color: #ffffff;
+        font-size: 0.75rem;
+        width: 100%;
+        text-align: center;
+        position: fixed;
+        bottom: 0px;
+    }
+
+    .padding {
+        margin-right: 0.75rem;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+
+    .Correct {
+        color: #2dce6a !important;
+    }
+
+    .error {
+        color: #ff5317;
+    }
+
+    .input {
+        background-size: cover;
+        background-image: url("../../image/xx.png");
+        background-color: transparent !important;
+        background-repeat: no-repeat;
+        border-color: transparent !important;
+    }
+
+    .afterert {
+        background-image: url("../../image/finishsuccess.png");
+        background-repeat: no-repeat;
+        border-color: transparent !important;
+        background-size: cover;
+    }
+
+    .radio {
+        width: 1.2rem;
+        height: 1.2rem;
+        background-color: #ffffff;
+        border: solid 1px #dddddd;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        font-size: 0.3rem;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        display: inline-block;
+        vertical-align: middle;
+        cursor: default;
+        -webkit-appearance: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-transition: background-color ease 0.1s;
+        transition: background-color ease 0.1s;
+    }
+
+    .bottomdiv {
+        clear: both;
+        width: 100%;
+        height: 2rem;
+        text-align: center;
+        line-height: 2rem;
+        color: black;
+    }
+
+    .uptext {
+        color: #bfbfbf;
+        font-size: 13px;
+    }
+
+    .publicfont {
+        width: 1rem;
+        height: 1rem;
+        margin: auto;
+    }
+
+
+</style>
+<body>
+<div id="warp">
+    <div class="mYlist" v-for="(item, index) in deatlis">
+        <div class="aui-ellipsis-2 subject">{{index+1}}.{{item.question}}</div>
+        <ul style="padding: 0 20px;" :id="'li'+index">
+            <li class="li"
+                :class="ifElsr == true && {Correct:list.key == item.right_key, error: list.key == Answer[index]}"
+                v-for="(list,num) in item.options" @click="rightKey(list.key, index, num)">
+                <input class="radio padding" :id="'input'+index+ num" style="background-image:;"
+                       :class="ifElsr == true &&{afterert:list.key == item.right_key, input: list.key == Answer[index]}"
+                       type="radio">
+                {{list.key}}.&nbsp;{{list.value}}
+            </li>
+        </ul>
+    </div>
+    <div class="bottomdiv">
+        <span v-if="rote" class="uptext">---查看更多---</span>
+        <img v-if="load" class="publicfont" src="../../image/timg.gif">
+        <span v-if="overlate" class="uptext">没有更多了...</span>
+    </div>
+    <p style="height: 2.8rem"></p>
+    <div class="Submit" @click="submit('2')" v-if="ifElsr == false">提交答案</div>
+    <div class="Submit" @click="again()" v-else-if="ifElsr == true">再来一次</div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#warp',
+    data: {
+      title: '',
+      deatlis: {},
+      ifElsr: false,
+      Answer: [],
+      rote: false,
+      load: false,
+      overlate: false,
+      perPage: 10,
+      page: 1,
+      nva: 0,
+      id: '',
+      cid: ''
+    },
+    created: function () {
+      apiready = function () {
+        if (api.pageParam.id) {
+          app.id = api.pageParam.id;
+          app.cid = api.pageParam.cid;
+        }
+        var news = $api.getStorage('Answer' + app.id + '')
+        if (news == undefined) {
+          app.Answer = []
+        } else {
+          app.Answer = news;
+          app.submit('1');
+        }
+        app.u_getPerExam(true)
+        // 下拉刷新
+        api.setCustomRefreshHeaderInfo({
+          bgColor: '#efefef',
+          image: {
+            pull: 'widget://res/refresh/pull_image.png',
+            transform: [
+              'widget://res/refresh/refreshing_image_frame_01.png',
+              'widget://res/refresh/refreshing_image_frame_02.png',
+              'widget://res/refresh/refreshing_image_frame_03.png',
+              'widget://res/refresh/refreshing_image_frame_04.png',
+              'widget://res/refresh/refreshing_image_frame_05.png',
+              'widget://res/refresh/refreshing_image_frame_06.png',
+              'widget://res/refresh/refreshing_image_frame_07.png',
+              'widget://res/refresh/refreshing_image_frame_08.png',
+              'widget://res/refresh/refreshing_image_frame_09.png',
+              'widget://res/refresh/refreshing_image_frame_10.png',
+              'widget://res/refresh/refreshing_image_frame_11.png',
+              'widget://res/refresh/refreshing_image_frame_12.png'
+            ],
+            load: [
+              'widget://res/refresh/pull_end_image_frame_01.png'
+            ]
+          }
+        }, function () {
+          app.page = 1
+          //下拉刷新被触发，使用 api.refreshHeaderLoadDone() 结束加载中状态
+          if (api.connectionType == 'none') {
+            api.refreshHeaderLoadDone();
+            api.toast({
+              msg: '未连接网络',
+              duration: 2000,
+              location: 'bottom'
+            });
+          } else {
+            app.u_getPerExam('none')
+            api.refreshHeaderLoadDone();
+          }
+        });
+        // 上拉加载
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 5 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+        }, function (ret, err) {
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.u_getPerExam(false)
+        });
+      }
+    },
+    methods: {
+      // 完成考试
+      u_completeExam: function () {
+        //  少判断弹框页的数据
+        var token = $api.getStorage('token')
+//        var token = 'ZmQ3YWQ3YWVlMjE1MmEwYWJkOGVjM2MyZjY3MzNmYTIxODI5'
+        var post = {
+          hash: token,
+          exam_id: app.id,
+          cid: app.cid,
+          result: app.Answer.toString()
+        }
+        sendAjax(this, post, '/Api/Ucenter/u_completeExam', function (res) {
+          console.log(JSON.stringify(res));
+          if (res.data.state == 1) {  // 获得证书
+            api.openFrame({
+              name: 'ExaminationAlert',
+              url: './ExaminationAlert.html',
+              rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: 'auto'
+              },
+              bgColor: 'rgba(0,0,0,0.3)',
+              pageParam: {
+                score: res.data.test_score, // 分数
+                money: res.data.xing_money, //  行币奖励数
+                titles: res.data.certificate_name,
+                state: 1,
+                image_html: res.data.certificate  //证书图片
+              }
+            })
+          } else {
+              /*
+               api.openFrame({
+               name: 'ExaminationAlert',
+               url: './ExaminationAlert.html',
+               rect: {
+               x: 0,
+               y: 0,
+               w: 'auto',
+               h: 'auto'
+               },
+               bgColor: 'rgba(0,0,0,0.3)',
+               pageParam: {
+               score: res.data.test_score,
+               money: res.data.xing_money,
+               titles: res.data.certificate_name,
+               image_html: res.data.certificate,
+               state: -1
+               }
+               })
+               */
+          }
+        })
+      },
+      //  再来
+      again: function () {
+        app.ifElsr = false;
+        $api.setStorage('Answer' + app.id + '', 'undefined')
+        app.Answer = []
+      },
+      // 提交按钮
+      submit: function (type) {
+        if (type === '1') {
+          app.forEchs();
+          app.ifElsr = true
+        } else {
+          if (app.Answer.length != 0) {
+            app.u_completeExam()
+            $api.setStorage('Answer' + app.id + '', app.Answer)
+          }
+        }
+      },
+      // 选择A,B,C,D,
+      rightKey: function (Key, index, num) {
+        var div1 = document.getElementById('li' + index).children[0]
+        var div2 = document.getElementById('li' + index).children[1]
+        var div3 = document.getElementById('li' + index).children[2]
+        var div4 = document.getElementById('li' + index).children[3]
+        div1.childNodes[0].style.backgroundImage = 'none';
+        div2.childNodes[0].style.backgroundImage = 'none';
+        div3.childNodes[0].style.backgroundImage = 'none';
+        div4.childNodes[0].style.backgroundImage = 'none';
+
+        if (index != index) {
+          app.Answer.push(Key)
+        } else {
+          app.Answer[index] = Key
+        }
+        document.getElementById('input' + index + num).style.backgroundImage = 'url("../../image/finishsuccess.png")'
+      },
+      //  试题
+      u_getPerExam: function (No) {
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token,
+          exam_id: app.id,
+          cid: app.cid,
+          perPage: app.perPage,
+          page: app.page
+        }
+        sendAjax(this, post, '/Api/Ucenter/u_getPerExam', function (res) {
+          if (No) {
+            app.deatlis = res.data.proList;
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          } else {
+            app.deatlis = app.deatlis.concat(res.data.proList);
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          }
+          if (res.data.proList.length == 0) {
+            app.overlate = true;
+            app.rote = false;
+            app.load = false
+          }
+        })
+      },
+      forEchs: function () {
+        for (var i = 0; i < app.deatlis.length; i++) {
+          for (var k = 0; k < 4; k++) {
+            document.getElementById('input' + i + k).style.backgroundImage = ''
+          }
+        }
+      }
+    }
+  })
+</script>
+</html>

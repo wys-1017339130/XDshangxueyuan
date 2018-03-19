@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>服务</title>
+</head>
+<meta name="viewport"
+      content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+<link rel="stylesheet" href="../../css/Order.css">
+<link rel="stylesheet" href="../../css/style.css">
+<style type="text/css">
+  .bottomdiv {
+    clear: both;
+    width: 100%;
+    height: 2rem;
+    text-align: center;
+    line-height: 2rem;
+    color: black;
+  }
+
+  .uptext {
+    color: #bfbfbf;
+    font-size: 13px;
+  }
+
+  .publicfont {
+    width: 1rem;
+    height: 1rem;
+    margin: auto;
+  }
+</style>
+<body  style="background-color: #f2f2f2;">
+<div id="warp">
+  <div class="details" style="padding: 0px 0.7rem;" v-for="(item,index) in mYlist" v-show="mYlist.length > 0">
+    <div class="details_top">
+      <div>订单编号：{{item.order_sn}}</div>
+      <div>下单时间：{{item.pay_time}}</div>
+    </div>
+    <div class="details_deac">
+      <div class="Desc_left"><div><p>行动商学院</p><p>咨询服务</p></div></div>
+      <div class="desc_center">
+        <p>{{item.title}}</p>
+        <p style="color:#666666; margin-top: 0.2rem;">时长{{item.times}}分钟</p>
+        <p style="color:red;font-size: 0.7rem;margin-top: 0.2rem">￥{{item.consult_price}}/p>
+      </div>
+      <div class="Identification"><div>待服务</div></div>
+    </div>
+  </div>
+  <div class="bottomdiv" v-show="mYlist.length > 0" >
+    <span v-if="rote" class="uptext">---查看更多---</span>
+    <img v-if="load" class="publicfont" src="../../image/timg.gif">
+    <span v-if="overlate" class="uptext">没有更多了...</span>
+  </div>
+  <div v-show="mYlist.length == 0" style="position: absolute;top: 0px;width: 100%;height: 100%;display: -webkit-box;-webkit-box-pack: center;">
+    <div style="margin-top:4.75rem;">
+      <div style="display: -webkit-box;-webkit-box-pack: center;-webkit-box-align: center;"><img style="width: 7.25rem;" src="../../image/nostudyList.png" alt=""></div>
+      <p style="text-align: center;font-size: 0.6rem;color: #999999;">还木有做过练习</p>
+    </div>
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#warp',
+    data: {
+      mYlist: [],
+      rote: false,
+      load: false,
+      overlate: false,
+      perPage: 10,
+      page: 1
+    },
+    created: function () {
+      apiready = function () {
+        app.u_getConsultOrder()
+        // 下拉刷新
+        api.setCustomRefreshHeaderInfo({
+          bgColor: '#efefef',
+          image: {
+            pull: 'widget://res/refresh/pull_image.png',
+            transform: [
+              'widget://res/refresh/refreshing_image_frame_01.png',
+              'widget://res/refresh/refreshing_image_frame_02.png',
+              'widget://res/refresh/refreshing_image_frame_03.png',
+              'widget://res/refresh/refreshing_image_frame_04.png',
+              'widget://res/refresh/refreshing_image_frame_05.png',
+              'widget://res/refresh/refreshing_image_frame_06.png',
+              'widget://res/refresh/refreshing_image_frame_07.png',
+              'widget://res/refresh/refreshing_image_frame_08.png',
+              'widget://res/refresh/refreshing_image_frame_09.png',
+              'widget://res/refresh/refreshing_image_frame_10.png',
+              'widget://res/refresh/refreshing_image_frame_11.png',
+              'widget://res/refresh/refreshing_image_frame_12.png'
+            ],
+            load: [
+              'widget://res/refresh/pull_end_image_frame_01.png'
+            ]
+          }
+        }, function () {
+          api.refreshHeaderLoadDone();
+          app,page = 1
+          //下拉刷新被触发，使用 api.refreshHeaderLoadDone() 结束加载中状态
+          if (api.connectionType == 'none') {
+            api.refreshHeaderLoadDone();
+            api.toast({
+              msg: '未连接网络',
+              duration: 2000,
+              location: 'bottom'
+            });
+          } else {
+            app.u_getConsultOrder('none')
+          }
+        });
+        // 上拉加载
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 5 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+        }, function (ret, err) {
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.u_getConsultOrder(false)
+        });
+      }
+
+    },
+    methods: {
+      u_getConsultOrder: function (No) {
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token,
+          switch: 1,
+          perPage: app.perPage,
+          page: app.page
+        }
+        sendAjax(this, post, '/Api/Ucenter/u_getConsultOrder', function (res) {
+//          alert(JSON.stringify(res))
+          if (No) {
+            app.mYlist = res.data.proList;
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          } else {
+            app.mYlist = app.mYlist.concat(res.data.proList);
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          }
+          if (res.data.proList.length == 0) {
+            app.overlate = true;
+            app.rote = false;
+            app.load = false
+          }
+//          api.refreshHeaderLoadDone();
+        })
+      }
+    }
+  })
+</script>
+</html>

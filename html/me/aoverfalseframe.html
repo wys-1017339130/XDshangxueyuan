@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>审核结果</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+		<link rel="stylesheet" href="../../iconfont/iconfont.css">
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		.success{
+			width: 100%;
+			height: auto;
+			text-align: center;
+			background: white;
+			border-bottom: 1px solid #f5f5f5;
+			padding-top: 30px;
+		}
+		.titlebox{
+			margin: 0 auto 2rem auto;
+		}
+		.titlebox img {
+			width: 50px;
+			height: 50px;
+			border-radius: 50%;
+		}
+		.groupcontent{
+			padding-left: 20px;
+			box-sizing: border-box;
+			background: white;
+		}
+		.groupname{
+			padding: 0.75rem 0;
+			box-sizing: border-box;
+		}
+		.bottombtnbox{
+			width: 100%;
+			height: 8rem;
+			display: flex;
+		}
+		.managebtn{
+			width: 90%;
+			color: white;
+			background: #d9b270;
+			text-align: center;
+			border-radius: 5px;
+			line-height: 2.5rem;
+			margin: auto;
+		}
+		.bottomspan{
+			width: 100%;
+			position: absolute;
+			bottom: 2rem;
+			text-align: center;
+			color: #a1a1a1;
+			font-size: 11px;
+		}
+	</style>
+</head>
+<body>
+<div id="app">
+	<div class="successbox">
+	<div class="success">
+		<div class="titlebox">
+			<img style="margin-bottom: 30px" src="../../image/falseoimg.png">
+			<p style="font-size: 16px;font-weight: 600;color:#333333">审核未通过</p>
+		</div>
+	</div>
+		<div class="groupcontent">
+		<div class="groupname" style="border-bottom: 1px solid #f5f5f5">
+			<span>不通过原因:<span style="margin-left: 10px">{{detailsmessage.reason || '无'}}</span></span>
+		</div>
+		<div class="groupname">
+			<span>小组负责人:</span>
+			<span style="margin-left: 10px">{{detailsmessage.leading}}</span>
+		</div>
+		</div>
+		<div class="bottombtnbox" v-if="ifshowbtn == true">
+			<div class="managebtn" @click="ressubmit">重新提交申请</div>
+		</div>
+	</div>
+	<div class="bottomspan">如有疑问请咨询，客服010-86382312</div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {});
+  var app = new Vue({
+    el: '#app',
+    data: {
+      detailsmessage:'',
+      gid:'',
+      ifshowbtn:true
+		},
+    created: function () {
+      apiready = function () {
+        app.detailsmessage = api.pageParam.detailsmessage;
+        app.gid = api.pageParam.gid;
+				app.checkoutstate();
+        api.addEventListener({
+          name: 'closeadd'
+        }, function(ret, err) {
+          app.ifshowbtn = false
+        });
+      };
+    },
+    filters:{
+    },
+    methods: {
+      ressubmit:function() {
+        api.openWin({
+          name: 'groupcreatwin',
+          url: './groupcreatwin.html',
+          pageParam: {
+            opentinne: app.detailsmessage.type - 1
+          }
+        });
+			},
+      checkoutstate:function() {
+        var post ={
+          hash:$api.getStorage('token'),
+          gid:app.gid
+        };
+        sendAjax(this,post,'/Api/Group/setRead',function (res) {})
+      }
+    }
+  });
+
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+
+</html>

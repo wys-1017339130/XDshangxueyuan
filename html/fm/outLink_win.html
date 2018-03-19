@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>详情</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+</head>
+<body>
+<div id="app">
+    <!--头-->
+    <header class="aui-bar aui-bar-nav">
+        <a class="aui-pull-left aui-btn" style="margin-left: 0.5rem;" @click="close()">
+            <span class="iconfont icon-jiantou"></span>
+        </a>
+        <div class="aui-title">{{url}}</div>
+        <a class="aui-pull-right aui-btn">
+            <!--<span class="iconfont icon-fenxiang3"></span>-->
+        </a>
+    </header>
+</div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      title: '',
+      url: ''
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        api.execScript({name: 'root', frameName: 'FM', script: "app.closeBox();"});
+        app.url = api.pageParam.url;
+        app.type = api.pageParam.type;
+        var userID = localStorage.getItem('userID');
+        if (app.type == 3) {
+          app.url = app.url + userID;
+        }
+        api.openFrame({
+          name: 'outLink_fm',
+          url: app.url,
+          rect: {
+            x: 0,
+            y: $api.offset($api.dom("header")).h,
+            w: 'auto',
+            h: 'auto'
+          }
+        });
+      }
+    },
+    methods: {
+      close: function () {
+        api.closeWin();
+      }
+    }
+  })
+</script>
+</body>
+</html>

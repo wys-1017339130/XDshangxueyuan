@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>登录</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <style>
+        body {
+            background-color: #fff;
+        }
+
+        .bottom-tip {
+            font-size: 0.75rem;
+            color: #999;
+            left: 0;
+            width: 100%;
+            bottom: 0;
+            z-index: 10;
+            padding: 10px 0;
+        }
+
+        .bottom-tip span > span {
+            color: #0a83ff;
+        }
+
+        .bottom-tip .flex-con {
+            border-bottom: 1px solid #0a83ff;
+            transform: translateY(-50%);
+            -webkit-transform: translateY(-50%);
+        }
+
+        .wx-login-box {
+            text-align: center;
+            padding-top: 10%;
+        }
+
+        .wx-login-title {
+            text-align: center;
+            position: relative;
+            width: 80%;
+            margin-left: 10%;
+            height: 50px;
+            line-height: 50px;
+        }
+
+        .wx-login-title:after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 1px;
+            background-color: #ddd;
+            margin-top: -25px;
+        }
+
+        .wx-login-font {
+            padding: 0 25px;
+            background-color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .z-login-code-btn:before {
+            content: '';
+            display: block;
+            height: 0.8rem;
+            width: 1px;
+            background-color: #24518e;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .wz-bottom:after {
+            content: '';
+            bottom: 0;
+            height: 1px;
+            background-color: #ddd;
+            left: 15px;
+            right: 15px;
+            display: block;
+        }
+
+        .login-tip_my {
+            color: #999;
+            font-size: 0.7rem;
+            padding: 0.3rem 0 0.3rem 4rem;
+        }
+
+        .login-tip_my span {
+            color: #999;
+            text-decoration: underline;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body class="z-fff">
+<div id="HeadBar">
+    <div class="z-head">
+        <a class="z-head-left icon iconfont icon-jiantou z-fanhui" style="display:none"></a>
+        <div class="z-ellipsis z-head-text">登录</div>
+    </div>
+</div>
+<div id="main" style="margin-bottom: 0;position: relative;z-index: 10;padding-top: 30%">
+    <!-- <div style="position: relative;margin-bottom: 60px">
+        <img style="width: 100%;vertical-align: top;" src="../../image/login_bg.png" alt="">
+        <div style="position: absolute;bottom: 0;left: 0;width: 100%;text-align: center;">
+            <img style="margin-bottom: -45px;border-radius: 100%" data-u='' width="90" height="90" src="../../image/avatar2.png" alt="" onerror="this.src='../../image/avatar2.png'">
+        </div>
+
+    </div> -->
+    <div class="z-login-column wz-bottom" style="padding: 0 15px;position: relative;">
+        <span onclick="select()"
+              style="color:#24518e;display: inline-block;width: 60px;position: absolute;left: 15px;top: 0;text-align: left;"><i
+                id="quhao" style="font-style: none;">+86</i> <span class="icon iconfont icon-sanjiao-copy"
+                                                                   style="width: 4px;color: #24518e;font-size: 0.75rem;position: absolute;right: 0.4rem;"></span></span>
+        <label style="margin-left: 70px" for="phone">
+            <input style="padding-left:0;width: 80%;" placeholder="请输入您的手机号码" id="phone" type="tel">
+        </label>
+    </div>
+
+    <div class="z-login-column" style="padding: 0 15px;">
+        <label for="password" style="overflow: hidden;position: relative;border-bottom: 1px solid #ddd;">
+            <input onfocus="onF(this)" maxlength="6" id="code" type="tel" style="padding-left: 70px;"
+                   placeholder="请输入验证码">
+            <div id="send" class="z-login-code-btn unclick"
+                 style="color:#24518e;border: none;border-radius: 0;font-size: 0.75rem;right: -10px;top: 12px;"
+                 onclick="sendCodeclick('1')">获取验证码
+            </div>
+        </label>
+    </div>
+    <div class="login-tip_my">收不到短信，<span onclick="sendCodeclick('2')">获取语音验证码</span></div>
+    <!--<div style="height: 15px"></div>-->
+    <div style="font-size: 0.8rem;padding: 8px 15px;margin:0;" onclick="login();"
+         class="z-login-column z-login-column-btn">
+        <label style="background-color: #24518e;border-radius: 5px"> 登&nbsp;录 </label>
+    </div>
+    <div class="bottom-tip">
+        <span style="margin: 0 0.8rem;"><span class="icon iconfont icon-xuanzhong"
+                                              style="margin-right: 0.4rem;color:#24518e;"></span>点击登录，即表示您同意<span
+                data-href="../../html/me/agreement.html" data-name="agreement"
+                style="color:#24518e;">《用户协议》</span></span>
+    </div>
+    <div class="wx-login-box">
+        <div id="WXBOX" style="display:none;">
+            <div class="wx-login-title"><span class="wx-login-font">微信登录</span></div>
+            <img width="50" id="loginWX" src="../../res/icon/wxlogin.png"/>
+        </div>
+        <div onclick="guest();" style="margin-top: 50px;text-decoration: underline;"><span
+                style="color: #24518e;">随便逛逛</span></div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script>
+  var clicked = false;
+  var s = 30;
+  var Will = 0;
+  var inte;
+  var phone, code;
+  var dialogBox;
+  var type = 1;//如果用户不点获取验证码就登录就默认是登录接口
+  var offsetTop = 0;
+  var HeadBar = $api.byId('HeadBar');
+  var wx;
+  var _font = 16;
+  var isSelector = false;
+  var UIActionSelector;
+  var zip = '86';
+  var JSONS = [
+    {"name": "+86"},
+    {"name": "+1"},
+    {"name": "+1242"},
+    {"name": "+1284"},
+    {"name": "+1345"},
+    {"name": "+1473"},
+    {"name": "+1868"},
+    {"name": "+1876"},
+    {"name": "+20"},
+    {"name": "+212"},
+    {"name": "+216"},
+    {"name": "+220"},
+    {"name": "+221"},
+    {"name": "+222"},
+    {"name": "+223"},
+    {"name": "+224"},
+    {"name": "+226"},
+    {"name": "+227"},
+    {"name": "+228"},
+    {"name": "+229"},
+    {"name": "+230"},
+    {"name": "+232"},
+    {"name": "+234"},
+    {"name": "+235"},
+    {"name": "+237"},
+    {"name": "+238"},
+    {"name": "+240"},
+    {"name": "+241"},
+    {"name": "+244"},
+    {"name": "+245"},
+    {"name": "+248"},
+    {"name": "+250"},
+    {"name": "+253"},
+    {"name": "+254"},
+    {"name": "+255"},
+    {"name": "+256"},
+    {"name": "+258"},
+    {"name": "+260"},
+    {"name": "+261"},
+    {"name": "+263"},
+    {"name": "+264"},
+    {"name": "+265"},
+    {"name": "+266"},
+    {"name": "+268"},
+    {"name": "+269"},
+    {"name": "+27"},
+    {"name": "+30"},
+    {"name": "+31"},
+    {"name": "+32"},
+    {"name": "+33"},
+    {"name": "+34"},
+    {"name": "+351"},
+    {"name": "+352"},
+    {"name": "+353"},
+    {"name": "+355"},
+    {"name": "+357"},
+    {"name": "+358"},
+    {"name": "+359"},
+    {"name": "+36"},
+    {"name": "+370"},
+    {"name": "+371"},
+    {"name": "+372"},
+    {"name": "+373"},
+    {"name": "+375"},
+    {"name": "+380"},
+    {"name": "+381"},
+    {"name": "+385"},
+    {"name": "+386"},
+    {"name": "+39"},
+    {"name": "+40"},
+    {"name": "+41"},
+    {"name": "+421"},
+    {"name": "+43"},
+    {"name": "+44"},
+    {"name": "+45"},
+    {"name": "+46"},
+    {"name": "+47"},
+    {"name": "+48"},
+    {"name": "+49"},
+    {"name": "+501"},
+    {"name": "+502"},
+    {"name": "+503"},
+    {"name": "+504"},
+    {"name": "+505"},
+    {"name": "+506"},
+    {"name": "+507"},
+    {"name": "+51"},
+    {"name": "+52"},
+    {"name": "+54"},
+    {"name": "+55"},
+    {"name": "+56"},
+    {"name": "+57"},
+    {"name": "+58"},
+    {"name": "+591"},
+    {"name": "+592"},
+    {"name": "+597"},
+    {"name": "+598"},
+    {"name": "+60"},
+    {"name": "+61"},
+    {"name": "+62"},
+    {"name": "+63"},
+    {"name": "+64"},
+    {"name": "+65"},
+    {"name": "+66"},
+    {"name": "+673"},
+    {"name": "+675"},
+    {"name": "+7"},
+    {"name": "+81"},
+    {"name": "+82"},
+    {"name": "+84"},
+    {"name": "+852"},
+    {"name": "+853"},
+    {"name": "+855"},
+    {"name": "+886"},
+    {"name": "+90"},
+    {"name": "+91"},
+    {"name": "+94"},
+    {"name": "+960"},
+    {"name": "+962"},
+    {"name": "+965"},
+    {"name": "+966"},
+    {"name": "+967"},
+    {"name": "+968"},
+    {"name": "+970"},
+    {"name": "+971"},
+    {"name": "+972"},
+    {"name": "+973"},
+    {"name": "+974"},
+    {"name": "+976"},
+    {"name": "+992"},
+    {"name": "+993"},
+    {"name": "+994"},
+    {"name": "+995"},
+    {"name": "+996"},
+    {"name": "+998"}
+  ];
+
+  apiready = function () {
+    offsetTop = $api.offset($api.byId('code')).t;
+    $api.fixStatusBar(HeadBar);
+    wx = api.require('wx');
+
+    api.setStatusBarStyle({
+      style: 'dark'
+    });
+
+    UIActionSelector = api.require('UIActionSelector');
+    if (!App.iphone) {
+      _font = 14;
+    }
+
+    var token = $api.getStorage('token');
+    if (token && (token == App.guest)) {
+      document.querySelector(".z-fanhui").style.display = 'block';
+    } else {
+      document.querySelector(".z-fanhui").style.display = 'none';
+    }
+
+    //MD Start
+    api.execScript({name: 'root', script: "ChatAna('LoginPage',{'Active':'加载'},'登录界面');"});
+    //MD End
+
+    dialogBox = api.require('dialogBox');
+    api.addEventListener({
+      name: 'keyback'
+    }, function (ret, err) {
+      if (isSelector) {
+        UIActionSelector.close();
+      } else {
+        if (Will == 0) {
+          Will = Will + 1;
+          api.toast({
+            msg: '再次返回将退出应用',
+            duration: 2000,
+            location: 'bottom'
+          });
+        } else {
+          api.closeWidget({silent: true});
+        }
+      }
+    });
+
+      /*
+       if($api.getStorage('face')){
+       console.log($api.getStorage('face'));
+       document.querySelector("[data-u]").src = $api.getStorage('face');
+       }
+       */
+
+    api.getPrefs({
+      key: 'tel'
+    }, function (ret, err) {
+      if (ret) {
+        tel = ret.value;
+        if (tel && (tel.length > 6)) {
+          document.getElementById('phone').value = tel;
+          document.querySelector('.z-login-code-btn').className = document.querySelector('.z-login-code-btn').className.replace('unclick', '');
+        }
+      }
+    });
+
+    document.getElementById('phone').onkeyup = function () {
+      if ((this.value.length > 6) && !isNaN(this.value)) {
+        if (zip == '86') {
+          if (this.value.length == 11 && /^1(3[0-9]|4[57]|5[0-35-9]|7[0135678]|8[0-9])\d{8}$/.test(this.value)) {
+            document.querySelector('.z-login-code-btn').className = document.querySelector('.z-login-code-btn').className.replace('unclick', '');
+          } else {
+            document.querySelector('.z-login-code-btn').className = document.querySelector('.z-login-code-btn').className.replace('unclick', '') + ' unclick';
+          }
+        } else {
+          document.querySelector('.z-login-code-btn').className = document.querySelector('.z-login-code-btn').className.replace('unclick', '');
+        }
+      } else {
+        document.querySelector('.z-login-code-btn').className = document.querySelector('.z-login-code-btn').className.replace('unclick', '') + ' unclick';
+      }
+    }
+
+    document.getElementById('code').onkeyup = function () {
+      if ((this.value.length == 6) && !isNaN(this.value)) {
+        //document.querySelector('.z-login-column-btn').className = document.querySelector('.z-login-column-btn').className.replace('unclick','');
+        login();
+      }
+    }
+    wx.isInstalled(function (ret, err) {
+      if (ret.installed) {
+        $api.setStorage('nowx', '0');
+        document.getElementById('WXBOX').style.display = 'block';
+        document.getElementById('loginWX').onclick = function () {
+          api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '微信授权中',
+            modal: false
+          });
+
+          //MD Start
+          api.execScript({name: 'root', script: "ChatAna('wx_login',{'active':'微信登录'},'微信登录');"});
+          //MD End
+
+          wx.auth(function (ret, err) {
+            if (ret.status) {
+              wx.getToken({
+                code: ret.code
+              }, function (ret, err) {
+                if (ret.status) {
+                  api.hideProgress();
+                  api.showProgress({
+                    style: 'default',
+                    animationType: 'fade',
+                    title: '登录中...',
+                    modal: false
+                  });
+                  wx.getUserInfo({
+                    accessToken: ret.accessToken,
+                    openId: ret.openId
+                  }, function (ret, err) {
+                    if (ret.status) {
+                      api.execScript({name: 'root', script: "ChatAna('wxCode',{'is_success':true},'登录界面-微信登录成功');"});
+                      $api.setStorage('wx_openid', ret.openid);
+                      $api.setStorage('wx_unionid', ret.unionid);
+                      api.execScript({
+                        name: 'root',
+                        script: "XO.getWXOpen('" + ret.openid + "','" + ret.unionid + "',{name:'login',fun:'WXOpened'},{name:'login',fun:'tips'});"
+                      });
+
+                    } else {
+                      api.execScript({name: 'root', script: "ChatAna('wxCode',{'is_success':false},'登录界面-微信登录失败');"});
+
+                      api.hideProgress();
+                      api.toast({
+                        msg: '授权失败',
+                        duration: 2000,
+                        location: 'bottom'
+                      });
+                    }
+                  });
+
+                } else {
+
+                  api.execScript({name: 'root', script: "ChatAna('wxCode',{'is_success':false},'登录界面-微信登录失败');"});
+
+                  api.hideProgress();
+                  api.toast({
+                    msg: '授权失败',
+                    duration: 2000,
+                    location: 'bottom'
+                  });
+                }
+              });
+            } else {
+
+              api.execScript({name: 'root', script: "ChatAna('wxCode',{'is_success':false},'登录界面-微信登录失败');"});
+
+
+              api.hideProgress();
+              api.toast({
+                msg: '授权失败',
+                duration: 2000,
+                location: 'bottom'
+              });
+            }
+          });
+        }
+      } else {
+        $api.setStorage('nowx', '1');
+      }
+    });
+  };
+
+  function sendCodeclick(type) {
+    if (App.State()) {
+      if (clicked) {
+        return;
+      }
+      var uncheck = document.getElementById('send').className;
+      if (uncheck.indexOf('unclick') > 0) {
+        return;
+      }
+      api.execScript({name: 'root', script: "ChatAna('LoginPage',{'Active':'获取验证码'},'登录界面-获取验证码');"});
+      clicked = true;
+      phone = document.getElementById('phone').value;
+      if ((phone.length < 7) || isNaN(phone)) {
+        return;
+      }
+      if (type === '1') {
+        clickSendBtn();
+        document.getElementById('code').focus();
+        inte = setInterval(clickSendBtn, 1000);
+      }
+      api.execScript({
+        name: 'root',
+        script: "XO.GetCode('" + zip + "','" + phone + '#' + type + "',{name:'login',fun:'sendSuccess'},{name:'login',fun:'codefail'});"
+      });
+      clicked = false;
+    }
+  }
+  function tips(msg) {
+    api.hideProgress();
+    App.tips(msg);
+  }
+
+  function onF(dom) {
+    if (!/^\d*$/g.test(dom.value)) {
+      dom.value = '';
+    }
+  }
+
+  function codeFailCheck() {
+    App.tips('验证码获取失败!');
+  }
+
+  function sendSuccess(data) {
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+    api.toast({
+      msg: data.msg,
+      duration: 2000,
+      location: 'bottom'
+    });
+
+    api.execScript({name: 'root', script: "ChatAna('sendCode',{'is_success':true},'登录界面-验证码获取成功');"});
+  }
+
+  function codefail(msg) {
+    api.hideProgress();
+    api.toast({
+      msg: msg,
+      duration: 2000,
+      location: 'bottom'
+    });
+    api.execScript({name: 'root', script: "ChatAna('sendCode',{'is_success':false},'登录界面-验证码获取失败');"});
+  }
+
+  function clickSendBtn() {
+    if (s > 0) {
+      document.getElementById('send').innerHTML = s + 's后重新获取';
+      s--;
+    } else {
+      document.getElementById('send').innerHTML = '获取验证码';
+      s = 30;
+      clicked = false;
+      clearInterval(inte);
+    }
+  }
+
+  //随便逛逛
+
+  function guest() {
+
+    api.showProgress({
+      style: 'default',
+      animationType: 'fade',
+      title: '加载中...',
+      modal: false
+    });
+
+    api.execScript({name: 'root', script: "ChatAna('guest',{'is_success':true},'登录界面-游客');"});
+    $api.setStorage('token', App.guest);
+    api.execScript({
+      name: 'root',
+      script: "XO.GetUinfo('" + App.guest + "',{name:'root',fun:'getUinfoUpview'},{name:'root',fun:'getUinfoFail'});"
+    });
+    api.execScript({
+      name: 'root',
+      script: 'openIndexFrameGroup();ToFront();'
+    });
+    setTimeout(function () {
+//      api.execScript({
+//        name: 'root',
+//        frameName: 'home',
+//        script: 'gguest();'
+//      });
+      api.hideProgress();
+      api.closeToWin({
+        name: 'root'
+      });
+    }, 500);
+  }
+
+  function WXOpened(data) {
+    api.hideProgress();
+    if (typeof data == 'string') {
+      if (data == 'WXopenid') {
+        api.sendEvent({name: 'IndexEvent', extra: {page: 'wxInfo'}});
+        api.openWin({
+          name: 'wxInfo',
+          url: '../../html/me/wxInfo.html',
+          pageParam: {
+            openid: $api.getStorage('wx_openid'),
+            unionid: $api.getStorage('wx_unionid')
+          },
+          bounces: false,
+          rect: {
+            x: 0,
+            y: 0,
+            w: 'auto',
+            h: 'auto'
+          },
+          slidBackEnabled: true
+        });
+      } else if (data == 'Opened') {
+        var token = $api.getStorage('token');
+        if (token && (token == App.guest)) {
+          api.execScript({
+            name: 'root',
+            script: "XO.GetUinfo('" + token + "',{name:'root',fun:'getUinfoUpview'},{name:'root',fun:'getUinfoFail'});"
+          });
+          api.execScript({name: 'root', frameName: 'foot', script: "select(0,document.querySelector('#ifoot'));"});
+          api.closeToWin({name: 'root'});
+          return;
+        } else if (token) {
+          api.execScript({
+            name: 'root',
+            script: "XO.GetUinfo('" + token + "',{name:'root',fun:'getUinfoUpview'},{name:'root',fun:'getUinfoFail'});"
+          });
+          api.execScript({
+            name: 'root',
+            script: 'openIndexFrameGroup();ToFront();'
+          });
+          api.closeToWin({
+            name: 'root'
+          });
+        }
+      }
+    }
+    api.sendEvent({
+      name: 'LOING'
+    });
+  }
+
+  var isloging = false;
+
+  function login() {
+    if (isloging) {
+      return;
+    }
+    isloging = true;
+    hide();
+    if (App.State()) {
+      phone = document.getElementById('phone').value;
+      code = document.getElementById('code').value;
+      if (!phone) {
+        api.toast({
+          msg: '请输入手机号',
+          duration: 2000,
+          location: 'bottom'
+        });
+        isloging = false;
+        return;
+      } else {
+        if (isNaN(phone)) {
+          api.toast({
+            msg: '请输入正确手机号',
+            duration: 2000,
+            location: 'bottom'
+          });
+          isloging = false;
+          return;
+        }
+      }
+      if (!code || !/^\d*$/g.test(code)) {
+        api.toast({
+          msg: '请输入验证码',
+          duration: 2000,
+          location: 'bottom'
+        });
+        isloging = false;
+        return;
+      }
+      api.showProgress({
+        style: 'default',
+        animationType: 'fade',
+        title: '登录中...',
+        modal: false
+      });
+      $api.rmStorage('token');
+      api.execScript({name: 'root', script: "ChatAna('LoginPage',{'Active':'提交登录'},'登录界面-提交登录');"});
+      api.execScript({
+        name: 'root',
+        script: "XO.Login('" + phone + "','" + code + "','" + zip + "',{name:'login',fun:'Login'},{name:'login',fun:'failLogin'});"
+      });
+    } else {
+      isloging = false;
+    }
+  }
+
+  function Login(data) {
+    api.hideProgress();
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+    api.sendEvent({
+      name: 'LOING'
+    });
+    api.execScript({name: 'root', script: "ChatAna('login',{'is_success':true},'登录界面-登录成功');"});
+    var token = $api.getStorage('token');
+    if (token && (token == App.guest)) {
+      console.log(data.token + '|' + App.guest);
+      if (data.token != App.guest) {
+        $api.setStorage('token', data.token);
+        api.execScript({name: 'root', frameName: 'foot', script: "select(0,document.querySelector('#ifoot'));"});
+        api.execScript({name: 'root', script: "willGetUinfo('" + data.token + "',true)"});
+        api.closeToWin({
+          name: 'root'
+        });
+        return;
+      }
+    }
+    $api.setStorage('token', data.token);
+    api.execScript({name: 'root', script: "willGetUinfo('" + data.token + "',true)"});
+    App.checkToken();
+    api.closeToWin({
+      name: 'root'
+    });
+  }
+
+  function closeW() {
+    api.closeToWin({
+      name: 'root'
+    });
+  }
+
+  function failLogin(data) {
+    isloging = false;
+    api.hideProgress();
+    api.toast({
+      msg: data,
+      duration: 2000,
+      location: 'bottom'
+    });
+    api.execScript({name: 'root', script: "ChatAna('login',{'is_success':false},'登录界面-登录失败');"});
+  }
+
+  function hide() {
+    var UIInput = api.require('UIInput');
+    UIInput.open({
+      rect: {
+        x: 0,
+        y: 0,
+        w: 0,
+        h: 0
+      },
+      autoFocus: true,
+      maxRows: 4,
+      placeholder: '',
+      keyboardType: 'number',
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      if (ret) {
+        UIInput.closeKeyboard({id: ret.id});
+        UIInput.close({id: ret.id});
+      }
+    });
+  }
+
+  function select() {
+    isSelector = true;
+    UIActionSelector.open({
+      datas: JSONS,
+      layout: {
+        row: 2,
+        col: 1,
+        height: 30,
+        size: _font,
+        sizeActive: _font + 2,
+        rowSpacing: 2,
+        colSpacing: 2,
+        maskBg: 'rgba(0,0,0,0.2)',
+        bg: '#fff',
+        color: '#888',
+        colorActive: '#0084ff',
+        colorSelected: '#0084ff'
+      },
+      animation: true,
+      cancel: {
+        text: '取消',
+        size: _font,
+        w: 90,
+        h: 35,
+        bg: '#eee',
+        bgActive: '#ccc',
+        color: '#888',
+        colorActive: '#fff'
+      },
+      ok: {
+        text: '确定',
+        size: _font,
+        w: 90,
+        h: 35,
+        bg: '#eee',
+        bgActive: '#ccc',
+        color: '#888',
+        colorActive: '#fff'
+      },
+      title: {
+        text: '',
+        size: 16,
+        h: 44,
+        bg: '#eee',
+        color: '#888'
+      },
+      fixedOn: api.frameName
+    }, function (ret, err) {
+      if (ret) {
+        isSelector = false;
+        if (ret.eventType == 'ok') {
+          document.getElementById("quhao").innerHTML = ret.selectedInfo[0].name;
+          zip = ret.selectedInfo[0].name;
+          zip = zip.slice(1);
+        }
+      }
+      UIActionSelector.close();
+    });
+  }
+</script>
+</html>

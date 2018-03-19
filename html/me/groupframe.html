@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>学生会</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper-3.4.2.min.css">
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style scoped="scoped">
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .mygrouptitle {
+            /*padding: 5px 15px 15px 15px;*/
+            box-sizing: border-box;
+            background: white;
+            height: auto;
+        }
+
+        .mygroup {
+            font-size: 17px;
+            font-weight: bold;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            background: white;
+            text-align: left;
+            width: 45%;
+        }
+
+        .moregroup {
+            width: 53%;
+            text-align: right;
+            font-size: 14px;
+            color: #a1a1a1;
+        }
+
+        .mywork {
+            background: #f9f9f9;
+            border-top: 10px solid #f5f5f5;
+        }
+
+        .myworktitle {
+            padding-left: 15px;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            font-size: 17px;
+            font-weight: bold;
+            background: white;
+            box-sizing: border-box;
+            border-bottom: 1px solid #ebebeb;
+        }
+
+        .leftimg {
+            width: 20%;
+            display: inline-block;
+            float: left;
+        }
+
+        .leftimg img {
+            width: 4rem;
+            border-radius: 4px;
+            height: 4.5rem;
+            margin: auto;
+        }
+
+        .contentbox {
+            width: 100%;
+            height: 5.5rem;
+            border-bottom: 1px solid #ebebeb;
+            padding: 0.5rem 10px;
+            background: white;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .contentbox:active {
+            background: gainsboro;
+        }
+
+        .rightcontent {
+            display: inline-block;
+            float: left;
+            margin-left: 0.75rem;
+        }
+
+        .headerimg {
+            border-radius: 50%;
+            width: 1.7rem;
+            height: 1.7rem;
+            display: block;
+        }
+
+        .headerpimgleft {
+            width: auto;
+            margin-right: 0.7rem;
+            display: inline-block;
+        }
+
+        .mastercontent {
+            padding: 10px 15px 0 15px;
+            box-sizing: border-box;
+            background: white;
+            border-bottom: 10px solid #f5f5f5;
+        }
+
+        .publicimg {
+            margin-right: 6px;
+            padding: 0;
+            width: 5rem;
+            height: 5rem;
+        }
+
+        .publicimgfour {
+            margin-right: 3%;
+            padding: 0;
+            width: 5rem;
+            height: 5rem;
+        }
+
+        .localwhere {
+            color: #000000;
+            line-height: 2rem;
+            font-size: 13px;
+        }
+
+        .contentp {
+            font-size: 15px;
+            line-height: 1rem;
+            margin: 1rem 0;
+            transition: 0.5s;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 10 !important;
+            overflow: hidden;
+        }
+
+        .beforecontentp {
+            font-size: 15px;
+            line-height: 1rem;
+            margin: 1rem 0;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+            transition: 0.5s;
+        }
+
+        .bottomdo {
+            text-align: right;
+            padding-bottom: 2rem;
+            padding-top: 1rem;
+        }
+
+        .bottomdo span {
+            margin: 0 5px 0 0.5rem;
+        }
+
+        .swiper-slide {
+            height: 4rem;
+            line-height: 4rem;
+            border-radius: 3px;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            /*box-shadow: 0 4px 4px rgba(255, 0, 0, 0.2);*/
+            box-shadow: 0 4px 4px #ec7e3a;
+            position: relative;
+        }
+
+        .oimg {
+            width: 5rem;
+            margin: 5px 0
+        }
+
+        .otherbox {
+            width: 100%;
+            height: auto;
+        }
+
+        .mygrouplistbox {
+            width: 100%;
+            height: 4.5rem;
+            background: #f9f9f9;
+            text-align: center;
+            color: #a1a1ab;
+            padding-bottom: 0.6rem;
+        }
+
+        /*分页*/
+        .bottomdiv {
+            width: 100%;
+            height: 3rem;
+            text-align: center;
+            line-height: 3rem;
+            background: #f9f9f9;
+            /*margin-bottom: 5rem;*/
+            padding-bottom: 3rem;
+            color: black;
+        }
+
+        .uptext {
+            color: #bfbfbf;
+            font-size: 13px;
+        }
+
+        .publicfont {
+            width: 20px;
+            height: 20px;
+            margin: auto;
+        }
+
+        .publicworkfont {
+            color: #797979;
+            font-size: 13px;
+        }
+
+        .bertrstyle {
+            padding: 1px 10px;
+            border-radius: 5px;
+            background: #ec7e3a;
+            text-align: center;
+            color: white;
+        }
+
+        .bertrstylestar {
+            padding: 1px 10px;
+            border-radius: 5px;
+            background: #0a83ff;
+            text-align: center;
+            color: white;
+        }
+
+        .noneworkbox {
+            margin: 1.2rem auto 0 auto;
+            text-align: center;
+            background: #f9f9f9;
+            font-size: 14px;
+        }
+
+        .noneworkbox img {
+            width: 7rem;
+            height: 7rem;
+            margin-bottom: 10px;
+        }
+
+        .bottomdo img {
+            width: 1.2rem;
+            height: 1.2rem;
+        }
+
+        .fonttextnum {
+            line-height: 1.2rem;
+        }
+
+        /*.swiper-container:last-child{*/
+        /*padding-right: 15px;*/
+        /*}*/
+        .minoimg {
+            width: 12px;
+            height: 15px;
+            margin-left: 3px;
+            margin-right: 3px
+        }
+    </style>
+</head>
+<body style="position: relative;background: #f9f9f9">
+<div id="app" style="width: 100%;height: 100%;">
+    <div style="width: 100%;height: 100%;background: #f2f2f2;display: flex;position: absolute;left: 0;top:0"
+         v-show="abllshow==false">
+        <img style="margin: auto;width: 3rem;height: 3rem" src="../../image/timg.gif">
+    </div>
+    <div v-show="abllshow==true">
+        <!--圈子选择列表-->
+        <div v-show="spanindex==0">
+            <!--有小组-->
+            <div id="main" v-if="boolshow==0" style="background: #f9f9f9">
+                <div class="mygrouptitle">
+                    <div style="line-height: 1.75rem">
+                        <div style="padding: 5px 15px;box-sizing: border-box">
+                            <span class="mygroup">我的小组</span>
+                            <span class="moregroup" @click="morework">更多	<i class="iconfont icon-jiantou"></i></span>
+                        </div>
+                        <!--1118版的-->
+                        <div class="swiperbox">
+                            <div class="swiper-container" style="height: 5.5rem">
+                                <div class="swiper-wrapper movie" style="box-sizing: border-box">
+                                    <div @click="openmygroup(index)" class="swiper-slide"
+                                         v-for="(item,index) in mygrouplist"
+                                         :style=" 'box-shadow: 2px 5px 10px ' + colorlistred[index].c +';'+'background:linear-gradient(to left,'　+　colorlistred[index].b　+　','　+colorlistred[index].a　+ ')'">
+                                        <span>{{item.name}}</span>
+                                        <span
+                                                style="width: 1.7rem;border-top: 2px solid white;margin-left: -0.85rem;position: absolute;left: 50%;right: 0;bottom: 18px"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--没有小组-->
+            <div class="otherbox" v-else>
+                <div class="mygroup"
+                     style="width: 100%;padding-left: 15px;box-sizing: border-box;border-bottom: 1px solid #f7f7f7">我的小组
+                </div>
+                <div class="mygrouplistbox">
+                    <img class="oimg" src="../../image/nullgroup.png">
+                    <p style="font-size: 14px">尚未加入组织</p>
+                </div>
+            </div>
+            <!--任务-->
+            <div class="mywork">
+                <div class="myworktitle">我的任务</div>
+                <!--有任务-->
+                <div v-show="ifshow == 1" v-for="(item,index) in worllist" class="contentbox"
+                     @click="gotodetail(index)">
+                    <div class="leftimg">
+                        <img v-if="item.pic!=''" :src="formatImg(item.pic)">
+                        <img v-else src="../../image/kong.png">
+                    </div>
+                    <div class="rightcontent" style="margin-left: 1rem">
+                        <div style="padding-bottom: 0.5rem">
+                            <span style="font-size: 17px">{{item.title || '暂无信息'}}</span>
+                        </div>
+                        <div style="padding-bottom: 0.5rem">
+                            <img style="float: left;width: 0.8rem;height:0.8rem" src="../../image/time.png">
+                            <span class="publicworkfont" style="margin-left: 5px;line-height: 0.7rem">{{item.start_date || '时间未定'}}至{{item.end_date || '时间未定'}}</span>
+                        </div>
+                        <div>
+                            <span v-if="item.complete==0" class="bertrstyle">{{item.complete | filetersstate}}</span>
+                            <span v-else class="bertrstylestar">{{item.complete | filetersstate}}</span>
+                            <span style="color: #252525;font-size: 12px;margin-left: 5px">{{item.gname || '暂无信息'}}</span>
+                        </div>
+                    </div>
+                </div>
+                <!--没任务-->
+                <div v-show="ifshow==0" class="noneworkbox">
+                    <img src="../../image/solan.png">
+                    <p style="color:#b5b4b9">某人很懒，还没有任务！</p>
+                </div>
+            </div>
+        </div>
+        <!--//官方列表-->
+        <div v-show="spanindex==1">
+            <!--官方有内容-->
+            <div v-if="ifshowkong==1" class="mastercontent" v-for="(item,index) in masterlist">
+                <div style="width: 100%;display: flex">
+                    <div class="headerpimgleft"><img class="headerimg" :src="formatImg(item.face)"></div>
+                    <div style="display: inline-block">
+                        <p style="font-size: 14px;display: flex">
+                            <span style="font-size: 13px;margin-right: 3px">{{item.nickname}}</span>
+                            <img v-if="item.level==5" src="../../image/haungguanpai.png" class="minoimg">
+                            <img v-if="item.level==3" src="../../image/haungjinpai.png" class="minoimg">
+                            <img v-if="item.level==4" src="../../image/zuanshipai.png" class="minoimg">
+                            <img v-if="item.level==1" src="../../image/tongpai.png" class="minoimg">
+                            <img v-if="item.level==2" src="../../image/yinpai.png" class="minoimg">
+                            <span style="color: #d3b57e;font-size: 12px">{{item.levelText}}</span>
+                        </p>
+                        <p style="color: #9c9c9c;font-size: 11px">{{item.addtime | sheng}}</p>
+                    </div>
+                </div>
+
+                <div class="beforecontentp erstyle" :class="{contentp: checkallindex == index}">{{item.content}}</div>
+                <!--<div class="contentp" v-if="item.content.length>35 && checkallindex == index">{{item.content}}</div>-->
+                <!--<div class="contentp" v-if = "item.content.length<=35">{{item.content}}</div>-->
+
+                <div style="color: #d9b270;font-size: 14px;padding:10px 0" @click="showalltext(index)"
+                     v-if=" item.content.length>35 && checkallindex != index">查看全部
+                </div>
+                <div style="width: 100%" v-if="item.pics.length==1">
+                    <img style="width: 10rem;height: 10rem" v-for="(itompic,i) in item.pics"
+                         :src="formatImg(itompic)"
+                         @click="openPhotoBrowser(item.pics,i)"
+                    >
+                </div>
+                <div style="width: 100%" v-if="item.pics.length==4">
+                    <div style="width: 100%;margin: 0">
+                        <img v-for="(pic,i) in item.pics" class="publicimgfour" :src="formatImg(pic)"
+                             @click="openPhotoBrowser(item.pics,i)">
+                    </div>
+                </div>
+                <div style="width: 100%" v-if="item.pics.length==2 || item.pics.length==3">
+                    <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
+                    <img class="publicimg" v-for="(itompic,i) in item.pics" :src="formatImg(itompic)"
+                         @click="openPhotoBrowser(item.pics,i)">
+                </div>
+                <div style="width: 100%" v-if="item.pics.length==0">
+                    <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!-->
+                    <img class="publicimg" v-for="itompic in item.pics" :src="formatImg(itompic)">
+                </div>
+                <!--[{'99':'xxx.mp3'},{}]-->
+                <p class="localwhere" v-if="item.address.length!=0">
+                    <i style="color: #000000;font-size: 13px" class="iconfont icon-icon104"></i>{{item.address}}
+                </p>
+                <div class="bottomdo">
+          <span v-show="item.sns_id" style="display: flex;float: right" @click="opengroupDetail(index)">
+					<img src="../../image/huati_icon.png">
+					<span class="fonttextnum">话题</span>
+				</span>
+                    <span style="display: flex;float: right" @click="openshare(index)">
+					<img src="../../image/turn.png">
+					<span class="fonttextnum">转发</span>
+				</span>
+                    <span @click="gotoalltoken(index)" style="display: flex;float: right">
+					<img src="../../image/messageer.png">
+					<span class="fonttextnum">{{item.commentCount}}</span>
+				</span>
+                    <span style="display: flex;float: right" @click="dianzanbtn(index)">
+					<!--<i style="color: #8a8a8a;font-size: 20px" class="iconfont icon-zan"></i>-->
+					<img v-if="item.agree == 0" src="../../image/dianzan.png">
+					<img v-if="item.agree == 1" src="../../image/zancopy.png">
+					<span class="fonttextnum">{{item.agreeCount}}</span>
+				</span>
+                </div>
+            </div>
+            <!--官方没内容-->
+            <div v-show="ifshowkong==0" style="margin: 0 auto 10px auto;text-align: center">
+                <img src="../../image/kong.png" style="width: 8.6rem;height: 8.6rem;margin-top: 4.7rem">
+                <p style="color:#b5b4b9">空空的，沙发都抢不到~</p>
+            </div>
+        </div>
+        <div class="bottomdiv">
+            <img v-if="load" class="publicfont" src="../../image/timg.gif">
+            <span v-if="overlate" class="uptext"></span>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/swiper-3.4.2.min.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      formatImg: formatImg,
+      photoBrowser: '',
+      boolshow: '',
+      spanindex: 0,
+      masterlist: '',
+      ceifblure: false,
+      newtime: ['1', '2', '3', '4'],
+      mygrouplist: [],
+      page: 1,
+      worllist: [],
+      overlate: false,
+      load: false,
+      ifshow: true,
+      loadering: 0,
+      abllshow: false,
+      colorlistred: [
+//			  #5563fe-#9f80ff:投影：#7a72ff
+        {
+          a: '#ff9627',
+          b: '#ffd184',
+          c: 'rgba(236, 126, 58, 0.4)',
+        },
+        {
+          a: '#25d6b6',
+          b: '#98ec68',
+          c: 'rgba(4,180,48,0.4)'
+        },
+        {
+          a: '#5563fe',
+          b: '#9f80ff',
+          c: 'rgba(122,114,255,0.4)'
+        },
+      ],
+      ifshowkong: 1,
+      filmscover: '',
+      ablershow: false,
+      checkallindex: null,
+      type: null
+    },
+    created: function () {
+      apiready = function () {
+        app.photoBrowser = api.require('photoBrowser');
+        //打开 小的 听课frame
+        setTimeout(function () {
+          api.openFrame({
+            name: 'smallcontroller',
+            url: '../../html/indexgroup/smallcontroller.html',
+            rect: {
+              x: 0,
+              y: api.winHeight - 97,
+              w: api.winWidth,
+              h: 50
+            },
+            pageParam: {
+              name: 'smallcontroller'
+            }
+          });
+        }, 500);
+        if (api.frameName == 'groupframe2') {
+          app.getnewIndex();
+        }
+        //监听发布任务成功接口再次调用
+        api.addEventListener({
+          name: 'revoreddate'
+        }, function (ret, err) {
+          app.getmyworklist(1);
+        });
+        //监听创建小组成功再次调用 获取小组列表
+        api.addEventListener({
+          name: 'successevent'
+        }, function (ret, err) {
+          app.getclass();
+        });
+        //下拉刷新
+        api.setCustomRefreshHeaderInfo({
+          bgColor: '#efefef',
+          image: {
+            pull: 'widget://res/refresh/pull_image.png',
+            transform: [
+              'widget://res/refresh/refreshing_image_frame_01.png',
+              'widget://res/refresh/refreshing_image_frame_02.png',
+              'widget://res/refresh/refreshing_image_frame_03.png',
+              'widget://res/refresh/refreshing_image_frame_04.png',
+              'widget://res/refresh/refreshing_image_frame_05.png',
+              'widget://res/refresh/refreshing_image_frame_06.png',
+              'widget://res/refresh/refreshing_image_frame_07.png',
+              'widget://res/refresh/refreshing_image_frame_08.png',
+              'widget://res/refresh/refreshing_image_frame_09.png',
+              'widget://res/refresh/refreshing_image_frame_10.png',
+              'widget://res/refresh/refreshing_image_frame_11.png',
+              'widget://res/refresh/refreshing_image_frame_12.png'
+            ],
+            load: [
+              'widget://res/refresh/pull_end_image_frame_01.png'
+            ]
+          }
+        }, function () {
+          if (api.connectionType == 'none') {
+            api.refreshHeaderLoadDone();
+            api.toast({
+              msg: '未连接网络',
+              duration: 2000,
+              location: 'bottom'
+            });
+          } else {
+            app.page = 1;
+            app.overlate = false;
+            app.load = false;
+            if (app.spanindex == 1) {
+              app.GFrefresh(function () {
+                api.refreshHeaderLoadDone();
+              })
+            } else {
+              app.allrefresh(function () {
+                api.refreshHeaderLoadDone();
+              });
+            }
+          }
+        });
+        //获取我的课程列表
+        app.getclass();
+        //获取我的任务列表
+        app.getmyworklist(1);
+        api.addEventListener({
+          name: 'myEvent'
+        }, function (ret, err) {
+          app.spanindex = ret.value.titleindex;
+          app.overlate = false;
+          app.load = false;
+          app.page = 1;
+          if (app.spanindex == 1) {
+            app.getOfficialList(1);
+            document.documentElement.scrollTop = document.body.scrollTop = 0;
+            app.overlate = false;
+          } else {
+            document.documentElement.scrollTop = document.body.scrollTop = 0;
+            app.getmyworklist(1);
+            app.overlate = false;
+          }
+        });
+        api.addEventListener({
+          name: 'opencreateevent'
+        }, function (ret, err) {
+          app.ceifblure = true
+        });
+        //滑动监听
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 20 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+          //滑动时候改变的值
+        }, function (ret, err) {
+          app.load = true;
+          app.overlate = false;
+          app.page++;
+          if (app.spanindex == 0) {
+            app.getmyworklist()
+          } else {
+            app.getOfficialList()
+          }
+        });
+        //监听评论更新
+        api.addEventListener({
+          name: 'newmessagelist'
+        }, function (ret, err) {
+          app.getOfficialList(1)
+        });
+      };
+    },
+    watch: {
+//记得改成2 value!
+      'loadering': function (value) {
+        if (value == 2) {
+          setTimeout(function () {
+            app.abllshow = true;
+          }, 0)
+        }
+      }
+    },
+    filters: {
+      //完成 未完成 状态过滤
+      filetersstate: function (a) {
+        switch (a) {
+          case "1":
+            return '已完成';
+          case "0":
+            return '未完成';
+        }
+      },
+      //减弱时间
+      sheng: function (chavaluetime) {
+        var diff = app.newdatatime - chavaluetime;
+        if (diff > 31536000) {
+          return parseInt(diff / 31536000) + '年前';
+        } else if (diff > 2592000) {
+          return parseInt(diff / 2592000) + '月前';
+        } else if (diff > 86400) {
+          return parseInt(diff / 86400) + '天前';
+        } else if (diff > 3600) {
+          return parseInt(diff / 3600) + '小时前';
+        } else if (diff > 60) {
+          return parseInt(diff / 60) + '分钟前';
+        } else {
+          return diff + '秒前';
+        }
+      }
+    },
+    mounted: function () {
+    },
+    methods: {
+      getnewIndex: function () {
+        var index = $api.getStorage('newIndex');
+        if (index && index == 1) {
+          app.spanindex = 1;
+          app.overlate = false;
+          app.load = false;
+          app.page = 1;
+          app.getOfficialList(1);
+          document.documentElement.scrollTop = document.body.scrollTop = 0;
+          app.overlate = false;
+          $api.rmStorage('newIndex');
+        }
+      },
+      //下拉刷新
+      allrefresh: function (callback) {
+        app.getclass();
+        app.getmyworklist(1);
+        if (callback) {
+          callback()
+        }
+      },
+      //官方-------下拉刷新
+      GFrefresh: function (callback) {
+        app.getOfficialList(1);
+        if (callback) {
+          callback()
+        }
+      },
+      //查看更多任务
+      morework: function () {
+        api.openWin({
+          name: 'morework',
+          url: './morework.html'
+        })
+      },
+      //前往留言
+      gotoalltoken: function (index) {
+        api.openWin({
+          name: 'alltokenmessage_win',
+          url: './alltokenmessage_win.html',
+          pageParam: {
+            reid: app.masterlist[index].id
+          }
+        })
+      },
+      //获取课程列表 （前3个课程）
+      getclass: function () {
+        var post = {
+          hash: $api.getStorage('token'),
+          type: 1
+        };
+        sendAjax(this, post, '/Api/Group/getGroupList', function (res) {
+          app.mygrouplist = res.data.splice(0, 3);
+          if (app.mygrouplist.length != 0) {
+            app.$nextTick(function () {
+              var mySwiper = new Swiper('.swiper-container', {
+                slidesPerView: 1.2,
+                spaceBetween: 10,
+                centeredSlides: true,
+                freeMode: false,
+                observer: true,
+                observeParents: true
+              });
+            })
+          } else {
+            app.boolshow = 1
+          }
+          app.loadering++;
+        })
+      },
+      //去我的小组任务(小组详情)
+      openmygroup: function (index) {
+        api.openWin({
+          name: 'grouplist_win',
+          url: './grouplist_win.html',
+          pageParam: {
+            gid: app.mygrouplist[index].id
+          }
+        })
+      },
+      //获取我的任务列表
+      getmyworklist: function (ref) {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var post = {
+          hash: $api.getStorage('token'),
+          page: app.page,
+          perPage: 5
+        };
+        sendAjax(this, post, '/Api/Group/getMyMissionList', function (res) {
+          api.hideProgress();
+          if (ref == 1) {
+            app.worllist = res.data.proList;
+//            app.filmscover = res.data.proList[0].pic;
+            if (app.worllist.length == 0) {
+              app.ifshow = 0;
+              app.load = false;
+              app.overlate = false;
+            } else {
+              app.ifshow = 1;
+            }
+          } else {
+            app.worllist = app.worllist.concat(res.data.proList);
+            app.load = false
+          }
+          if (res.data.proList.length == 0 && app.boolshow == 0) {
+            app.overlate = true;
+            app.load = false
+          }
+          app.loadering++;
+        })
+      },
+      //前往我的任务详情
+      gotodetail: function (index) {
+        if (app.worllist[index].cid == 1) {
+          api.openWin({
+            name: 'weekly',
+            url: '../me/weekly.html',
+            pageParam: {
+              des: 0
+            }
+          });
+          return
+        } else {
+          //        收费 跳转购买页
+//          if (app.worllist[index].price > 0 && app.worllist[index].buyed == 0) {
+//            api.openWin({
+//              name: 'courseInfo_win',
+//              url: '../fm/courseInfo_win.html',
+//              pageParam: {
+//                des: app.worllist[index].cid,
+//                price: app.worllist[index].price,
+//                buyed: app.worllist[index].buyed,
+//                title: app.worllist[index].title
+//              }
+//            });
+////        价格为零 跳转课程列表页
+//          } else {
+          api.openWin({
+            name: 'professionDetail2',
+            url: '../fm/professionDetail3.html',
+            pageParam: {
+              des: app.worllist[index].cid,
+              price: app.worllist[index].price,
+              buyed: app.worllist[index].buyed,
+              title: app.worllist[index].title
+            }
+          });
+//          }
+        }
+      },
+      //开始点赞 ，关闭点赞
+      dianzanbtn: function (index) {
+        if (app.masterlist[index].agree == 1) {
+          app.masterlist[index].agree = 0;
+          app.masterlist[index].agreeCount = app.masterlist[index].agreeCount - 1
+
+        } else {
+          app.masterlist[index].agreeCount++;
+          app.masterlist[index].agree = 1
+        }
+
+        var post = {
+          hash: $api.getStorage('token'),
+          oid: app.masterlist[index].id
+        };
+        sendAjax(this, post, '/Api/Official/officialAgree', function (res) {
+        })
+      },
+      //转发
+      share: function (index) {
+        dialogBox = api.require("dialogBox");
+        wx = api.require("wx");
+        //MD Start
+        api.execScript({name: 'root', script: "ChatAna('EMBAPage',{'Active':'开始分享'},'商学院-开始分享');"});
+        //MD End
+        dialogBox.actionMenu({
+          rect: {
+            h: 170
+          },
+          texts: {
+            cancel: '取消分享'
+          },
+          items: [
+            {
+              text: '微信好友',
+              icon: 'widget://res/icon/icon-wx.png'
+            },
+            {
+              text: '微信朋友圈',
+              icon: 'widget://res/icon/icon-pyq.png'
+            }
+          ],
+          styles: {
+            bg: '#FFF',
+            column: 2,
+            itemText: {
+              color: '#000',
+              size: 12,
+              marginT: 8
+            },
+            itemIcon: {
+              size: 60
+            },
+            cancel: {
+              bg: '#fff',
+              color: '#000',
+              h: 44,
+              size: 14
+            }
+          },
+          tapClose: true
+        }, function (ret) {
+          dialogBox.close({dialogName: 'actionMenu'});
+          switch (ret.index) {
+            case 0 : {
+              wx.shareWebpage({
+                apiKey: '',
+                scene: 'session',
+                title: app.masterlist[index].nickname,
+                description: app.masterlist[index].content,
+                thumb: '../../image/logo.png',
+//              contentUrl: wapUrl + 'wap/html2/find/catchdetails/catchdetails_fm.html?' + app.typenumer + ',' + app.courseorclubId + ',' + getcitycode()
+                contentUrl: App.url + 'api.php/' + 'Api/Share/sharepage_frame?id=' + app.masterlist[index].id
+              }, function (ret, err) {
+                if (ret.status) {
+                  toastMsg('分享成功');
+                } else {
+                  toastMsg('取消发送');
+                }
+              });
+              break;
+            }
+              break;
+            case 1: {
+              wx.shareWebpage({
+                scene: 'timeline',
+                title: app.masterlist[index].nickname,
+                description: app.masterlist[index].content,
+                thumb: '../../image/logo.png',
+//              contentUrl: wapUrl + 'wap/html2/find/catchdetails/catchdetails_fm.html?' + app.typenumer + ',' + app.courseorclubId + ',' + getcitycode()
+                contentUrl: App.url + 'api.php/' + 'Api/Share/sharepage_frame?id=' + app.masterlist[index].id
+              }, function (ret, err) {
+                if (ret.status) {
+                  toastMsg('分享成功');
+                } else {
+                  toastMsg('取消发送');
+                }
+              });
+              break;
+            }
+              break;
+            default:
+          }
+        });
+      },
+      //打开 转发
+      openshare: function (index) {
+        app.share(index)
+      },
+      //获取官方动态
+      getOfficialList: function (ref, callback) {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var post = {
+          hash: $api.getStorage('token'),
+          type: 1,
+          page: app.page,
+          perPage: 5
+        };
+        sendAjax(this, post, '/Api/Official/getOfficialList', function (res) {
+          api.hideProgress();
+          app.newdatatime = res.data.now;
+          if (ref == 1) {
+            app.masterlist = res.data.prolist;
+            if (app.masterlist.length == 0) {
+              app.ifshowkong = 0;
+              app.overlate = false;
+              app.load = false;
+            } else {
+              app.ifshowkong = 1;
+            }
+          }
+          else {
+            app.masterlist = app.masterlist.concat(res.data.prolist);
+            app.load = false
+          }
+          if (res.data.prolist.length == 0 && app.ifshowkong == 1) {
+            app.overlate = true;
+            app.load = false
+          }
+          if (callback) {
+            callback()
+          }
+        })
+      },
+//      跳转到对应话题详情页
+      opengroupDetail: function (index) {
+        App.checkLogin();
+        api.openWin({
+          name: 'groupDetail',
+          url: './groupDetail.html',
+          pageParam: {
+            des: app.masterlist[index].sns_id
+          }
+        });
+      },
+      //查看全部
+      showalltext: function (index) {
+        app.checkallindex = index
+      },
+//      点击查看大图
+      openPhotoBrowser: function (imageList, inde) {
+        var image = [];
+        if (imageList && (typeof imageList == 'object')) {
+          for (var i = 0; i < imageList.length; i++) {
+            image[i] = App.url + imageList[i];
+          }
+        }
+        app.photoBrowser.open({
+          images: image,
+          bgColor: 'rgba(0,0,0,.8)',
+          activeIndex: inde
+        }, function (ret, err) {
+          if (ret) {
+            if (ret.eventType == 'click') {
+              app.photoBrowser.close();
+            }
+//            长按保存功能
+//            if (ret.eventType == 'longPress') {
+//              var url = images[ret.index];
+////              app.photoBrowser.close();
+//              api.actionSheet({
+//                buttons: ['保存到本地']
+//              }, function (ret, err) {
+//                var index = ret.buttonIndex;
+//                if (index == 1) {
+//                  api.download({
+//                    url: url,
+//                    cache: true,
+//                    allowResume: true
+//                  }, function (ret, err) {
+//                    if (ret.state == 1) {
+//                      //下载成功
+//                      console.log(ret.savePath);
+//                      api.saveMediaToAlbum({
+//                        path: ret.savePath
+//                      }, function (ret, err) {
+//                        if (ret && ret.status) {
+//                          App.tips('已成功保存至你的相册');
+//                        } else {
+//                          App.tips('保存失败');
+//                        }
+//                      });
+//                    } else {
+//
+//                    }
+//                  });
+//
+//                }
+//              });
+//            }
+          } else {
+//            alert(JSON.stringify(err));
+          }
+        });
+      }
+    }
+  });
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+</html>

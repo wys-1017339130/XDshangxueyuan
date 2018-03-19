@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>选择兴趣与时间</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">我的兴趣</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div class="z-change-box">
+			<div class="z-change-title">请选择你感兴趣的话题</div>
+			<div class="z-change-title-below">接下来让实效商学院为你服务</div>
+			<div id="content" class="z-change-intreset-box">
+				<!-- <span data-int="3001" class="z-change-intreset">互联网</span>
+				<span data-int="3002" class="z-change-intreset">职场</span>
+				<span data-int="3003" class="z-change-intreset">绩效管理</span>
+				<span data-int="3004" class="z-change-intreset">研发</span>
+				<span data-int="3005" class="z-change-intreset">阅读</span>
+				<span data-int="3006" class="z-change-intreset">赢利模式</span>
+				<span data-int="3007" class="z-change-intreset">导购</span>
+				<span data-int="3008" class="z-change-intreset">心理学</span>
+				<span data-int="3009" class="z-change-intreset">书籍</span>
+				<span data-int="3010" class="z-change-intreset">FM音频</span>
+				<span data-int="3011" class="z-change-intreset">互联网</span>
+				<span data-int="3012" class="z-change-intreset">健康学</span> -->
+			</div>
+			<div class="z-change-time-title fl z-change-absolute">计划每日<br>学习时间</div>
+			<div class="z-column2 z-change-btn">
+				<div class="z-change-to-rank">选好了</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<span data-int="{{id}}" class="z-change-intreset">{{title}}</span>
+	{{/data}}
+</script>
+<script type="text/javascript">
+	var UICustomPicker;//苹果无法设置初始值,安卓id是0，苹果id是12~~
+	var planTime = 600;
+	var HeadBar = $api.byId('HeadBar');
+	var ani,id;
+
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('chanegplan',{'Active':'加载'},'兴趣爱好修改');"});
+		//MD End
+
+		if(!App.State()){
+			setTimeout(function(){
+				api.closeWin();
+			},2000);
+		}else{
+			Refresh();
+		}
+
+		api.execScript({
+            name: 'root',
+            script: "getPlayId();"
+        });
+
+		UICustomPicker = api.require('UICustomPicker');
+		UICustomPicker.open({
+		    rect: {
+		        x: api.frameWidth /2,
+		        y: api.frameHeight * 2 / 3 -50,
+		        w: api.frameWidth /3,
+		        //w: api.frameWidth - 60,
+		        h: 140
+		    },
+		    styles: {
+		        bg: 'rgba(0,0,0,0)',
+		        normalColor: '#959595',
+		        selectedColor: '#0084ff',
+		        selectedSize: 32,
+		        tagColor: '#0084ff',
+		        tagSize: 18
+		    },
+		    data: [{
+		        tag: '分钟',
+		        scope: ['1','2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54' ,'55', '56', '57', '58', '59', '60']
+		    }],
+		    rows: 3,
+		    loop: false,
+		    autoHide:false,
+		    fixedOn: api.frameName,
+		    fixed: true
+		}, function(ret, err) {
+		    if (ret) {
+		        //alert(JSON.stringify(ret));
+		        id = ret.id;
+		        if(ret.eventType == "show"){
+		        	UICustomPicker.setValue({
+					    id: id,
+					    data: ['10']
+					});
+		        }
+		        if(ret.eventType == "selected"){
+		        	planTime = ret.data[0]*60;
+		        }
+		    } else {
+		        api.toast({
+				    msg: '未知错误',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+		    }
+
+		});
+
+		document.querySelector(".z-change-btn").addEventListener('touchstart', function(event) {
+		 		//api.closeWin();
+        		event.preventDefault();
+        		var int = [];
+        		var dom = document.querySelectorAll(".active");
+        		if(dom.length == 0){
+        			api.toast({
+					    msg: '请选择你感兴趣的话题',
+					    duration: 2000,
+					    location: 'bottom'
+					});
+					return;
+        		}
+        		if(!planTime){
+        			api.toast({
+					    msg: '请设置你的学习时间',
+					    duration: 2000,
+					    location: 'bottom'
+					});
+					return;
+        		}
+        		api.showProgress({
+				    style: 'default',
+				    animationType: 'fade',
+				    title: '加载中...',
+				    modal: false
+				});//数据加载中显示方块
+				for(i in dom){
+					if(typeof dom[i] == 'object'){
+						int.push(dom[i].getAttribute('data-int'));
+					}
+				}
+				api.execScript({name: 'root',script: "XO.ChangePlan('"+ $api.getStorage('token') +"','"+int+"','"+planTime+"',{name:'change',fun:'change'},{name:'change',fun:'fail'});"});
+	           });
+	};
+
+	function Refresh(){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});//数据加载中显示方块
+		api.execScript({name: 'root',script: "XO.GetTag('"+ $api.getStorage('token') +"',{name:'change',fun:'uptag'},{name:'change',fun:'fail'});"});
+
+	}
+
+	function uptag(data){
+
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		var TM = new T7({tm: document.getElementById("list_Tpl")});
+		var html = TM.Tpl(data);
+		document.getElementById('content').innerHTML = html;
+		var domarr = document.querySelectorAll(".z-change-intreset");
+		for(i in domarr){
+			if(typeof domarr[i] == 'object'){
+				domarr[i].addEventListener('click',function(){
+					if(/active/.test(this.className)){
+						this.className = "z-change-intreset";
+					}else{
+						this.className = "z-change-intreset active";
+					}
+				});
+			}
+		}
+		api.execScript({name: 'root',script: "XO.GetPlan('"+ $api.getStorage('token') +"',{name:'change',fun:'upview'},{name:'change',fun:'fail'});"});
+	}
+	// function ChangePlan(token,int,planTime,callFr,errFr){
+	// 	var active = document.querySelectorAll("z-active");
+	// 	for(i in active){
+	// 		if(typeof active[i] == 'object'){
+	// 			tag.push[active[i].getAttribute('data-int')];
+	// 		}
+	// 	}
+	// 	$.ajax({
+	//         url:App.url + "ChangePlan",
+	//         jsonp:'callback',
+	//         contentType:"application/x-www-form-urlencoded",
+	//         dataType:"jsonp",
+	//         traditional: true,
+	//         data:{
+	//             token:token,
+	//             int:int,
+	//             planTime:planTime
+	//         },
+	//         success:function(data){
+	//             callFr(data);
+	//         },
+	//         error:function(data){
+	//             errFr(data);
+	//         }
+	//     });
+	// }
+	function change(data){
+		api.execScript({
+            name: 'root',
+            frameName: 'home',
+            script: "Refresh();"
+        });
+        api.execScript({
+            name: 'plan',
+            script: "Refresh();"
+        });
+		api.hideProgress();
+		api.toast({
+		    msg: "设置成功",
+		    duration: 2000,
+		    location: 'bottom'
+		});
+		setTimeout(function(){api.closeWin();},1000);
+	}
+
+	// function GetPlan(token,callFr,errFr){
+	// 	api.refreshHeaderLoadDone();
+	// 	api.showProgress({
+	// 	    style: 'default',
+	// 	    animationType: 'fade',
+	// 	    title: '加载中...',
+	// 	    modal: false
+	// 	});//数据加载中显示方块
+
+	//     $.ajax({
+	//         url:App.url + "GetPlan",
+	//         jsonp:'callback',
+	//         contentType:"application/x-www-form-urlencoded",
+	//         dataType:"jsonp",
+	//         data:{
+	//             token:token
+	//         },
+	//         success:function(data){
+	//             callFr(data);
+	//         },
+	//         error:function(data){
+	//             errFr(data);
+	//         }
+	//     });
+	// }
+
+	function upview(data){
+		localStorage.setItem('change',JSON.stringify(data));
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		if(data.interest && data.interest.length > 0){
+			data.interest.forEach(function(arg){
+				document.querySelector("[data-int='"+ arg.id +"']").className = "z-change-intreset active";
+			})
+		}
+		planTime = data.learn;
+
+		var m = parseInt(data.learn/60);
+
+		if(UICustomPicker){
+			UICustomPicker.setValue({
+			    id: id,
+			    data: [m]
+			});
+		}
+		App.init();
+		api.hideProgress();
+	}
+
+	function fail(msg){
+		api.hideProgress();
+		App.tips(msg);
+	}
+
+	function play(){
+
+	}
+
+	function pause(){
+
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

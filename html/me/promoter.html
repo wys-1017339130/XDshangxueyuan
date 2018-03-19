@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>推广大使</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+</head>
+<body style="height: 100%" class="z-fff">
+<div id="HeadBar" style="background-color: transparent;">
+    <div class="z-head" style="background-color: transparent;border-bottom: none">
+        <a style="color: rgba(0,0,0,0.5)" class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+        <span tapmode="" onclick="save()"
+              style="color: #666;padding: 0 15px;font-size: 0.75rem;position: absolute;top: 0;right: 50px;">保存</span>
+        <span style="color:#666;display:none;padding: 0 15px;font-size: 0.75rem" tapmode=""
+              class="z-head-right fenxiang3">转发
+			</span>
+    </div>
+</div>
+<div style="height: 100%" id="main">
+    <img style="height: 100%" id="promoter" class="mall-detail-back" onerror="this.src='../../image/promoter.png'">
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+  var id = 0;
+  var HeadBar = $api.byId('HeadBar');
+  var fs, wx;
+  var n = 0;
+
+  //MD Start
+  var dialogBox;
+  //MD End
+  apiready = function () {
+    $api.fixStatusBar(HeadBar);
+    id = api.pageParam.des || 0;
+    fs = api.require("fs");
+    wx = api.require("wx");
+    dialogBox = api.require("dialogBox");
+
+    //MD Start
+    api.execScript({name: 'root', script: "ChatAna('promoter',{'Active':'打开'},'推广大使');"});
+    //MD End
+
+    wx.isInstalled(function (ret, err) {
+      if (ret.installed) {
+        var isshare = $api.getStorage('share');
+        if (isshare && (isshare == '1')) {
+          document.querySelector('.fenxiang3').style.display = 'block';
+        } else {
+          document.querySelector('.fenxiang3').style.display = 'none';
+        }
+      }
+    });
+
+    //从数据库中获取封面并渲染,包含是否已兑换,文字切换,兑换成功后又一系列变化，兑换成功返回id
+    if (!App.State()) {
+      setTimeout(function () {
+        api.closeWin();
+      }, 2000);
+    } else {
+      if ($api.getStorage('nickname')) {
+        Refresh();
+      } else {
+        api.toast({
+          msg: '完善个人资料后才可以分享',
+          duration: 2000,
+          location: 'bottom'
+        });
+        setTimeout(function () {
+          var bounces = false;//新开窗口是否弹动
+          var reload = false;
+          var name = 'edit';
+          var href = '../../html/me/edit.html';
+          var animation = {};
+          if (!App.iphone) {
+            animation = {
+              type: "movein",
+              subType: "from_right",
+              duration: 300
+            };
+            api.openWin({
+              name: name,
+              url: href,
+              slidBackEnabled: false,
+              reload: reload,
+              animation: animation,
+              bounces: bounces,
+              customRefreshHeader: 'UIPullRefresh',
+              rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: 'auto'
+              }
+            });
+          } else {
+            api.openWin({
+              name: name,
+              url: href,
+              reload: true,
+              slidBackEnabled: false,
+            });
+          }
+          api.closeWin();
+        }, 2000);
+      }
+    }
+  }
+
+  function Refresh() {
+    if (localStorage.getItem('promoterPIC')) {
+      var promoter = localStorage.getItem('promoterPIC');
+      var _file = App.file(promoter);
+      fs.exist({
+        path: (api.fsDir + '/file/' + _file.full)
+      }, function (ret, err) {
+        if (ret.exist) {
+          data = (api.fsDir + '/file/' + _file.full);
+          document.getElementById("promoter").src = data;
+        } else {
+          api.showProgress({
+            style: 'default',
+            animationType: 'fade',
+            title: '加载中...',
+            modal: false
+          });
+        }
+      });
+    } else {
+      api.showProgress({
+        style: 'default',
+        animationType: 'fade',
+        title: '加载中...',
+        modal: false
+      });
+    }
+
+    api.execScript({
+      name: 'root',
+      script: "XO.GetPromoter('" + $api.getStorage('token') + "',{name:'promoter',fun:'xx'},{name:'promoter',fun:'xx'});"
+    });
+    setTimeout(function () {
+      api.execScript({
+        name: 'root',
+        script: "XO.GetPromoter('" + $api.getStorage('token') + "',{name:'promoter',fun:'upview'},{name:'promoter',fun:'fail'});"
+      });
+    }, 2000);
+  }
+
+  function xx() {
+  }
+
+  function save() {
+    var promoter = localStorage.getItem('promoterPIC');
+    if (promoter && (promoter.length > 9)) {
+      var _file = App.file(promoter);
+      api.saveMediaToAlbum({
+        path: 'fs://file/' + _file.full
+      }, function (ret, err) {
+        if (ret && ret.status) {
+          App.tips('已成功保存至你的相册');
+        } else {
+          App.tips('保存失败');
+        }
+      });
+    }
+  }
+
+  var dpic = '';
+  var lpic = "widget://res/logo.png";
+  function upviewlittle(data) {
+    //小兔地址data+1_,下载下来
+    var _file = App.file(data);
+    fs.exist({
+      path: (api.fsDir + '/file/' + _file.full)
+    }, function (ret, err) {
+      if (ret.exist) {
+        data = (api.fsDir + '/file/' + _file.full);
+        lpic = 'fs://file/' + _file.full;
+      } else {
+        if (data.indexOf('/') == 0) {
+          var dface = App.url + data;
+        } else {
+          var dface = data;
+        }
+        api.download({
+          url: dface,
+          savePath: ('fs://file/' + _file.full),
+          cache: false,
+          allowResume: false
+        }, function (ret, err) {
+          data = (api.fsDir + '/file/' + _file.full);
+          lpic = 'fs://file/' + _file.full;
+        });
+      }
+    });
+  }
+
+  function upview(data) {
+    console.log(data);
+    console.log(JSON.stringify(data));
+    api.hideProgress();
+
+    //小兔地址data+1_,下载下来
+    var little = data.split('/');
+    var littleURL = '';
+
+    if (little.length > 0) {
+      for (var i = 1; i < little.length - 1; i++) {
+        littleURL += '/' + little[i];
+      }
+      littleURL += '/1_' + little[little.length - 1];
+    }
+
+    upviewlittle(littleURL);
+
+    // api.imageCache({
+    //     url: App.url+data
+    // }, function(ret, err) {
+    //     document.getElementById("promoter").src = ret.url;
+    //     api.hideProgress();
+    // });
+    localStorage.setItem('promoterPIC', data);
+    var _file = App.file(data);
+    fs.exist({
+      path: (api.fsDir + '/file/' + _file.full)
+    }, function (ret, err) {
+      if (ret.exist) {
+        data = (api.fsDir + '/file/' + _file.full);
+        dpic = 'fs://file/' + _file.full;
+        document.getElementById("promoter").src = data;
+        fs.getAttribute({
+          path: dpic
+        }, function (ret, err) {
+          if (ret.status) {
+            if (parseInt(ret.size) < 1000) {
+              fs.remove({
+                path: dpic
+              }, function (ret, err) {
+                api.execScript({
+                  name: 'root',
+                  script: "XO.GetPromoter('" + $api.getStorage('token') + "',{name:'promoter',fun:'upview'},{name:'promoter',fun:'fail'});"
+                });
+              });
+            }
+          }
+        });
+        api.hideProgress();
+      } else {
+        if (data.indexOf('/') == 0) {
+          var dface = App.url + data;
+        } else {
+          var dface = data;
+        }
+        api.download({
+          url: dface,
+          savePath: ('fs://file/' + _file.full),
+          cache: false,
+          allowResume: false
+        }, function (ret, err) {
+          data = (api.fsDir + '/file/' + _file.full);
+          dpic = 'fs://file/' + _file.full;
+          document.getElementById("promoter").src = data;
+          fs.getAttribute({
+            path: dpic
+          }, function (ret, err) {
+            if (ret.status) {
+              if (parseInt(ret.size) < 100) {
+                fs.remove({
+                  path: dpic
+                }, function (ret, err) {
+
+                });
+                setTimeout(function () {
+                  api.execScript({
+                    name: 'root',
+                    script: "XO.GetPromoter('" + $api.getStorage('token') + "',{name:'promoter',fun:'upview'},{name:'promoter',fun:'fail'});"
+                  });
+                }, 20000);
+              } else {
+                api.hideProgress();
+              }
+            }
+          });
+
+        });
+      }
+    });
+  }
+
+  function fail(msg) {
+    api.hideProgress();
+    App.tips(msg);
+  }
+
+  var apiKey = 'wxcfe803c780dc2647';
+  document.querySelector('.fenxiang3').onclick = function () {
+    share();
+  }
+
+  function share() {
+    dialogBox.actionMenu({
+      rect: {
+        h: 170
+      },
+      texts: {
+        cancel: '取消分享'
+      },
+      items: [
+        {
+          text: '微信好友',
+          icon: 'widget://res/icon/icon-wx.png'
+        },
+        {
+          text: '微信朋友圈',
+          icon: 'widget://res/icon/icon-pyq.png'
+        }
+      ],
+      styles: {
+        bg: '#FFF',
+        column: 2,
+        itemText: {
+          color: '#000',
+          size: 12,
+          marginT: 8
+        },
+        itemIcon: {
+          size: 60
+        },
+        cancel: {
+          bg: '#fff',
+          color: '#000',
+          h: 44,
+          size: 14
+        }
+      },
+      tapClose: true
+    }, function (ret) {
+      dialogBox.close({dialogName: 'actionMenu'});
+      if (ret.eventType == 'click') {
+        if (dpic.length > 0) {
+          switch (ret.index) {
+            case 0:
+              var wx = api.require('wx');
+              wx.isInstalled(function (ret, err) {
+                if (ret.installed) {
+                  wx.shareImage({
+                    apiKey: apiKey,
+                    scene: 'session',
+                    thumb: lpic,
+                    contentUrl: dpic
+                  }, function (ret, err) {
+                    if (ret.status) {
+                      //MD Start
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':true,'sharingMethod':'session','page':'promoter'},'推广大使-分享成功');"
+                      });
+                      //MD End
+                      api.toast({
+                        msg: '分享成功',
+                        duration: 2000,
+                        location: 'bottom'
+                      });
+                    } else {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':false,'sharingMethod':'session','page':'promoter'},'推广大使-分享成功');"
+                      });
+                    }
+                  });
+                }
+              });
+              break;
+            case 1:
+              var wx = api.require('wx');
+              wx.isInstalled(function (ret, err) {
+                if (ret.installed) {
+                  wx.shareImage({
+                    apiKey: apiKey,
+                    scene: 'timeline',
+                    thumb: lpic,
+                    contentUrl: dpic
+                  }, function (ret, err) {
+                    if (ret.status) {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':true,'sharingMethod':'timeline','page':'promoter'},'推广大使-分享成功');"
+                      });
+                      api.toast({
+                        msg: '分享成功',
+                        duration: 2000,
+                        location: 'bottom'
+                      });
+                    } else {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':true,'sharingMethod':'timeline','page':'promoter'},'推广大使-分享成功');"
+                      });
+                    }
+                  });
+                }
+              });
+              break;
+            default:
+          }
+        }
+      }
+    });
+  }
+
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

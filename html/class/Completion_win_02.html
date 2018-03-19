@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<meta name="viewport"
+      content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+<link rel="stylesheet" href="../../css/api.css">
+<link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+<style>
+  html, body {
+    background-color: transparent;
+  }
+
+  #warp02 {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    display: -webkit-box;
+    -webkit-box-align: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    -webkit-box-pack: center;
+  }
+
+  #warp02 > div {
+    width: 14rem;
+    /*min-height: 8.9rem;*/
+    background: white;
+    position: relative;
+    border-radius: 0.2rem;
+  }
+
+  .title {
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #252525;
+  }
+
+  .tishi {
+    text-align: center;
+    color: #252525;
+    font-size: 0.7rem;
+    margin: 1rem 0;
+  }
+
+  .image {
+    text-align: center;
+  }
+
+  .image > img {
+    width: 1.5rem;
+  }
+
+  .psots {
+    position: absolute;
+    top: -1rem;
+    right: -1rem;
+    width: 2rem;
+  }
+</style>
+<body>
+<div id="warp02">
+  <div>
+    <div class="title" style="margin-top: 1.5rem;padding:0 0.65rem;">《{{name}}》</div>
+    <div class="title" style="margin-bottom: 1rem">课后练习</div>
+    <div class="image"><img v-for="i in list" src="../../image/xingxing.png" alt=""></div>
+    <div class="tishi">恭喜，您获得{{money_credit.credit}}学分和{{money_credit.score}}个行币的奖励</div>
+    <img class="psots" @click="colse()" src="../../image/close_icon.png" alt="">
+  </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#warp02',
+    data: {
+      name: '',
+      list: 3,
+      money_credit: ''
+    },
+    created: function () {
+      apiready = function () {
+        app.name = api.pageParam.title;
+        app.list = JSON.parse(api.pageParam.star);
+        app.money_credit = api.pageParam.num
+      }
+    },
+    methods: {
+      colse: function () {
+        api.closeFrame({
+          name: 'Completion_win_02'
+        });
+      }
+    }
+  })
+</script>
+</html>

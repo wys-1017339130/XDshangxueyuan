@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<meta name="viewport"
+      content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+<link rel="stylesheet" href="../../css/api.css"/>
+<link rel="stylesheet" href="../../css/static.css"/>
+<style>
+  #app {
+    background: #f2f2f2;
+  }
+
+  #header {
+    display: flex;
+    height: 44px;
+    line-height: 44px;
+  }
+
+  .left-box {
+    font-size: 1rem;
+    margin-left: 0.5rem;
+  }
+
+  .right-box {
+    position: absolute;
+    right: 10px;
+  }
+
+  .NavLiat {
+    background-color: #ffffff;
+    display: -webkit-box;
+    height: 40px;
+    margin-top: 10px;
+    border-bottom: 1px solid #dddddd;
+  }
+
+  .NavLiat > div {
+    display: -webkit-box;
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+    -webkit-box-flex: 1;
+    height: 38px;
+    color: #b2b2b2;
+  }
+
+  .indeste {
+    border-bottom: 2px solid #d9b270;
+    height: 38px;
+    line-height: 38px;
+    color: #d9b270 !important;
+  }
+</style>
+<body style="background-color: #f2f2f2;">
+<div id='app'>
+  <header class="aui-bar aui-bar-nav" id="header">
+    <a class="left-box iconfont icon-jiantou" @click="closeWindow()"></a>
+    <span class="aui-title">咨询订单</span>
+    <img @click="Call()" width="22" height="22" style="margin-top: 10px;" class="right-box" src="../../image/20171201163455.png" />
+  </header>
+  <div class="NavLiat" id="nav">
+    <div v-for="(item,index) in nav" :class="{indeste:index==nwsr}">
+      <div @click="navList(index)">{{item}}</div>
+    </div>
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      nwsr: 0,
+      nav: ['待服务', '待评价', '已完成']
+    },
+    created: function () {
+      var _this = this
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        var height = $api.offset($api.dom('header')).h + 51
+        api.openFrame({
+          name: 'service',
+          url: './service.html',
+          rect: {
+            x: 0,
+            y: height,
+            w: 'auto'
+          },
+          pageParam: {}
+        })
+      }
+    },
+    methods: {
+      Call: function () {
+        var dialogBox = api.require('dialogBox');
+        dialogBox.alert({
+          texts: {
+            content: '确认拨打客服热线021-60260888？',
+            leftBtnTitle: '取消',
+            rightBtnTitle: '确认',
+          },
+          styles: {
+            bg: '#fff',
+            corner: 2,
+            w: 300,
+            content: {
+              marginT: 20,
+              marginB: 20,
+              color: '#000',
+              size: 16
+            },
+            left: {
+              marginB: 7,
+              marginL: 20,
+              w: 130,
+              h: 35,
+              corner: 2,
+              bg: '#FFF',
+              color: '#007FFF',
+              size: 14
+            },
+            right: {
+              marginB: 7,
+              marginL: 10,
+              w: 130,
+              h: 35,
+              corner: 2,
+              bg: '#FFF',
+              color: '#007FFF',
+              size: 14
+            }
+          },
+          tapClose: false
+        }, function (ret) {
+          if (ret.eventType == 'left') {
+            dialogBox.close({
+              dialogName: 'alert'
+            });
+          } else {
+            api.call({
+              type: 'tel_prompt',
+              number: '021-60260888'
+            });
+          }
+        })
+      },
+      closeWindow: function () {
+        api.closeWin()
+      },
+      navList: function (number) {
+        app.nwsr = number
+        var height = $api.offset($api.dom('header')).h + 51
+        switch (number) {
+          case 0:
+            api.openFrame({
+              name: 'service',
+              url: './service.html',
+              rect: {
+                x: 0,
+                y: height,
+                w: 'auto'
+              },
+              pageParam: {}
+            })
+            break
+          case 1:
+            api.openFrame({
+              name: 'evaluate',
+              url: './evaluate.html',
+              rect: {
+                x: 0,
+                y: height,
+                w: 'auto'
+              },
+              pageParam: {}
+            })
+            break
+          case 2:
+            api.openFrame({
+              name: 'complete',
+              url: './complete.html',
+              rect: {
+                x: 0,
+                y: height,
+                w: 'auto'
+              },
+              pageParam: {}
+            })
+            break
+        }
+      }
+    }
+  })
+</script>
+</html>

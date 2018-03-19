@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+</head>
+<link rel="stylesheet" href="../../css/api.css"/>
+<link rel="stylesheet" href="../../css/style.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+<style>
+    body {
+        background: #f2f2f2;
+    }
+
+    #header {
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        height: 2.2rem;
+        line-height: 2.2rem;
+    }
+
+    .left-box {
+        font-size: 0.75rem;
+        color: #ba9764;
+        margin-left: 0.5rem;
+    }
+
+    .right-box {
+        position: absolute;
+        font-size: 0.75rem;
+        right: 10px;
+        color: #ba9764;
+    }
+
+    .title {
+        height: 0.5rem;
+        background-color: transparent;
+        width: 100%;
+    }
+
+    .nckiname {
+        display: -webkit-box;
+        box-sizing: border-box;
+        -webkit-box-align: center;
+        padding: 0 0.5rem;
+        height: 2rem;
+        background-color: #ffffff;
+    }
+
+    .nckiname > div {
+        -webkit-box-flex: 1;
+        height: 2rem;
+    }
+
+    .nckiname > div > input {
+        width: 100%;
+        height: 2rem;
+    }
+
+    .nckiname > p {
+        width: 1.5rem;
+        height: 1.5rem;
+        line-height: 1.5rem;
+        text-align: center;
+        border-radius: 100%;
+        background: #f1f1f1;
+        font-size: 0.8rem;
+        color: #FFF;
+    }
+
+    .Identification {
+        display: -webkit-box;
+        -webkit-box-align: center;
+        padding-left: 1rem;
+        height: 2rem;
+        font-size: 0.6rem;
+        line-height: 2rem;
+    }
+
+    .Identification > p {
+        width: 0.8rem;
+        height: 0.8rem;
+        border-radius: 100%;
+        color: #ffffff;
+        background-color: #ff3300;
+        text-align: center;
+        margin: 0.5rem;
+        line-height: 0.8rem;
+    }
+</style>
+<body>
+<div id='app'>
+    <header class="aui-bar aui-bar-nav" id="header">
+        <a class="left-box" @click="closeWindow()">取消</a>
+        <span class="aui-title">修改昵称</span>
+        <span class="right-box" @click="complete()">完成</span>
+    </header>
+    <div class="title"></div>
+    <div class="nckiname">
+        <div><input v-model="nackname" type="text"></div>
+        <p v-if="nackname != ''" @click="Eliminate()">X</p></div>
+    <div class="Identification" v-if="Identification != true"><p>!</p>输入超出字数限制</div>
+    <div class="Identification" v-else><p style="background-color: #1bcd05;">!</p>输入昵称在2-5字符以内</div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      Title: '',
+      nackname: '',
+      Identification: true
+    },
+    watch: {
+      'nackname': function () {
+        console.log(app.nackname.length)
+        if (app.nackname.length >= 2 && app.nackname.length <= 5) {
+          app.Identification = true
+        } else {
+          app.Identification = false
+        }
+      }
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        if ($api.getStorage('myNickname') != 'undefined') {
+          app.nackname = $api.getStorage('myNickname')
+        }
+      }
+    },
+    methods: {
+      closeWindow: function () {
+        api.closeWin()
+      },
+      complete: function () {
+        if (app.Identification) {
+          $api.setStorage('myNickname', app.nackname)
+          api.sendEvent({
+            name: 'myAddress',
+          });
+          api.closeWin()
+        } else {
+          toastMsg('名字长度超出限制,请重新输入')
+        }
+      },
+      Eliminate: function () {
+        app.nackname = ''
+      }
+    }
+  })
+</script>
+</html>

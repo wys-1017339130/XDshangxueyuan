@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>预判图片</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+		<style>
+			html,body{
+				background-color: #000;
+			}
+			.chat-img-box{
+				background-color: #000;
+			}
+		</style>
+</head>
+<body class="z-fff">
+	<div class="chat-img-box">
+		<img id="chat_img" alt="">
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+
+	apiready = function(){
+		src = api.pageParam.des || 0;
+		document.getElementById('chat_img').src = src;
+		document.querySelector('.chat-img-box').addEventListener('touchstart',function(){
+			api.closeFrame();
+			//api.execScript({name: 'chat',frameName:'chat_h',script: "comment();"});
+		})
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

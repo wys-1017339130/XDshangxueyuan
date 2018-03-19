@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+</head>
+<link rel="stylesheet" href="../../css/api.css">
+<style>
+    .credit {
+        width: 100%;
+        height: 10.8rem;
+        display: -webkit-box;
+        background-image: url('../../image/xuefen.png');
+        background-size: 100%;
+        background-position-y: -2.2rem;
+        background-repeat: no-repeat;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        position: relative;
+    }
+
+    .credit img {
+        position: absolute;
+        bottom: 0px;
+    }
+
+    .credit_circular {
+        width: 4.5rem;
+        height: 4.5rem;
+        text-align: center;
+        line-height: 4.5rem;
+        color: #FFF;
+        font-size: 1.8rem;
+        font-weight: bold;
+        border: 3px solid rgba(255, 255, 255, 0.7);
+        border-radius: 100%;
+    }
+
+    .credit_circular + div {
+        font-size: 0.7rem;
+        position: absolute;
+        right: 27%;
+        top: 2.2rem;
+    }
+
+    .credit_top {
+        display: -webkit-box;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        position: relative;
+    }
+
+    .credit_desc {
+        font-size: 0.7rem;
+        color: #fff;
+        margin-top: 0.45rem;
+        width: 100%;
+        display: -webkit-box;
+        -webkit-box-align: center;
+    }
+
+    .credit_desc > p {
+        -webkit-box-flex: 1;
+    }
+
+    .cresits_title {
+        display: -webkit-box;
+        -webkit-box-align: center;
+        padding-left: 0.5rem;
+        padding-bottom: 1rem;
+    }
+
+    .cresits_title {
+        font-size: 0.85rem;
+        height: 1.5rem;
+        line-height: 1.5rem;
+    }
+
+    .tatap, .tataps {
+        display: -webkit-box;
+        border: 1px solid #e6e6e6;
+        font-size: 0.6rem;
+        color: #a2a2a2;
+    }
+
+    .tataps > div,
+    .tatap > div {
+        width: 33.33333%;
+        text-align: center;
+    }
+
+    .tatap > div {
+        height: 2.2rem;
+        line-height: 2.2rem;
+    }
+
+    .tataps > div > p {
+        height: 2rem;
+        line-height: 2rem;
+        color: #666666;
+    }
+
+    .width {
+        border-right: 1px solid #e6e6e6;
+    }
+
+    .buttom {
+        position: fixed;
+        width: 100%;
+        bottom: 0px;
+        background-color: #d9b270;
+        height: 2.2rem;
+        line-height: 2.2rem;
+        font-size: 0.7rem;
+        color: #FFF;
+        text-align: center;
+    }
+
+    .padd {
+        padding: 0.5rem 0;
+    }
+</style>
+<body>
+<div id="Window">
+    <div style="position: relative;">
+        <div class="credit">
+            <div style="width: 100%;">
+                <div class="credit_top">
+                    <div class="credit_circular">{{mydectils.user_credit || 0}}</div>
+                    <div style="color: #ffffff;text-align: left;padding-left: 0.5rem;">学分</div>
+                </div>
+            </div>
+        </div>
+        <div style="position: absolute; bottom: -10px;">
+            <div class="credit_desc">
+                <p style="padding-left: 0.75rem;">{{mydectils.level}}&nbsp;</p>
+                <p style="text-align: right;padding-right: 0.75rem;"
+                   v-show="mydectils.pass != '' ||mydectils.pass != 'null'">
+                    &nbsp;超过全国{{mydectils.pass}}%的用户</p>
+                <p style="text-align: right;padding-right: 0.75rem;"
+                   v-show="mydectils.pass == '' ||mydectils.pass == 'null'">
+                    &nbsp;超过全国0.00%的用户</p>
+            </div>
+            <img src="../../image/bolang.png" style="width: 100%;" alt="">
+        </div>
+    </div>
+    <div class="cresits_title">&nbsp;&nbsp;学分有什么用？</div>
+    <div style="font-size: 0.6rem;padding-left: 15px;padding-right: 15px;color: #666666;">
+        学分可以提高用户当前等级，等级分化为：大学、硕士、博士、博士后，升级条件如下：
+    </div>
+    <div style="margin: 15px;">
+        <div class="tatap" style="background-color: #f7f7f7;color: #252525;">
+            <div>等级</div>
+            <div>升级条件</div>
+            <div>毕业条件</div>
+        </div>
+        <div class="tataps" style="border-top:0px solid;">
+            <div class="width padd">
+                <p v-for="(item,index) in mydectils.standard">{{item.title}}1&nbsp;-&nbsp;{{item.gradeCount}}年级</p>
+            </div>
+            <div class="width padd">
+                <p v-for="(item,index) in mydectils.standard">满{{item.needScore}}学分，升1级</p>
+            </div>
+            <div class="padd">
+                <p v-for="(item,index) in mydectils.standard">累计{{item.gradeCount*item.needScore}}学分</p>
+            </div>
+        </div>
+    </div>
+    <p style="width: 100%;height: 5px;background-color: #f2f2f2;"></p>
+    <div class="cresits_title" style="padding-bottom: 0px;"><p></p>&nbsp;&nbsp;学分获取规则说明</div>
+    <div style="font-size: 12px;color: #666666;text-indent: 15px;">完成1个课程且练习评分达到三星以上者将获得1学分奖励</div>
+    <p style="height: 2.6rem;"></p>
+    <div class="buttom" @click="xuefen()">去赚学分</div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script>
+  var app = new Vue({
+    el: '#Window',
+    data: {
+      mydectils: {
+        user_credit: '1'
+      }
+    },
+    created: function () {
+      apiready = function () {
+        app.u_getMyCredit()
+      }
+    },
+    methods: {
+      u_getMyCredit: function () {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token
+        }
+        sendAjax(this, post, '/Api/Ucenter/u_getMyCredit', function (res) {
+          api.hideProgress();
+          app.mydectils = res.data
+        })
+      },
+      xuefen: function () {
+        api.openWin({
+          name: 'MyRecord_fm',
+          url: './MyRecord_fm.html',
+          pageParam: {}
+        })
+      }
+    }
+  })
+</script>
+</html>

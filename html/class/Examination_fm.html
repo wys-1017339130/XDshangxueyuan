@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/static.css">
+</head>
+<body>
+<div id="app">
+  <header class="aui-bar aui-bar-nav" id="header">
+    <a class="aui-pull-left iconfont icon-jiantou" @click="closeWindow()"></a>
+    <span class="aui-title aui-ellipsis-1">《{{title}}》课程考试</span>
+  </header>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      title: '',
+      emid: '',
+      cid: ''
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        app.title = api.pageParam.texts
+        app.emid = api.pageParam.id
+        app.cid = api.pageParam.cid
+        api.openFrame({
+          name: 'Examination_List',
+          url: './Examination_List.html',
+          rect: {
+            x: 0,
+            y: $api.offset($api.dom('header')).h,
+            w: 'auto',
+            h: 'auto'
+          },
+          pageParam: {
+            id: app.emid,
+            cid: app.cid
+          }
+        })
+      }
+    },
+    methods: {
+      closeWindow: function () {
+        api.closeWin()
+      }
+    }
+  })
+</script>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>搜索</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+		<link rel="stylesheet" href="../../iconfont/iconfont.css">
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		.searchbox{
+			text-align: left;
+			flex: 1;
+			background: #f9f9f9;
+			border-radius: 5px;
+			height: 1.7rem;
+			display: flex;
+			line-height: 1.7em;
+			color: #969696;
+			margin: auto 0 auto 12px;
+		}
+		.searchbox input{
+			margin: auto 0 auto 10px;
+			outline: none;
+			font-size: 16px;
+		}
+		.searchfont{
+			color: #b5b5b5;
+			margin-left: 15px;
+			width: 1rem;
+			height: 1rem;
+			float: left;
+			margin-top: auto;
+			margin-bottom: auto;
+		}
+	</style>
+</head>
+<body style="position: relative;">
+<div id="app">
+	<!--<i style="color: #b5b5b5;font-size: 20px;" class="iconfont icon-fanhui"></i>-->
+	<header id="HeadBar" style="background: white;display: flex">
+		<div class="searchbox">
+			<!--<i class="iconfont searchfont icon-sousuo"></i>-->
+			<img class="searchfont" src="../../image/searchimg.png">
+			<input style="height: 1.7rem;line-height: 1.2rem;color: black" type="text" placeholder="输入课程名称查找" @input="serchcontent" v-model="serchvalue">
+		</div>
+		<div style="padding: 0 20px;text-align: center;color: #444;font-size: 15px" @click="closethiswin">取消</div>
+	</header>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      serchvalue:''
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        var posY = $api.offset($api.dom("header")).h;
+        api.openFrame({
+          name: 'search_fm',
+          url: './search_fm.html',
+          rect: {
+            x: 0,
+            y: posY,
+            width:'auto',
+            h:api.winHeight - posY
+          },
+          bounces:true,
+          hScrollBarEnabled: false,
+          vScrollBarEnabled: false,
+        });
+      };
+    },
+    filters:{
+    },
+    mounted:function(){
+		},
+    methods: {
+      //实时搜索内容事件
+      serchcontent:function() {
+          api.sendEvent({
+            name: 'serchvalueeven',
+            extra: {
+              serchvalue: app.serchvalue
+            }
+          });
+			},
+//			取消 关闭当前页面
+      closethiswin:function() {
+        api.closeWin()
+			}
+    }
+  });
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+</html>

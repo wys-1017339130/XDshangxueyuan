@@ -1,0 +1,533 @@
+html {  font-size:20px; height:100%; }
+
+@media only screen and (min-width:240px){html{font-size:12.8px!important}}
+@media only screen and (min-width:320px){html{font-size:17.06px!important}}
+@media only screen and (min-width:360px){html{font-size:19.2px!important}}
+@media only screen and (min-width:375px){html{font-size:20px!important}}
+@media only screen and (min-width:400px){html{font-size:21.33333333px!important}}
+@media only screen and (min-width:414px){html{font-size:21.08px!important}}
+@media only screen and (min-width:480px){html{font-size:25.6px!important}}
+
+
+body {
+	color:#000;
+	font-family:Helvetica Neue,Helvetica,Arial,Microsoft Yahei,sans-serif;
+	font-size:.7rem;
+	line-height:.98rem;
+	height:100%;
+	-webkit-text-size-adjust:none;
+	-webkit-user-select:none;
+	-moz-user-select:none;
+	-ms-user-select:none;
+	user-select:none
+}
+
+
+@font-face {font-family: "iconfont";
+  src: url('iconfont.eot?t=1501253111570'); /* IE9*/
+  src: url('iconfont.eot?t=1501253111570#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('iconfont.woff?t=1501253111570') format('woff'), /* chrome, firefox */
+  url('iconfont.ttf?t=1501253111570') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('iconfont.svg?t=1501253111570#iconfont') format('svg'); /* iOS 4.1- */
+}
+
+.iconfont {
+  font-family:"iconfont" !important;
+  font-size:16px;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.icon-bofang1:before { content: "\e633"; }
+
+.icon-QQ:before { content: "\e607"; }
+
+.icon-forward2:before { content: "\e623"; }
+
+.icon-weixin:before { content: "\e603"; }
+
+.icon-lock:before { content: "\e75d"; }
+
+.icon-shijian:before { content: "\e61b"; }
+
+.icon-yonghu:before { content: "\e625"; }
+
+.icon-iconfont05:before { content: "\e609"; }
+
+.icon-fenxiang:before { content: "\e601"; }
+
+.icon-jiantou:before { content: "\e62c"; }
+
+.icon-dianzan:before { content: "\e60d"; }
+
+.icon-bofang:before { content: "\e614"; }
+
+.icon-shezhi:before { content: "\e62d"; }
+
+.icon-xiazai1:before { content: "\e6a3"; }
+
+.icon-edit:before { content: "\e69e"; }
+
+.icon-clock:before { content: "\e6bb"; }
+
+.icon-fenxiang1:before { content: "\e6d2"; }
+
+.icon-diantai:before { content: "\e648"; }
+
+.icon-paixu:before { content: "\e66c"; }
+
+.icon-wode:before { content: "\e65c"; }
+
+.icon-fenxiang2:before { content: "\e628"; }
+
+.icon-download:before { content: "\e600"; }
+
+.icon-pause:before { content: "\e606"; }
+
+.icon-neirong:before { content: "\e632"; }
+
+.icon-icon066:before { content: "\e64c"; }
+
+.icon-bf3:before { content: "\e9c0"; }
+
+.icon-dingwei:before { content: "\e60e"; }
+
+.icon-liuyan:before { content: "\e6fc"; }
+
+.icon-yonghu2:before { content: "\e649"; }
+
+.icon-xiangji:before { content: "\e619"; }
+
+.icon-yonghu1:before { content: "\e60c"; }
+
+.icon-bofang2:before { content: "\e63c"; }
+
+.icon-jiantou1:before { content: "\e6a4"; }
+
+.icon-quxiao:before { content: "\e61d"; }
+
+.icon-icondownload:before { content: "\e714"; }
+
+.icon-xiaoxi:before { content: "\e6b6"; }
+
+.icon-xuanzhong:before { content: "\e636"; }
+
+.icon-xiazai:before { content: "\e63d"; }
+
+.icon-good:before { content: "\e717"; }
+
+.icon-skip:before { content: "\e718"; }
+
+.icon-dz:before { content: "\e620"; }
+
+.icon-ch1:before { content: "\e621"; }
+
+.icon-fangdajing:before { content: "\e612"; }
+
+.icon-riqi:before { content: "\e61f"; }
+
+.icon-ch2:before { content: "\e624"; }
+
+.icon-shu1:before { content: "\e610"; }
+
+.icon-iconfont:before { content: "\e654"; }
+
+.icon-youjiantou:before { content: "\e6a1"; }
+
+.icon-xiangji1:before { content: "\e608"; }
+
+.icon-shijian1:before { content: "\e64d"; }
+
+.icon-xihuan1:before { content: "\e62b"; }
+
+.icon-bangzhu:before { content: "\e6ec"; }
+
+.icon-x:before { content: "\e7a5"; }
+
+.icon-sanjiao-copy:before { content: "\e659"; }
+
+.icon-1huojian:before { content: "\e64f"; }
+
+.icon-1:before { content: "\e681"; }
+
+.icon-menu:before { content: "\e604"; }
+
+.icon-yes2:before { content: "\e7ef"; }
+
+.icon-sousuoic:before { content: "\e64b"; }
+
+.icon-yingxiaojianyi:before { content: "\e62f"; }
+
+.icon-suo:before { content: "\e646"; }
+
+.icon-yonghu3:before { content: "\e626"; }
+
+.icon-yonghu4:before { content: "\e627"; }
+
+.icon-yuanxijieshao:before { content: "\e651"; }
+
+.icon-shuaxin:before { content: "\e622"; }
+
+.icon-404:before { content: "\e652"; }
+
+.icon-aihao:before { content: "\e62a"; }
+
+.icon-40:before { content: "\e755"; }
+
+.icon-shu:before { content: "\e634"; }
+
+.icon-ch3:before { content: "\e638"; }
+
+.icon-kecheng:before { content: "\e61e"; }
+
+.icon-bf:before { content: "\e602"; }
+
+.icon-bf2:before { content: "\e618"; }
+
+.icon-update:before { content: "\e615"; }
+
+.icon-shangcheng:before { content: "\e996"; }
+
+.icon-xiaoxi1:before { content: "\e6bd"; }
+
+.icon-xueyuan2:before { content: "\e637"; }
+
+.icon-gerenziliao:before { content: "\e643"; }
+
+.icon-diantai50:before { content: "\e647"; }
+
+.icon-tag3:before { content: "\e653"; }
+
+.icon-biyan:before { content: "\e635"; }
+
+.icon-coin:before { content: "\e64a"; }
+
+.icon-duihuan:before { content: "\e616"; }
+
+.icon-zoujinxueyuan:before { content: "\e62e"; }
+
+.icon-trade:before { content: "\e758"; }
+
+.icon-bofang4:before { content: "\e64e"; }
+
+.icon-phb:before { content: "\e61c"; }
+
+.icon-kuaijin1:before { content: "\e60b"; }
+
+.icon-shu_1:before { content: "\e645"; }
+
+.icon-shenglve:before { content: "\e60a"; }
+
+.icon-player-back:before { content: "\e670"; }
+
+.icon-player-forward:before { content: "\e671"; }
+
+.icon-caidan:before { content: "\e679"; }
+
+.icon-wode1:before { content: "\e7fb"; }
+
+.icon-icon-clear:before { content: "\e68c"; }
+
+.icon-xiaoxi2:before { content: "\e63b"; }
+
+.icon-gn:before { content: "\e617"; }
+
+.icon-rili:before { content: "\e685"; }
+
+.icon-ting:before { content: "\e605"; }
+
+.icon-message:before { content: "\e63f"; }
+
+.icon-caidan1:before { content: "\e667"; }
+
+.icon-liuyan1:before { content: "\e61a"; }
+
+.icon-renqun:before { content: "\e72b"; }
+
+.icon-s:before { content: "\e666"; }
+
+.icon-shunxuxunhuanwenzhang:before { content: "\e630"; }
+
+.icon-rili1:before { content: "\e631"; }
+
+.icon-fenxiang3:before { content: "\e640"; }
+
+.icon-qianmishangxueyuan-:before { content: "\e65b"; }
+
+.icon-xingqu:before { content: "\e860"; }
+
+.icon-yinleliebiaoxian:before { content: "\e639"; }
+
+.icon-kuaijin2:before { content: "\e60f"; }
+
+.icon-xueyuan:before { content: "\e709"; }
+
+.icon-bofangqi_shouyegequliebiao_:before { content: "\e63a"; }
+
+.icon-wenzhang:before { content: "\e673"; }
+
+.icon-xiazai2:before { content: "\e641"; }
+
+.icon-xueyuan1:before { content: "\e682"; }
+
+.icon-shezhi1:before { content: "\e642"; }
+
+.icon-zuoye:before { content: "\e629"; }
+
+.icon-lianxiren-dizhi:before { content: "\e6c1"; }
+
+.icon-dafen:before { content: "\e644"; }
+
+.icon-yijianfankui:before { content: "\e759"; }
+
+.icon-xueshenghui:before { content: "\e611"; }
+
+.icon-yijianfankui1:before { content: "\e613"; }
+
+.icon-bofang3:before { content: "\e66a"; }
+
+.icon-paixu1:before { content: "\e63e"; }
+
+.icon-erji:before { content: "\e690"; }
+
+
+
+button,input,optgroup,select,textarea {
+	color:inherit;
+	font:inherit;
+	margin:0
+}
+button {
+	overflow:visible
+}
+button,select {
+	text-transform:none
+}
+button,html input[type=button],input[type=reset],input[type=submit] {
+	-webkit-appearance:button;
+	cursor:pointer
+}
+button[disabled],html input[disabled] {
+	cursor:default
+}
+button::-moz-focus-inner,input::-moz-focus-inner {
+	border:0;
+	padding:0
+}
+input {
+	line-height:normal
+}
+input[type=checkbox],input[type=radio] {
+	box-sizing:border-box;
+	padding:0
+}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button {
+	height:auto
+}
+input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration {
+	-webkit-appearance:none
+}
+fieldset {
+	border:1px solid silver;
+	margin:0 .1rem;
+	padding:.35em .625em .75em
+}
+legend {
+	border:0;
+	padding:0
+}
+textarea {
+	overflow:auto
+}
+optgroup {
+	font-weight:700
+}
+table {
+	border-collapse:collapse;
+	border-spacing:0
+}
+td,th {
+	padding:0
+}
+dl,li,ol,ul {
+	margin:0;
+	padding:0
+}
+
+.flex-wrap{ display: -webkit-box;	display: -webkit-flex;	display: flex; }
+.flex-con{     -webkit-box-flex: 1;     -webkit-flex: 1;    flex: 1;}
+.flex-vertical{ -webkit-box-orient: vertical;-webkit-flex-flow: column;flex-flow: column;}
+
+.border-t,
+.border-b{ position:relative;  }
+.border-t:before,
+.border-b:after{     content: '';     position: absolute;     left: 0;  top:0;     background: #ddd;   right:0;    height: 1px;     -webkit-transform: scaleY(0.5);             transform: scaleY(0.5);     -webkit-transform-origin: 0 0;             transform-origin: 0 0; }
+.border-b:after{ top:auto; bottom:0;  }
+
+h3{font-weight: normal;}
+.hidden{overflow: hidden;}
+.hover{ opacity: .8; }
+.indent{text-indent:4px!important;}
+.indent45{text-indent:45px!important;}
+input{color: #50606e;-webkit-appearance: none;}
+input:focus,select:focus,textarea:focus{
+	box-shadow:none !important;
+	outline:0 !important;
+}
+::-webkit-input-placeholder,:-moz-placeholder,::-moz-placeholder,:-ms-input-placeholder {
+    color:  #efefef;
+}
+
+/*******/
+.btn{
+	height:42px;
+	line-height: 43px;
+	text-align: center;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	font-size: .7826rem;
+}
+.btn-min{
+	height: 25px;
+    line-height: 26px;
+    font-size: 0.6708rem;
+    padding: 0 10px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+.btn-min-sg{
+	height: 30px;
+    line-height: 31px;
+    font-size: 0.6708rem;
+    padding: 0 15px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.def-color{color:#0084ff;}
+.bl-color{color:#8f8f8f;}
+.d5-color{color:#d5d5d5;}
+.war-color{color:#ffaa01;}
+.dan-color{color:#FF4949;}
+
+.bg-def-color{background-color:#0084ff!important;color:#fff;}
+.bg-war-color{background-color:#ffaa01!important;color:#fff;}
+.bg-tran-color{background-color:transparent!important;}
+.bg-can-color{background-color:#909090!important;color:#fff;}
+.notification-war{
+	background-color: #fefaef;
+    color: #ff6600;
+    padding: 10px 15px;
+    font-size: 0.7826rem;
+    text-align: center;
+}
+.notification-def{
+	background-color: #ededf2;
+    color: #333;
+    padding: 10px 15px;
+    font-size: 0.7826rem;
+    text-align: center;
+}
+.through{text-decoration:line-through!important;}
+.mt10{margin-top:10px!important;}
+.mt20{margin-top:20px!important;}
+.mt40{margin-top:40px!important;}
+.mb10{margin-bottom:10px!important;}
+.mb40{margin-bottom:40px!important;}
+.mb50{margin-bottom:50px!important;}
+.ml{margin-left:15px!important;}
+.mr{margin-right:15px!important;}
+.fl{float:left!important;}
+.fr{float:right!important;}
+#wrap{
+    height: 100%;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-flex-flow: column;
+}
+#main {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    /*
+    margin-left: 20px;
+    margin-right:20px;
+    */
+    z-index: 0;
+}
+#FootBar{
+    height: 50px;
+    line-height: 50px;
+    background-color: #fff;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 -1px 1px #eee;
+    overflow: hidden;
+    z-index: 1;
+}
+#FootBar .tab{
+    width: 33.33%;
+    float: left;
+    color: #8492A6;
+    font-size: 0.6708rem;
+    line-height: 42px;
+    height: 49px;
+    overflow: hidden;
+}
+#FootBar .tab i{
+    font-size: 1.3rem;
+}
+#FootBar .tab.active{
+    color: #20A0FF;
+}
+.frame_name{
+    margin-top: -24px;
+}
+
+#HeadBar{
+    text-align: center;
+    background-color: #fff;
+    color: #50606e;
+    width: 100%;
+    height: 44px;
+    line-height: 44px;
+    position: fixed;
+    z-index: 11;
+}
+#HeadBar h1{
+	font-weight: normal;
+    font-size: 0.9503rem;
+    text-indent: -45px;
+}
+#HeadBar.bg-tran-color.on{
+	background-color: rgba(0,0,0,.3)!important;
+}
+#HeadBar.bg-tran-color i.mooc.icon-fl{
+	width:50px;
+	float: left;
+	color:#fff;
+}
+#HeadBar.main h1{
+	font-weight: normal;
+    font-size: 0.9503rem;
+    text-indent: 50px;
+}
+#HeadBar.def-color{
+	background-color: #2e73d0;
+	color:#fff;
+}
+#HeadBar .fl{
+	float:left;
+    width: 50px;
+}
+#HeadBar .fr{
+	float:right;
+    width: 50px;
+    font-size: 0.7826rem;
+}
+#fixStatus{
+	position: relative;
+	height:64px;
+	width: 100%;
+}
+.clear{clear:both;}
+.middle{vertical-align: middle;}

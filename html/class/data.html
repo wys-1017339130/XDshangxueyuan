@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的资料</title>
+</head>
+<meta name="viewport"
+      content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+<link rel="stylesheet" href="../../css/api.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/weui.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/jquery-weui.min.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/demos.css"/>
+<style>
+    #app {
+        background: white;
+    }
+
+    #header {
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        height: 2.2rem;
+        line-height: 2.2rem;
+    }
+
+    .left-box {
+        font-size: 1rem;
+        margin-left: 0.5rem;
+    }
+
+    .right-box {
+        position: absolute;
+        font-size: 0.75rem;
+        right: 0.5rem;
+    }
+
+    .z-sets {
+        font-size: 0.8rem;
+        line-height: 2.25rem;
+        height: 2.25rem;
+        color: #252525;
+    }
+
+    .caree {
+        width: 0.5rem;
+        height: 0.5rem;
+        background-color: red;
+        border-radius: 100%;
+        margin-top: auto;
+        margin-bottom: 9px;
+    }
+
+    .dist {
+        -webkit-box-flex: 1;
+    }
+
+    .size {
+        font-size: 0.7rem;
+    }
+</style>
+<body>
+<div id='app'>
+    <header class="aui-bar aui-bar-nav" id="header">
+        <a class="left-box iconfont icon-jiantou z-fanhui" @click="closeWindow()"></a>
+        <span class="aui-title">我的资料</span>
+    </header>
+    <p style="background-color: #dddddd;height: 5px;width: 100%"></p>
+    <div data-des="0" data-name="edit" class="z-column6 z-sets z-border-bottom" @click="images()"
+         tapmode style="margin-bottom: 1px;">
+        头像
+        <span class="fr icon iconfont icon-ch2"></span>
+        <sapn style="display: flex;" class="fr fonts">
+            <img width="30" height="30" id="date"
+                 style="border-radius: 100%;margin-top: 7px;margin-left: 10px;margin-right: 10px;"
+                 :src="formatImg(imgs)"/>
+        </sapn>
+    </div>
+    <div class="z-column6 z-sets z-border-bottom" @click="namesList_html()">
+        昵称
+        <span class="fr icon iconfont icon-ch2"></span>
+        <span class="size" style="float:right;">{{mYnciKname}}</span>
+    </div>
+    <div class="z-column6 z-sets"
+         style="display: -webkit-box;" @click="setSex">
+        <div style="-webkit-box-flex: 1"><label for="date" class="weui-label">性别</label></div>
+        <div>
+            {{sex}}
+            <span class="fr icon iconfont icon-ch2"></span>
+            <div class="fr">
+            </div>
+        </div>
+    </div>
+    <p style="background-color: #dddddd;height: 5px;width: 100%"></p>
+    <div class="z-column6 z-sets z-border-bottom" @click="Picker()">
+        出生年月
+        <span class="fr icon iconfont icon-ch2"></span>
+        <span class="size" style="float:right;">{{Birth_time || '' }}</span>
+    </div>
+    <div class="z-column6 z-sets z-border-bottom" style="display: -webkit-box;">
+        <div class="dist"><label for="home-city" class="weui-label">所在城市</label></div>
+        <div style="-webkit-box-flex: 1;">
+            <span class="fr icon iconfont icon-ch2"></span>
+            <div class="fr" style="width: 90%;">
+        <textarea id="home-city" style="text-align: right;width: 100%;height: 2rem;resize: none;"
+                  v-model="City"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="z-column6 z-sets" tapmode @click="address_html()">
+        详细地址
+        <span class="fr icon iconfont icon-ch2"></span>
+        <span class="size aui-ellipsis-1"
+              style="float:right;width: 100px;text-align: right;">{{meaddress || '' }}</span>
+    </div>
+    <p style="background-color: #dddddd;height: 5px;width: 100%"></p>
+    <div class="z-column6 z-sets z-border-bottom" id="industry" @click="selectorIndustry()">
+        从事行业
+        <span class="fr icon iconfont icon-ch2"></span>
+        <span class="size aui-ellipsis-1"
+              style="float:right;">{{industrys == 'undefined' ?  '请选择' : industrys }}</span>
+    </div>
+    <div class="z-column6 z-sets z-border-bottom" tapmode @click="company_html()">
+        公司名称
+        <span class="fr icon iconfont icon-ch2"></span>
+        <span class="size aui-ellipsis-1" style="float:right;">{{company}}</span>
+    </div>
+    <div class="z-column6 z-sets" id="profession" @click="selectorProfession()">
+        公司职务
+        <span class="fr icon iconfont icon-ch2"></span>
+        <span class="size aui-ellipsis-1" style="float:right;">{{Botany == 'undefined' ?  '请选择' : Botany }} </span>
+    </div>
+    <p style="background-color: #dddddd;height: 5px;width: 100%"></p>
+    <div class="z-column6 z-sets z-border-bottom" tapmode @click="training_html()">
+        贏利模式（新训）
+        <span class="fr icon iconfont icon-ch2"></span>
+        <span class="size aui-ellipsis-1" style="float:right;">{{training}}<span>期</span></span>
+    </div>
+    <div id="photo_btn">
+        <ul>
+            <li id="photo_back" @click="photo_back()">取消</li>
+            <li id="photo_save" @click="photo_save()">完成</li>
+        </ul>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/jquery-2.1.4.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  $(function () {
+    FastClick.attach(document.body);
+  });
+</script>
+<script type="text/javascript" src="../../script/jquery-weui.min.js"></script>
+<script type="text/javascript" src="../../script/city-picker.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      imgs: '',
+      mYnciKname: '',
+      sex: '男',
+      Birth_time: '2017-1',
+      City: '',
+      meaddress: '',
+      industrys: '',
+      company: '',
+      Botany: '',
+      training: '',
+      professionJSON: [
+        {"name": "董事长/老板"},
+        {"name": "总经理/CEO/总裁"},
+        {"name": "高层管理(部门负责人/分总/副总)"},
+        {"name": "中层管理"},
+        {"name": "职员"},
+        {"name": "创业者"},
+        {"name": "其他"}
+
+      ],
+      industryJSON: [
+        {"name": "互联网/电子商务/IT"},
+        {"name": "金融业"},
+        {"name": "零售业"},
+        {"name": "制造业"},
+        {"name": "广告/传媒"},
+        {"name": "教育/培训"},
+        {"name": "房地产/建筑"},
+        {"name": "服务业"},
+        {"name": "物流/运输"},
+        {"name": "制药/医疗"},
+        {"name": "政府/非盈利"},
+        {"name": "其他"}
+      ],
+      industryIndex: [0],
+      professionIndex: [0],
+      _font: '12'
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+//        隐藏红点
+        $api.setStorage('images_html', 1);
+        //    关闭窗口页 （昵称， 地址，盈利， 公司名称）
+        api.addEventListener({
+          name: 'myAddress'
+        }, function (ret, err) {
+          //  地址
+          app.meaddress = $api.getStorage('myaddress') || '';
+          // 公司名称
+          app.company = $api.getStorage('myCompany')
+          // 昵称
+          app.mYnciKname = $api.getStorage('myNickname')
+          // 盈利
+          app.training = $api.getStorage('myTraining')
+        });
+        //  城市
+        if ($api.getStorage('sext') == 'undefind') {
+          app.sex = '男'
+        }
+        if ($api.getStorage('sext') != 'undefind') {
+          app.sex = $api.getStorage('sext')
+        }
+        //  性别
+        if ($api.getStorage('citys') == 'undefind') {
+          app.City = '北京 北京市'
+        }
+        if ($api.getStorage('citys') != 'undefind') {
+          app.City = $api.getStorage('citys')
+        }
+        // 行业
+        var idf = $api.getStorage('myindustrys')
+        if (idf == 'undefind') {
+          app.industrys = ''
+        }
+        if (idf != 'undefind') {
+          app.industrys = $api.getStorage('myindustrys')
+        }
+        // 职务
+        if ($api.getStorage('myBotany') == 'undefind') {
+          app.industrys = ''
+        }
+        if ($api.getStorage('myBotany') != 'undefind') {
+          app.Botany = $api.getStorage('myBotany')
+        }
+        app.getUserInfo()
+        //  城市 初始化
+        $("#home-city").cityPicker({
+          title: "选择城市",
+          showDistrict: false,
+          onChange: function (picker, values, displayValues) {
+            app.City = displayValues[0] + ' ' + displayValues[1]
+            $api.setStorage('citys', displayValues[0] + ' ' + displayValues[1])
+          }
+        });
+      };
+    },
+    methods: {
+      // 获取个人资料
+      getUserInfo: function () {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token
+        }
+        sendAjax(this, post, '/Api/Ucenter/getUserInfo', function (res) {
+          api.hideProgress();
+          try {
+            app.imgfunction(res.data.face)
+            if (res.data.stage) {
+              app.training = res.data.stage
+              $api.setStorage('myTraining', res.data.stage)
+            }
+            if (res.data.address) {
+              app.meaddress = res.data.address;
+              $api.setStorage('myaddress', res.data.address)
+            }
+            if (res.data.company) {
+              app.company = res.data.company
+              $api.setStorage('myCompany', res.data.company)
+            }
+            if (res.data.nickname) {
+              app.mYnciKname = res.data.nickname
+              $api.setStorage('myNickname', res.data.nickname)
+            }
+            if (res.data.province) {
+              app.City = res.data.province
+              $api.setStorage('citys', res.data.province)
+            }
+            if (res.data.birthday) {
+              app.Birth_time = res.data.birthday
+              api.setStorage('aBirth_time', res.data.birthday)
+            }
+          } catch (e) {
+          }
+          if (res.data.sex == 0) {
+            app.sex = '女'
+            $api.setStorage('sext', '女')
+          }
+          if (res.data.sex == 1) {
+            app.sex = '男'
+            $api.setStorage('sext', '男')
+          }
+          if (res.data.industry != '') {
+            app.industrys = res.data.industry
+            $api.setStorage('myindustrys', res.data.industry)
+          }
+          if (res.data.profession != '') {
+            app.Botany = res.data.profession
+            $api.setStorage('myBotany', res.data.profession)
+          }
+        })
+      },
+//      选择性别
+      setSex: function () {
+        api.actionSheet({
+          title: '选择性别',
+          cancelTitle: '取消',
+          buttons: ['男', '女']
+        }, function (ret, err) {
+          var index = ret.buttonIndex;
+          if (index == 1) {
+            app.sex = '男';
+            $api.setStorage('sext', '男')
+          } else {
+            app.sex = '女';
+            $api.setStorage('sext', '女')
+          }
+        });
+      },
+      // 行业
+      selectorIndustry: function () {
+        this.selector(document.getElementById('industry'), app.industryJSON, app.industryIndex);
+      },
+      // zhi wu tanchuang
+      selectorProfession: function () {
+        this.selector(document.getElementById('profession'), app.professionJSON, app.professionIndex);
+      },
+      selector: function (input, json, _index) {
+        UIActionSelector = api.require('UIActionSelector');
+        isSelector = true;
+
+        var v = input.value;
+        if (v != '' && json[_index[0]].name != v) {
+          json.every(function (arg, index) {
+            if (arg.name == v) {
+              _index[0] = index;
+              return false;
+            }
+            return true;
+          });
+        }
+
+        UIActionSelector.close();
+        UIActionSelector.open({
+          datas: json,
+          layout: {
+            row: 7,
+            col: 1,
+            height: 40,
+            size: 12,
+            sizeActive: 14,
+            rowSpacing: 2,
+            colSpacing: 2,
+            maskBg: 'rgba(0,0,0,0.2)',
+            bg: '#fff',
+            color: '#888',
+            colorActive: '#2f63a8',
+            colorSelected: '#2f63a8'
+          },
+          animation: true,
+          cancel: {
+            text: '取消',
+            size: app._font,
+            w: 90,
+            h: 35,
+            bg: '#eee',
+            bgActive: '#ccc',
+            color: '#888',
+            colorActive: '#fff'
+          },
+          ok: {
+            text: '确定',
+            size: app._font,
+            w: 90,
+            h: 35,
+            bg: '#eee',
+            bgActive: '#ccc',
+            color: '#888',
+            colorActive: '#fff'
+          },
+          title: {
+            text: '',
+            size: 14,
+            h: 44,
+            bg: '#eee',
+            color: '#888'
+          },
+          fixedOn: api.frameName
+        }, function (ret, err) {
+          if (ret) {
+            isSelector = false;
+            if (document.getElementById('industry') == input) {
+              app.industrys = ret.level1
+              $api.setStorage('myindustrys', ret.level1)
+            } else {
+              app.Botany = ret.level1
+              $api.setStorage('myBotany', ret.level1)
+            }
+            UIActionSelector.close();
+          } else {
+            UIActionSelector.close();
+          }
+        });
+        setTimeout(function () {
+          UIActionSelector.setActive({
+            actives: _index
+          });
+        }, 800)
+      },
+      // 分页的跳转
+      training_html: function () {
+        api.openWin({
+          name: 'training',
+          url: './training.html',
+          pageParam: {}
+        })
+      },
+      address_html: function () {
+        api.openWin({
+          name: 'address',
+          url: './address.html',
+          pageParam: {}
+        })
+      },
+      company_html: function () {
+        api.openWin({
+          name: 'company',
+          url: './company.html',
+          pageParam: {}
+        })
+      },
+      namesList_html: function () {
+        api.openWin({
+          name: 'nickname',
+          url: './nickname.html',
+          pageParam: {}
+        })
+      },
+      // 相册、相机
+      images: function () {
+        var FNImageClip = api.require('FNImageClip');
+        api.actionSheet({
+          cancelTitle: '取 消',
+          buttons: ['相册', '拍照']
+        }, function (ret, err) {
+          var index = ret.buttonIndex;
+          if (index == 1) {
+            api.getPicture({
+              sourceType: 'album',
+              encodingType: 'jpg',
+              mediaValue: 'pic',
+              destinationType: 'url',
+              allowEdit: true,
+              quality: 100,
+              saveToPhotoAlbum: false
+            }, function (ret, err) {
+              if (ret) {
+                if (App.iphone) {
+                  if (ret) {
+                    $api.setStorage('face', ret.data);
+                    api.setPrefs({key: 'face', value: ret.data});
+                    app.upface(ret.data);
+                  }
+                } else {
+                  var file = ret.data.split('/picture/');
+                  photo_file = 'fs://picture/' + file[1];
+                  FNImageClip.open({
+                    rect: {
+                      x: 0,
+                      y: 0,
+                      w: api.winWidth,
+                      h: api.winHeight - 60
+                    },
+                    srcPath: photo_file,
+                    style: {
+                      mask: '#000',
+                      clip: {
+                        w: (api.winWidth - 80),
+                        h: (api.winWidth - 80),
+                        x: 40,
+                        y: (api.winHeight - (api.winWidth - 80) - 60) / 2,
+                        borderColor: '#fff',
+                        borderWidth: 1,
+                        appearance: 'rectangle'
+                      }
+                    },
+                    fixedOn: api.frameName,
+                    mode: 'image'
+                  }, function (ret, err) {
+                    document.getElementById('photo_btn').style.display = 'block';
+                  });
+                }
+              }
+            });
+          } else if (index == 2) {
+            api.getPicture({
+              sourceType: 'camera',
+              encodingType: 'jpg',
+              mediaValue: 'pic',
+              destinationType: 'url',
+              allowEdit: true,
+              quality: 100,
+              saveToPhotoAlbum: false
+            }, function (ret, err) {
+              if (ret) {
+                if (App.iphone) {
+                  if (ret) {
+                    $api.setStorage('face', ret.data);
+                    api.setPrefs({key: 'face', value: ret.data});
+                    app.upface(ret.data);
+                  }
+                } else {
+                  var file = ret.data.split('/picture/');
+                  photo_file = 'fs://picture/' + file[1];
+                  FNImageClip.open({
+                    rect: {
+                      x: 0,
+                      y: 0,
+                      w: api.winWidth,
+                      h: api.winHeight - 60
+                    },
+                    srcPath: photo_file,
+                    style: {
+                      mask: '#000',
+                      clip: {
+                        w: (api.winWidth - 80),
+                        h: (api.winWidth - 80),
+                        x: 40,
+                        y: (api.winHeight - (api.winWidth - 80) - 60) / 2,
+                        borderColor: '#fff',
+                        borderWidth: 1,
+                        appearance: 'rectangle'
+                      }
+                    },
+                    fixedOn: api.frameName,
+                    mode: 'image'
+                  }, function (ret, err) {
+                    document.getElementById('photo_btn').style.display = 'block';
+                  });
+                }
+              }
+            });
+          }
+        });
+      },
+      //  选择相机、相册按钮
+      photo_back: function () {
+        var FNImageClip = api.require('FNImageClip');
+        document.getElementById('photo_btn').style.display = 'none';
+        FNImageClip.close();
+      },
+      photo_save: function () {
+        var FNImageClip = api.require('FNImageClip');
+        FNImageClip.save({
+          destPath: photo_file,
+          copyToAlbum: false,
+          quality: 1
+        }, function (ret, err) {
+          if (ret) {
+            $api.setStorage('face', ret.destPath);
+            api.setPrefs({key: 'face', value: ret.destPath});
+            FNImageClip.close();
+            document.getElementById('photo_btn').style.display = 'none';
+            app.upface(ret.destPath);
+          }
+        });
+      },
+      //  处理上传图片地址
+      upface: function (img_path) {
+        var FNImageClip = api.require('FNImageClip');
+        $api.setStorage('face', img_path);
+        api.sendEvent({
+          name: 'redS',
+        });
+        app.imgs = img_path
+        api.execScript({name: 'root', frameName: 'home', script: "app.upface();"});
+        var token = $api.getStorage('token');
+        if (token) {
+          api.ajax({
+            url: App.url + '/?r=up&a=face&token=' + token,
+            method: 'post',
+            data: {
+              files: {
+                file: img_path
+              }
+            }
+          }, function (ret, err) {
+//            if (ret) {
+//              App.Uinfo();
+//            } else {
+//            }
+          });
+        }
+      },
+      // 关闭
+      closeWindow: function () {
+        var toesex = 0;
+        if (app.sex == '男') {
+          toesex = 1
+        } else {
+          toesex = 0
+        }
+//        alert(app.mYnciKname + "','" + toesex + "','" + app.Birth_time + "','" + app.company + "','" + app.industrys + "','" + app.Botany + "','" + app.City + "','" + app.meaddress + "','" + app.training)
+        api.execScript({
+          name: 'root',
+          script: "XO.PostUser('" + $api.getStorage('token') + "','" + app.mYnciKname + "','" + toesex + "','" + app.Birth_time + "','" + app.company + "','" + app.industrys + "','" + app.Botany + "','" + app.City + "','" + app.meaddress + "','" + app.training + "',{name:'edit',fun:'app.savesuccess'},{name:'edit',fun:'app.fail'});"
+        });
+        api.execScript({
+          name: 'set',
+          script: 'getUserInfo()'
+        })
+        api.closeWin()
+      },
+      // 选择时间
+      Picker: function () {
+        api.openPicker({
+          type: 'date',
+          date: '2014-05-01',
+          title: '选择时间'
+        }, function (ret, err) {
+          if (ret) {
+            app.Birth_time = ret.year + '-' + ret.month
+            $api.setStorage('aBirth_time', ret.year + '-' + ret.month)
+          }
+        });
+      },
+      // 图片过率
+      imgfunction: function (img_utl) {
+        api.imageCache({url: App.url + img_utl}, function (ret, err) {
+          if (ret.status) {
+            app.imgs = ret.url;
+            $api.setStorage('face', ret.url);
+          } else {
+            app.imgs = App.imge_url
+          }
+        });
+
+      }
+    }
+  })
+</script>
+</html>

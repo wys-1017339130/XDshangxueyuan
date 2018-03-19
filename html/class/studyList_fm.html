@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>学生会</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        body {
+            background-color: white;
+        }
+
+        /*重构*/
+        .list {
+            overflow: hidden;
+            padding-bottom: 1rem;
+        }
+
+        .list li:last-child {
+            border-bottom: none;
+        }
+
+        .list-item {
+            clear: both;
+            width: 100%;
+            padding: 0.5rem 0;
+        }
+
+        .left-box {
+            width: 25%;
+            float: left;
+            position: relative;
+        }
+
+        .img_box {
+            width: 4rem;
+            height: 4.8rem;
+            border-radius: 5px;
+            margin: 0 0.5rem;
+            /*background-repeat:no-repeat;*/
+            /*background-position:right center;*/
+            /*background-size:150% 100%;*/
+            /*-moz-background-size:100% 100%;*/
+        }
+
+        .left-box .icon-box {
+            position: absolute;
+            bottom: 0.5rem;
+            right: 0.5rem;
+            color: #fff;
+            width: 1rem;
+            height: 1rem;
+            line-height: 1rem;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .right_box {
+            float: left;
+            width: 70%;
+            margin-left: 0.5rem;
+        }
+
+        .title_box {
+            text-align: left;
+            padding-top: 0.2rem;
+            font-size: 0.8792rem;
+            font-weight: 300;
+            color: #434343;
+        }
+
+        .small_title_box {
+            color: #999;
+            font-size: 0.7rem;
+            padding: 0.3rem 0;
+        }
+
+        .listInfo_box {
+            height: 1.55rem;
+            text-align: center;
+            background-color: #fffcf7;
+            font-size: 0.6rem;
+            color: #D9B270;
+            border-bottom: 1px solid #eaeaea;
+            -webkit-justify-content: center;
+            -moz-justify-content: center;
+            -ms-justify-content: center;
+            -o-justify-content: center;
+            justify-content: center;
+            -webkit-align-items: center;
+            -moz-align-items: center;
+            -ms-align-items: center;
+            -o-align-items: center;
+            align-items: center;
+            box-pack: center;
+            box-align: center;
+            -webkit-box-pack: center;
+            -webkit-box-align: center;
+            -moz-box-pack: center;
+            -moz-box-align: center;
+            -ms-flex-pack: center;
+            -ms-flex-align: center;
+        }
+
+        .listInfo_box img {
+            width: 1.5rem;
+        }
+
+        .laberbar {
+            border-left: 2px solid #d9b270;
+            padding-left: 10px;
+            padding-top: 0.5rem;
+            padding-bottom: 1rem;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .learntitle {
+            font-size: 15px;
+        }
+
+        .scorebox {
+            background: #f0f0f0;
+            height: 13px;
+            width: 85%;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .scoreminbox {
+            background: #d9b270;
+            height: 100%;
+            border-radius: 20px;
+        }
+
+        .minball {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #d9b270;
+            position: absolute;
+            left: -7.5px;
+            top: 13%;
+        }
+
+        .flex-con-my {
+            -webkit-box-flex: 3;
+            -webkit-flex: 3;
+            flex: 3;
+        }
+
+        .time_box {
+            font-size: 0.6rem;
+            color: #ccc;
+            text-align: center;
+        }
+
+        /*底部上拉加载更多样式*/
+        .bottomdiv {
+            clear: both;
+            width: 100%;
+            height: 2rem;
+            text-align: center;
+            line-height: 2rem;
+            color: black;
+        }
+
+        .uptext {
+            color: #bfbfbf;
+            font-size: 13px;
+        }
+
+        .publicfont {
+            width: 1rem;
+            height: 1rem;
+            margin: auto;
+        }
+
+        .nomessage_box {
+            text-align: center;
+            color: #999;
+            padding-top: 4.75rem;
+            margin: 0;
+        }
+
+        .nomessage_box img {
+            width: 7.25rem;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div v-show="main">
+        <div class="nomessage_box nomessage">
+            <img src="../../image/nostudyList.png" alt="">
+            <div class="no-tips">某人很懒,还没有开始学习~</div>
+        </div>
+    </div>
+    <div v-show="!main">
+        <div style="height: 10px;background-color: #f5f5f5"></div>
+        <ul class="list" v-show="studyList.length>0">
+            <li class="flex-wrap flex-vertical" v-for="(item,index) in studyList">
+                <div class="list-item flex-wrap" @click="openclassFm(index)">
+                    <div class="left-box">
+								<span class="icon-box">
+									<span class="icon iconfont icon-1"></span>
+								</span>
+                        <img class="img_box" :src="formatImg(item.pic)">
+                    </div>
+                    <div class="right_box">
+                    <span class="title_box flex-wrap">
+                      <span class="flex-con-my aui-ellipsis-1">{{item.title}}</span>
+                      <span class="time_box flex-con">{{item.how_long_ago | jifenzhongqian}}</span>
+                    </span>
+                        <span class="small_title_box aui-ellipsis-1">
+										{{item.lecturer}} &nbsp;|&nbsp; {{item.fit || '暂无信息' }}
+									</span>
+                        <p style="color:#d9b270;font-size: 0.6rem;">已学习:{{item.learn_len |learnTime}} - {{item.percent
+                            +'%'}} </p>
+                    </div>
+                </div>
+                <ul style="padding: 0.75rem 12px 1rem 15px;display: none" class="listInfo_box_item"
+                    :class=" 'listInfo_box_item'+ index ">
+                    <li class="laberbar" v-for="(child,i) in studyListInfo[index]">
+                        <p class="learntitle">{{child.title}}</p>
+                        <div style="padding: 0.5rem 0;color: #d9b270;font-size: 14px">已学习:{{child.percent | percentLon
+                            }}
+                        </div>
+                        <div style="display: flex">
+                            <div class="scorebox">
+                                <div class="scoreminbox" :style="{width:child.percent+'%'}"></div>
+                            </div>
+                            <div style="margin-left: 15px;color:#D9B270">{{child.len | sheng}}</div>
+                        </div>
+                        <div class="minball"></div>
+                    </li>
+                </ul>
+                <div class="listInfo_box flex-wrap" @click="getlogList(index)">
+                    查看列表 <img src="../../image/down_icon.png" alt="" :class="'img_icon_box' +index ">
+                </div>
+            </li>
+        </ul>
+        <div class="bottomdiv">
+            <img v-if="load" class="publicfont" src="../../image/timg.gif">
+            <span v-if="overlate" class="uptext">没有更多了</span>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      page: 1,
+      perpage: 100,
+      studyList: [],
+      studyListInfo: [],
+      formatImg: formatImg,
+      load: false,
+      overlate: false,
+      main: true,
+      homeData: {}  //单个课程信息
+    },
+    created: function () {
+      apiready = function () {
+        if (App.State()) {
+          app.u_getLearnLog(true);
+        } else {
+          app.main = true;
+        }
+        api.setCustomRefreshHeaderInfo({
+          bgColor: '#efefef',
+          image: {
+            pull: 'widget://res/refresh/pull_image.png',
+            transform: [
+              'widget://res/refresh/refreshing_image_frame_01.png',
+              'widget://res/refresh/refreshing_image_frame_02.png',
+              'widget://res/refresh/refreshing_image_frame_03.png',
+              'widget://res/refresh/refreshing_image_frame_04.png',
+              'widget://res/refresh/refreshing_image_frame_05.png',
+              'widget://res/refresh/refreshing_image_frame_06.png',
+              'widget://res/refresh/refreshing_image_frame_07.png',
+              'widget://res/refresh/refreshing_image_frame_08.png',
+              'widget://res/refresh/refreshing_image_frame_09.png',
+              'widget://res/refresh/refreshing_image_frame_10.png',
+              'widget://res/refresh/refreshing_image_frame_11.png',
+              'widget://res/refresh/refreshing_image_frame_12.png'
+            ],
+            load: [
+              'widget://res/refresh/pull_end_image_frame_01.png'
+            ]
+          }
+        }, function () {
+          //下拉刷新被触发，使用 api.refreshHeaderLoadDone() 结束加载中状态
+          if (api.connectionType == 'none') {
+            api.refreshHeaderLoadDone();
+            api.toast({
+              msg: '未连接网络',
+              duration: 2000,
+              location: 'bottom'
+            });
+          } else {
+            app.page = 1;
+            app.u_getLearnLog(true);
+            api.refreshHeaderLoadDone();
+          }
+        });
+//        api.addEventListener({
+//          name: 'scrolltobottom',
+//          extra: {
+//            threshold: -30 //设置距离底部多少距离时触发，默认值为0，数字类型
+//          }
+//        }, function (ret, err) {
+//          app.page++;
+//          app.u_getLearnLog(false);
+//        });
+      };
+    },
+    filters: {
+      percentLon: function (lon) {
+        if (lon < 100) {
+          return lon + '%';
+        } else {
+          return '100%';
+        }
+      },
+      jifenzhongqian: function (item) {
+        if (item == '') {
+          return '暂无时间'
+        } else {
+          return item + '前'
+        }
+      },
+      learnTime: function (time) {
+        return (Math.floor(time / 60) + "小时" + (time % 60) + "分" );
+      },
+      sheng: function (chavaluetime) {
+        var mintime = Math.floor(chavaluetime / 60);
+        var secondtime = chavaluetime % 60;
+        return mintime + ':' + secondtime;
+      },
+      mySubStr: function (str) {
+        if (str) {
+          if (str.length > 10) {
+            return str.substr(0, 10) + '…';
+          } else {
+            return str;
+          }
+        } else {
+          return '';
+        }
+      }
+    },
+    methods: {
+      //获得学习记录
+      u_getLearnLog: function (ref) {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        if (ref) {
+          app.page = 1;
+        }
+        var post = {
+          hash: $api.getStorage('token'),
+          page: app.page,
+          perPage: app.perpage
+        };
+        setTimeout(function () {
+          api.hideProgress();
+        }, 3000)
+        console.log(JSON.stringify(post));
+        sendAjax(this, post, '/Api/Ucenter/u_getLearnLog', function (res) {
+          api.hideProgress();
+          console.log(JSON.stringify(res));
+//          alert(JSON.stringify(res));
+          if (ref && res.data.proList.length === 0) {
+            app.main = true;
+          } else {
+            app.main = false;
+          }
+          if (ref) {
+            app.studyList = res.data.proList;
+            app.overlate = false;
+            app.load = false
+          } else {
+            app.studyList = app.studyList.concat(res.data.proList);
+            app.overlate = false;
+            app.load = false
+          }
+          if (res.data.proList.length == 0) {
+            app.overlate = true;
+            app.load = false
+          }
+        })
+      },
+      getlogList: function (index) {
+        app.studyListInfo[index] = [];
+        app.u_getLearnLogList(index);
+        $('.listInfo_box_item' + index).slideToggle(200, function () {
+          if ($(this).is(":visible")) {
+            $('.img_icon_box' + index).attr('src', '../../image/up_icon.png')
+          } else {
+            $('.img_icon_box' + index).attr('src', '../../image/down_icon.png')
+          }
+        });
+      },
+      //获得学习记录列表
+      u_getLearnLogList: function (index) {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var post = {
+          hash: $api.getStorage('token'),
+          cid: app.studyList[index].cid
+        };
+        sendAjax(this, post, '/Api/Ucenter/u_getLearnLogList', function (res) {
+          api.hideProgress();
+          Vue.set(app.studyListInfo, index, res.data);
+//          alert(JSON.stringify(app.studyListInfo[index]));
+        })
+      },
+//      获取对应课程详情
+//      getCourses:function (index) {
+//        var post ={
+//          hash:$api.getStorage('token'),
+//          id:app.studyList[index].cid
+//        }
+//        sendAjax(this,post,'/Api/Data/getCourse',function (res) {
+//          console.log(JSON.stringify(res));
+//          app.homeData = res.data;
+//          //        买过或者价格为零
+//          if (app.homeData.buyed == 1 || app.homeData.price == '0.00') {
+//            api.openWin({
+//              name: 'professionDetail2',
+//              url: '../fm/professionDetail3.html',
+//              pageParam: {
+//                des: app.homeData.id,
+//                price: app.homeData.price,
+//                buyed: app.homeData.buyed,
+//                title: app.homeData.title
+//              }
+//            });
+////没买过
+//          } else {
+////            课程详情
+//            api.openWin({
+//              name: 'courseInfo_win',
+//              url: '../fm/courseInfo_win.html',
+//              pageParam: {
+//                des: app.studyList[index].cid,
+//                title: app.title
+//              }
+//            });
+//          }
+//        })
+//      },
+      openclassFm: function (index) {
+        api.openWin({
+          name: 'professionDetail2',
+          url: '../fm/professionDetail3.html',
+          pageParam: {
+            des: app.studyList[index].cid,
+            price: app.studyList[index].price,
+            buyed: app.studyList[index].buyed,
+            title: app.studyList[index].title
+          }
+        });
+      }
+    }
+  });
+
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+</html>

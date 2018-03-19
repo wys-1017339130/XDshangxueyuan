@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <style type="text/css">
+        #app {
+            background: white;
+        }
+
+        #header {
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            height: 2.2rem;
+            line-height: 2.2rem;
+        }
+
+        .left-box {
+            font-size: 1rem;
+            margin-left: 0.5rem;
+        }
+
+        .right-box {
+            position: absolute;
+            right: 1rem;
+        }
+
+        .up-box {
+            /*border-top: 15px solid #f2f2f2;*/
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+<body style="background-color: #f2f2f2;">
+<div id='app'>
+    <header class="aui-bar aui-bar-nav" id="header">
+        <a class="left-box iconfont icon-jiantou" @click="closeWindow()"></a>
+        <span class="aui-title">个人中心</span>
+    </header>
+
+    <div class="box_List">
+        <div class="boxTitle">
+            <div>当月累计学习时长</div>
+            <div v-cloak style="text-align: right;" v-show="mYlist.month_current && mYlist.month_current != 0">
+                超越了{{mYlist.pass}}%的用户
+            </div>
+        </div>
+        <div class="Cumulative">
+            <div>
+                <p><span style="font-size: 1.5rem;font-weight: 800;color: #d2b379;"
+                         v-show="mYlist.month_current == null">0</span><span
+                        style="font-size: 1.5rem;font-weight: 800;color: #d2b379;"
+                        v-show="mYlist.month_current != null">{{mYlist.month_current}}</span>分钟
+                </p>
+                <p style="margin-top: 15px;">获得{{mYlist.get_score || '0'}}个行币奖励</p>
+            </div>
+        </div>
+        <div class="flex-wrap new-data">
+            <div style="line-height: 1.6;padding: 10px 0" class="flex-con z-ellipsis new-border new-border-2"
+                 @click="kecheng(mYinfo.id)">
+                <span id="z-home-second" style="font-size: 0.7rem;color: #000;">
+                <span style="font-size: 1rem;" v-show="mYlist.month_current != null">{{mYlist.month_current}}</span>
+                <span style="font-size: 1rem;" v-show="mYlist.month_current == null">0</span>分钟</span><br><span
+                    class="new-little-title">当前课程学习情况</span>
+            </div>
+            <div style="line-height: 1.6;padding: 10px 0" class="flex-con z-ellipsis new-border new-border-2"
+                 @click="jilu()">
+                <span id="z-home-colume" style="font-size: 0.7rem;color: #000;"><span style="font-size: 1rem;">{{mYlist.lesson_current}}</span>课时</span><br><span
+                    class="new-little-title">学习课程</span>
+            </div>
+            <div style="line-height: 1.6;padding: 10px 0" class="flex-con z-ellipsis new-ch2" @click="certificate()">
+                <span id="z-home-day" style="font-size: 0.7rem;color: #000;"><span
+                        style="font-size: 1rem;">{{mYlist.get_cert}}</span></span><br><span
+                    class="new-little-title">学习证书</span>
+                <span class="icon iconfont icon-ch2" style="display:none;"></span>
+            </div>
+        </div>
+    </div>
+    <div class="up-box">
+        <div class="home-2">
+            <div class="box_List">
+                <p style="border:none;">当月课程学习情况</p>
+                <div class="ListBox" v-for="item in mYlist.learn_state">
+                    <p style="font-size: 0.7rem;font-weight: 800;color: #252525;">{{item.title}}</p>
+                    <p v-if="item.sum_real !== 0" style="font-size: 0.6rem; color: #666;">当月累计学习了<span
+                            style="color: #ff5317;">{{item.sum_real}}</span>分钟，超过了{{item.beyond}}%的用户
+                    </p>
+                    <p v-else style="font-size: 0.6rem; color: #666;">当月累计学习了<span
+                            style="color: #ff5317;">{{item.sum_real}}</span>分钟
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--
+    <div class="up-box">
+        <div class="home-2" style="margin-top: 0px;">
+            <div class="z-home-menu new-home-menu" @click="studylist()">
+                <img src="../../image/jilus.png" alt="">学习记录<span class="icon iconfont icon-ch2 fr"></span>
+            </div>
+            <div class="z-home-menu new-home-menu" @click="myclass()">
+                <img src="../../image/kc.png" alt="">我的课程<span class="icon iconfont icon-ch2 fr"></span>
+                <sapn class="fr fonts">{{rightText.countCourse}}</sapn>
+            </div>
+            <div class="z-home-menu new-home-menu" id="myclick" @click="Examination()">
+                <img src="../../image/xg.png" alt="">练习考试<span class="icon iconfont icon-ch2 fr"></span>
+                <sapn class="fr reds" v-show="rightText.examIsRed == 1">&nbsp;</sapn>
+            </div>
+            <div class="z-home-menu new-home-menu marings"
+                 @click="score()">
+                <img src="../../image/kb.png" alt="">我的行币<span class="icon iconfont icon-ch2 fr"></span>
+                <sapn class="fr fonts">{{rightText.score}}</sapn>
+            </div>
+            <div class="z-home-menu new-home-menu" @click="credit()">
+                <img src="../../image/xuefen1.png" alt="">我的学分<span class="icon iconfont icon-ch2 fr"></span>
+                <sapn class="fr fonts">{{rightText.credit}}</sapn>
+            </div>
+            <div id="click" class="z-home-menu new-home-menu" @click="certificate()">
+                <img src="../../image/zhengshu.png" alt="">我的证书<span class="icon iconfont icon-ch2 fr"></span>
+                <sapn class="fr fonts">{{rightText.count_cert}}</sapn>
+            </div>
+            <div class="z-home-menu new-home-menu" @click="ranking()">
+                <img src="../../image/rinking.png" alt="">学霸排行榜<span class="icon iconfont icon-ch2 fr"></span>
+                <sapn class="fr fonts" v-show="rightText.index != null">第<span id="rank">{{rightText.index}}</span>名
+                </sapn>
+                <sapn class="fr fonts" v-show="rightText.index == null">未上榜</sapn>
+            </div>
+            <div class="z-home-menu new-home-menu" style="display: none;" @click="query()">
+                <img src="../../image/chakan1.png" alt="">学员查看<span class="icon iconfont icon-ch2 fr"></span>
+            </div>
+            <div class="z-home-menu new-home-menu" @click="daiyanren()">
+                <img src="../../image/fmicon4.png" alt="">学习代言人<span></span><span
+                    class="icon iconfont icon-ch2 fr"></span>
+                <sapn class="fr fonts"></sapn>
+            </div>
+        </div>
+    </div>
+    -->
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      mYinfo: {},
+      mYlist: {}
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        app.u_getMyData()
+      }
+    },
+    methods: {
+      u_getMyData: function () {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var token = $api.getStorage('token');
+        var post = {
+          hash: token
+        };
+        sendAjax(this, post, '/Api/Ucenter/u_getMyData', function (res) {
+          api.hideProgress();
+          console.log('----------------' + JSON.stringify(res.data));
+          app.mYlist = res.data;
+          app.mYinfo = res.data.info
+        })
+      },
+      jilu: function () {
+        api.openWin({
+          name: 'studyList_win',
+          url: './studyList_win.html',
+          pageParam: {}
+        })
+      },
+      certificate: function () {
+        api.openWin({
+          name: 'certificate_fm',
+          url: './certificate_fm.html',
+          pageParam: {}
+        })
+      },
+      kecheng: function (id) {
+        api.openWin({
+          name: 'sharepage_win',
+          url: '../me/sharepage_win.html',
+          pageParam: {
+            id: id
+          }
+        })
+      }
+    }
+  })
+</script>
+</html>

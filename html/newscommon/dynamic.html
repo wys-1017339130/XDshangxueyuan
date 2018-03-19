@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>动态消息</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        #app {
+            min-height: 100%;
+        }
+
+        .news_list {
+            padding: 0.5rem 0.6rem 0 0.6rem;
+        }
+
+        .time_box {
+            width: 100%;
+            height: 1rem;
+            line-height: 1rem;
+            text-align: center;
+            font-size: 0.6rem;
+            color: white;
+            margin-top: 1rem;
+
+        }
+
+        .time_box span {
+            background-color: #ABABAB;
+            border-radius: 1rem;
+            padding: 0 0.2rem;
+        }
+
+        .news_message_bigbox {
+            background-color: white;
+            padding-top: 0.5rem;
+            margin-top: 0.75rem;
+            border-radius: 5px;
+        }
+
+        .news_message_box {
+            padding-bottom: 0.5rem;
+        }
+
+        .news_message_tx {
+            float: left;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background-repeat: no-repeat;
+            background-size: cover;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+
+        .message_name_box {
+            padding: 0.5rem 0 0.5rem 0;
+        }
+
+        .message_content_box {
+            color: #999;
+            font-size: 0.675rem;
+        }
+
+        .botton_btn_box {
+            font-size: 0.7rem;
+            height: 1.5rem;
+            line-height: 1.5rem;
+            text-align: center;
+            background-color: #ebebf0;
+            color: #000000;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 2px 0 rgb(227, 227, 227);
+        }
+
+        .news_message_bigbox_7 {
+            background-color: white;
+            padding: 0.5rem 1rem;
+            margin-top: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /*底部上拉加载更多样式*/
+        .bottomdiv {
+            clear: both;
+            width: 100%;
+            height: 2rem;
+            text-align: center;
+            line-height: 2rem;
+            color: black;
+        }
+
+        .uptext {
+            color: #bfbfbf;
+            font-size: 13px;
+        }
+
+        .publicfont {
+            width: 1rem;
+            height: 1rem;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<div id='app'>
+    <div id="HeadBar">
+        <div class="z-head">
+            <a class="z-head-left icon iconfont icon-fanhui" @click="closeWindow()"></a>
+            <div class="z-ellipsis z-head-text">动态消息</div>
+        </div>
+    </div>
+    <div v-show="main">
+        <div id="fixStatus"></div>
+        <ul id="list" class="tidings-wraper"></ul>
+        <div id="isnull" class="nomessage">
+            <img src="../../image/nomessage.png" alt="">
+            <div class="no-tips">暂无消息</div>
+        </div>
+    </div>
+    <ul v-show="!main">
+        <div id="fixStatus"></div>
+        <li class="news_list" v-for="(item,index) in proList">
+            <div class="time_box"><span>{{item.addtime}}</span></div>
+            <!--&lt;!&ndash;动态消息7 和移除小组6&ndash;&gt;-->
+            <!--<div class="news_message_bigbox_7" v-show="item.subtype === '7' || item.subtype === '6'  ">-->
+            <!--<div>{{item.value}}</div>-->
+            <!--</div>-->
+            <!--回复消息-->
+            <div class="news_message_bigbox" v-show="item.subtype === '1' ">
+                <!--信息-->
+                <div class="news_message_box flex-wrap">
+                    <div class="news_message_tx"
+                         :style="{'background-image': 'url(' + formatImg(item.value.face) + ')'}">
+                    </div>
+                    <div style="width:90%;margin-right: 0.5rem;">
+                        <div class="message_name_box">{{item.value.nickname}}
+                            <img v-if="item.value.level==5" src="../../image/haungguanpai.png"
+                                 style="width: 15px;height: 15px;margin-left: 3px;margin-right: 3px">
+                            <img v-if="item.value.level==3" src="../../image/haungjinpai.png"
+                                 style="width: 15px;height: 15px;margin-left: 3px;margin-right: 3px">
+                            <img v-if="item.value.level==4" src="../../image/zuanshipai.png"
+                                 style="width: 15px;height: 15px;margin-left: 3px;margin-right: 3px">
+                            <img v-if="item.value.level==1" src="../../image/tongpai.png"
+                                 style="width: 15px;height: 15px;margin-left: 3px;margin-right: 3px">
+                            <img v-if="item.value.level==2" src="../../image/yinpai.png"
+                                 style="width: 15px;height: 15px;margin-left: 3px;margin-right: 3px">
+                            <span style="color:#d2b379;font-size: 0.6rem;">{{item.value.levelText}}</span></div>
+                        <div class="message_content_box" v-show="item.value.com_type== 1">评论了你:{{item.value.comment ?
+                            item.value.comment :
+                            item.value.yourComment }}
+                        </div>
+                        <div class="message_content_box" v-show="item.value.com_type== 2">回复了你的评论:{{item.value.comment ?
+                            item.value.comment :
+                            item.value.yourComment }}
+                        </div>
+                    </div>
+                </div>
+                <!--查看详情-->
+                <div class="botton_btn_box" @click="openMessage(index)">
+                    <div>点击查看详情</div>
+                </div>
+            </div>
+            <!--小组部分消息-->
+            <div class="news_message_bigbox" v-show="item.subtype !== '1'">
+                <div class="news_message_box flex-wrap" style="text-align: center">
+                    <div style="padding:0 0.3rem;">{{item.value | strOrobj}}</div>
+                </div>
+                <!--查看详情-->
+                <div class="botton_btn_box" @click="openGroup(item)">
+                    <div>点击查看详情</div>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div class="bottomdiv">
+        <span v-if="rote" class="uptext">---查看更多---</span>
+        <img v-if="load" class="publicfont" src="../../image/timg.gif">
+        <span v-if="overlate" class="uptext">数据已全部加载</span>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: {
+      page: 1,
+      perPage: 10,
+      proList: [],
+      formatImg: formatImg,
+      baseimageUrl: baseimageUrl,
+      main: false,
+      rote: false,
+      load: false,
+      overlate: false
+    },
+    filters: {
+      jitianqian: function (diff) {
+        if (diff > 31536000) {
+          return parseInt(diff / 31536000) + '年前';
+        } else if (diff > 2592000) {
+          return parseInt(diff / 2592000) + '月前';
+        } else if (diff > 86400) {
+          return parseInt(diff / 86400) + '天前';
+        } else if (diff > 3600) {
+          return parseInt(diff / 3600) + '小时前';
+        } else if (diff > 60) {
+          return parseInt(diff / 60) + '分钟前';
+        } else {
+          return diff + '秒前';
+        }
+      },
+      strOrobj: function (data) {
+        if (typeof data == 'object') {
+          return data.message;
+        }
+        if (typeof data == 'string') {
+          return data;
+        }
+      }
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.byId('HeadBar'));
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 5 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+        }, function (ret, err) {
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.getMessageList(false);
+        });
+        app.getMessageList(true);
+        app.setTypeMessageRead();
+      }
+    },
+    methods: {
+      closeWindow: function () {
+        closeWindow();
+      },
+//        获取课程消息列表
+      getMessageList: function (ref) {
+        if (ref) {
+          app.page = 1;
+        }
+        var post = {
+          hash: $api.getStorage('token'),
+//          hash: 'OTE5NTE3Nzg1YjdmZTAyMTE3NTAzNDVkMGIwOTdlYTk0ODA5',
+          type: 1,
+          page: app.page,
+          perPage: app.perPage
+        };
+        sendAjax(this, post, '/Api/Message/getMessageList', function (res) {
+          if (ref) {
+            app.proList = res.data.proList;
+            console.log('==========>' + JSON.stringify(app.proList));
+            if (app.proList.length == 0) {
+              app.main = true;
+            }
+            if (app.proList.length > 5) {
+              document.body.style.height = 'auto';
+              app.overlate = false;
+              app.rote = true;
+              app.load = false
+            }
+          } else {
+            app.proList = app.proList.concat(res.data.proList);
+            app.overlate = false;
+            app.rote = true;
+            app.load = false;
+            if (res.data.proList.length == 0) {
+              app.overlate = true;
+              app.rote = false;
+              app.load = false
+            }
+          }
+        })
+      },
+//      点击查看详情
+      openMessage: function (index) {
+        api.openWin({
+          name: 'alltokenmessage_win',
+          url: '../me/alltokenmessage_win.html',
+          pageParam: {
+            reid: app.proList[index].value.com_id
+          }
+        })
+      },
+      openGroup: function (item) {
+        switch (item.subtype) {
+          case '2':  //小组审核
+            console.log('xiaozu-------------------' + JSON.stringify(item));
+//          通过
+            if (item.value.status == '1') {
+              var detailsmessage = {
+                name: item.value.name,
+                leading: item.value.leading
+              }
+              api.openWin({
+                name: 'aoverwin',
+                url: '../me/aoverwin.html',
+                pageParam: {
+                  boolindex: 0,
+                  gid: item.value.gid,
+                  detailsmessage: detailsmessage
+                }
+              });
+            } else {
+              //          未通过
+              api.openWin({
+                name: 'aoverfalseframenews_win',
+                url: '../me/aoverfalseframenews_win.html',
+                pageParam: {
+                  reason: item.value.reason
+                }
+              });
+            }
+            break;
+          case '3':  // 小组发布任务 (任务详情页)
+            api.openWin({
+              name: 'task_win',
+              url: '../me/task_win.html',
+              pageParam: {
+                mid: item.value.mid
+              }
+            });
+            break;
+          case '4':  // 任务快到截止日期、逾期消息  (小组任务列表页)
+            api.openWin({
+              name: 'grouplist_win',
+              url: '../me/grouplist_win.html',
+              pageParam: {
+                gid: item.value.gid
+              }
+            })
+            break;
+          case '5':  // 加入小组消息 (小组主页)
+            api.openWin({
+              name: 'grouplist_win',
+              url: '../me/grouplist_win.html',
+              pageParam: {
+                gid: item.value.gid
+              }
+            })
+            break;
+          case '6':  // 被移除小组消息 (圈子首页)
+            api.execScript({name: 'root', script: "MenuClick(1,0);"});
+            api.sendEvent({
+              name: 'myEvent',
+              extra: {
+                'titleindex': 0
+              }
+            });
+            setTimeout(function () {
+              api.closeToWin({
+                name: 'root'
+              });
+            }, 200);
+            break;
+          case '7':  // 有新动态消息 (官方首页)
+            api.execScript({name: 'root', script: "openGroup();"});
+          $api.setStorage('newIndex', 1);
+            setTimeout(function () {
+              api.closeToWin({
+                name: 'root'
+              });
+            }, 200);
+            break;
+        }
+      },
+      //      将消息置为已读
+      setTypeMessageRead: function () {
+        var post = {
+          hash: $api.getStorage('token'),
+          type: 1
+        };
+        sendAjax(this, post, '/Api/Message/setTypeMessageRead', function (res) {
+          api.sendEvent({
+            name: 'newsUp',
+          });
+          api.execScript({name: 'root', frameName: 'FM', script: "app.getUnreadCount();"});
+          api.execScript({name: 'root', frameName: 'group', script: "app.getUnreadCount();"});
+        })
+      }
+    }
+  })
+</script>
+</html>

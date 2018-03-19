@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>播放</title>
+  <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+  <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+  <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+</head>
+<body style="background-color: #e2e0dc;">
+<div id="main" class="z-audio-main flex-wrap smallcontroller">
+  <!-- <span data-tid="" data-category="" data-id="" data-path="" id="pbtn" class="icon iconfont icon-bofang" tapmode></span> -->
+  <img id="smallcontrollerIMG" height="40" width="40" src='../../image/sm_img.png'
+       onerror="this.src='../../image/sm_img.png'">
+  <div data-tid="" data-category="" data-des="" data-link="../../html/indexgroup/audio.html" data-name="audio"
+       data-pro="" class="flex-con" style="max-width: calc(100% - 110px);">
+    <div class="z-ellipsis small-title"></div>
+    <div class="small-below"><span id="progress">00:00</span><span class="des"></span></div>
+  </div>
+  <div id="bigbtn" style="position: relative;margin: 10px">
+    <img id="splay" style="position: absolute;left: 8px;top: 8px;width: 14px" src="../../image/s_play.png"/>
+    <img id="spause" style="display: none;position: absolute;left: 8px;top: 8px;width: 14px"
+         src="../../image/s_pause.png" alt="">
+    <canvas style="height: 30px;width: 30px" class="can-btn" height="90" width="90" data-pro="" data-tid=""
+            data-category="" data-id="" data-path="" id="pbtn" tapmode></canvas>
+  </div>
+  <!-- <span onclick="closeFrameFF()" class="smallquxiao"><span>x</span></span> -->
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+  var isSetProgress;
+  var d, playing;
+  var frist = true;//页面初始化是否完成参数，因为index一直触发setprogress函数，页面没初始化时报错
+  var id = 0;
+  var pro_up, pro_down, pro_now, pro_now_text, pro_now_w, pro_box, pro_box_width, duration;//播放进度相关参数
+  var cur;//将current变成全局，共快进和快退使用，快进快退只要改了index的进度就好
+  var fs, type, path, db;//type是获取数据方式，为0为读取缓存加载正在播放的音频，为1为根据传进来的id获取音频并播放
+  var rate = [0, 0];
+  var fsDir = '';
+  var c = document.querySelector('canvas'),
+    x = c.getContext('2d'),
+    pl = document.getElementById('splay'),
+    ps = document.getElementById('spause'),
+    bigbtn = document.getElementById('bigbtn');
+
+  x.scale(3, 3);
+
+  apiready = function () {
+    db = api.require('db');
+    fs = api.require("fs");
+
+    fsDir = api.fsDir;
+
+    drawbtn(0, 100);
+
+    api.addEventListener({
+      name: 'topause'
+    }, function (ret, err) {
+      document.getElementById('spause').style.display = 'none';
+      document.getElementById('splay').style.display = 'block'
+      document.querySelector(".small-title").className = "z-ellipsis small-title";
+    });
+
+    api.addEventListener({
+      name: 'PlayStatus'
+    }, function (ret, err) {
+      if (ret) {
+        PlayStatus(ret.value);
+        play(ret.value.id, ret.value.tid)
+      }
+    });
+
+    api.execScript({name: 'root', script: "CheckList();"});
+
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from currentaudio order by `time` desc')
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          if (ret.data[0].pic && (ret.data[0].pic.length > 10)) {
+            cacheIMG(ret.data[0].pic);
+          }
+          if ((ret.data[0].lecturer == 'null') || (ret.data[0].lecturer == 'undefined')) {
+            ret.data[0].lecturer = '';
+          }
+          if (ret.data[0].lecturer) {
+            document.querySelector(".small-title").innerHTML = ret.data[0].title + ' | ' + ret.data[0].lecturer;
+          } else {
+            document.querySelector(".small-title").innerHTML = ret.data[0].title;
+          }
+          if ((ret.data[0].columnTitle != "undefined") && ret.data[0].columnTitle) {
+            document.querySelector(".des").innerHTML = ret.data[0].columnTitle;
+          } else {
+            document.querySelector(".des").innerHTML = '行动在线商学院';
+          }
+
+          var s, m;
+          m = parseInt(ret.data[0].duration / 60);
+          s = parseInt(ret.data[0].duration % 60);
+          m = (m >= 10) ? m : '0' + m;
+          s = (s >= 10) ? s : '0' + s;
+          document.getElementById("progress").innerHTML = m + ':' + s + ' -';
+
+          document.querySelector("[data-id]").setAttribute("data-id", ret.data[0].id);
+          document.querySelector("[data-path]").setAttribute("data-path", ret.data[0].path);
+          document.getElementById("pbtn").setAttribute("data-tid", ret.data[0].tid);
+          document.getElementById("pbtn").setAttribute("data-category", ret.data[0].type);
+          document.getElementById("pbtn").setAttribute("data-pro", ret.data[0].progress);
+          document.querySelector("[data-link]").setAttribute("data-des", ret.data[0].id);
+          document.querySelector("[data-link]").setAttribute("data-tid", ret.data[0].tid);
+          document.querySelector("[data-link]").setAttribute("data-category", ret.data[0].type);
+          document.querySelector("[data-link]").setAttribute("data-pro", ret.data[0].progress);
+          if (isNaN(ret.data[0].progress)) {
+            ret.data[0].progress = 0;
+          }
+          drawbtn(ret.data[0].progress, ret.data[0].duration);
+          App.init();
+        } else {
+          api.closeFrame();
+        }
+      }
+    });
+
+    document.getElementById("bigbtn").addEventListener('click', function () {
+      var id = document.getElementById("pbtn").getAttribute("data-id");
+      var path = document.getElementById("pbtn").getAttribute("data-path");
+      var tid = document.getElementById("pbtn").getAttribute("data-tid");
+      var pro = document.getElementById("pbtn").getAttribute("data-pro");
+      var category = document.getElementById("pbtn").getAttribute("data-category");
+
+      console.log('pbtn ==>' + id + ' - ' + pro);
+
+      api.execScript({name: 'root', script: "(rebot=false);"});
+      api.execScript({name: 'root', script: "setNewId();"});
+      api.execScript({name: 'root', script: "JumpProgress(" + pro + "," + id + ");"});
+      api.execScript({name: 'root', script: "reayplay('" + id + "');"});
+
+    })
+    App.init();
+  }
+
+  function drawbtn(progress, duration) {
+    if (duration != 100) {
+      progress = parseInt(progress / duration);
+      duration = 100;
+    }
+    console.log('progress ' + progress + '|' + duration);
+    var eAngle = ((Math.PI * (Math.PI / 2)) / 100) * progress - 1.5;
+    console.log('drawbtn ==>' + eAngle);
+
+    x.clearRect(30, 30, 30, 30);
+    x.beginPath();
+    x.strokeStyle = '#d2b379';
+    x.arc(15, 15, 14, 0, Math.PI * 2, true);
+    x.stroke();
+    if (duration != 0) {
+      x.beginPath();
+      x.strokeStyle = '#6b6353';
+      x.arc(15, 15, 14, -1.5, eAngle, false);
+      x.stroke();
+    }
+  }
+
+  var CPicNum = 1;
+  function PlayStatus(data) {
+    if (typeof data == 'string') {
+      var data = App.JSON(data);
+    }
+
+    var ret_value = data;
+    document.getElementById('spause').style.display = 'block';
+    document.getElementById('splay').style.display = 'none';
+    if ((ret_value.lecturer == 'null') || (ret_value.lecturer == 'undefined')) {
+      ret_value.lecturer = '';
+    }
+    if (ret_value.lecturer) {
+      document.querySelector(".small-title").innerHTML = ret_value.key2 + ' | ' + ret_value.lecturer;
+    } else {
+      document.querySelector(".small-title").innerHTML = ret_value.key2;
+    }
+    document.querySelector(".small-title").className = "z-ellipsis small-title active";
+    if ((ret_value.columnTitle != '') && (ret_value.columnTitle != "undefined")) {
+      document.querySelector(".des").innerHTML = ret_value.columnTitle;
+    } else {
+      document.querySelector(".des").innerHTML = '行动在线商学院';
+    }
+
+    var s, m;
+    m = parseInt(ret_value.duration / 60);
+    s = parseInt(ret_value.duration % 60);
+    m = (m >= 10) ? m : '0' + m;
+    s = (s >= 10) ? s : '0' + s;
+    document.getElementById("progress").innerHTML = m + ':' + s + ' -';
+
+    id = ret_value.key1;
+    document.querySelector("[data-id]").setAttribute("data-id", ret_value.key1);
+    document.querySelector("[data-path]").setAttribute("data-path", '');
+    document.getElementById("pbtn").setAttribute("data-tid", ret_value.tid);
+    document.getElementById("pbtn").setAttribute("data-category", ret_value.type);
+    document.getElementById("pbtn").setAttribute("data-pro", ret_value.pro);
+    document.querySelector("[data-link]").setAttribute("data-des", ret_value.key1);
+    document.querySelector("[data-link]").setAttribute("data-tid", ret_value.tid);
+    document.querySelector("[data-link]").setAttribute("data-category", ret_value.type);
+    document.querySelector("[data-link]").setAttribute("data-pro", ret_value.pro);
+    if (!isNaN(ret_value.pro) && !isNaN(ret_value.duration)) {
+      var lvrate = parseInt(ret_value.duration / 100);
+      //console.log(ret_value.pro + '|' + ret_value.duration + '['+ lvrate + '|' + rate[0] + '|' + rate[1] +']');
+      if ((rate[0] != parseInt(ret_value.pro / lvrate)) || (rate[1] != ret_value.duration)) {
+        rate = [parseInt(ret_value.pro / lvrate), ret_value.duration];
+        drawbtn(rate[0], 100);
+      }
+    }
+
+    if (ret_value.pic && (ret_value.pic.length > 10)) {
+      CPicNum++;
+      if (CPicNum > 10) {
+        CPicNum = 1;
+      }
+      if ((CPicNum % 5) == 0) {
+        var Getpic = $api.setStorage('cacheIMG', ret_value.pic);
+        if (Getpic != ret_value.pic) {
+          cacheIMG(ret_value.pic);
+        }
+      }
+    }
+    App.init();
+  }
+
+  function closeFrameFF() {
+    api.closeFrame();
+  }
+
+  function download() {
+    api.execScript({name: 'root', script: "downloadCurrent();"});
+  }
+
+  //特殊情形，当播放被暂停的歌曲时需要把进度也传回去，可以从缓存取
+  function playAudio() {
+    api.execScript({
+      name: 'audio',
+      script: "playAudio()"
+    });
+  }
+
+  function play(pid, tid) {
+//    alert(pid+"--"+tid);
+    document.querySelector("[data-link]").setAttribute("data-des", pid);
+    document.querySelector("[data-link]").setAttribute("data-tid", tid);
+    document.getElementById("pbtn").setAttribute('data-id', pid);
+  }
+
+  function toplay() {
+    document.getElementById('spause').style.display = 'block';
+    document.getElementById('splay').style.display = 'none';
+  }
+
+  function pause() {
+    document.getElementById('spause').style.display = 'none';
+    document.getElementById('splay').style.display = 'block'
+  }
+
+  function upview(data) {
+
+  }
+
+  function fail(msg) {
+    api.hideProgress();
+    App.tips(msg);
+  }
+  // 上一首
+  function prev() {
+    api.execScript({
+      name: 'root',
+      script: "playPrev();"
+    });
+  }
+  // 下一首
+  function next() {
+    api.execScript({
+      name: 'root',
+      script: "playNext();"
+    });
+  }
+  // 弹窗
+  function toast(msg) {
+    api.toast({
+      msg: msg,
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+
+
+  function toTop() {
+    var dom = document.getElementById("play_btn");
+    dom.className = dom.className.replace(/50/g, '30');
+  }
+
+  function toBottom() {
+    var dom = document.getElementById("play_btn");
+    dom.className = dom.className.replace(/30/g, '50');
+  }
+
+  function setPlayStatus(status) {
+    if (status == 1) {
+      toplay();
+      document.querySelector(".small-title").className = "z-ellipsis small-title active";
+    }
+  }
+
+  function cacheIMG(data) {
+    var _file = App.file(data);
+    fs.exist({
+      path: (fsDir + '/file/' + _file.full)
+    }, function (ret, err) {
+      if (ret.exist) {
+        document.getElementById('smallcontrollerIMG').src = fsDir + '/file/' + _file.full;
+      } else {
+        if (data.indexOf('/') == 0) {
+          var dpic = App.url + data;
+        } else {
+          var dpic = data;
+        }
+        api.download({
+          url: dpic,
+          savePath: ('fs://file/' + _file.full),
+          cache: true,
+          allowResume: true
+        }, function (ret, err) {
+          if (ret.state == 1) {
+            document.getElementById('smallcontrollerIMG').src = fsDir + '/file/' + _file.full;
+          }
+        })
+      }
+    })
+  }
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

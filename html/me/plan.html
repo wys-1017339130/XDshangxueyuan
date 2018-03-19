@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>学习计划</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">学习计划</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div class="box" style="margin-top: 3%">
+			<div class="z-column z-plan-now">本月计划完成度<span id="rate_1" class="fr z-0084ff">0%</span></div>
+			<div class="z-column2">
+				<div class="z-plan-progress-con">
+					<div class="z-plan-progress-already"></div>
+					<div class="z-plan-progress-total"></div>
+				</div>
+			</div>
+			<ul class="flex-wrap z-column z-plan-list">
+				<li class="flex-con z-l1">
+					<div class="z-ib">
+						<div id="plan_a" class="z-plan-list-text">0</div>
+						<div class="z-plan-list-title">原定计划/时</div>
+					</div>
+				</li>
+				<li class="flex-con z-l2">
+					<div class="z-ib">
+						<div id="plan_b" class="z-plan-list-text">0</div>
+						<div class="z-plan-list-title">阅读时长/时</div>
+					</div>
+				</li>
+				<li class="flex-con z-l3">
+					<div class="z-ib">
+						<div id="rate_2" class="z-plan-list-text">0%</div>
+						<div class="z-plan-list-title">已完成率</div>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="box">
+			<div class="z-column">
+				<div class="search-title" style="padding-top: 15px">
+					分类搜索
+				</div>
+				<div id="content" class="z-change-intreset-box">
+					<span data-int="3001" class="z-change-intreset z-active">互联网</span>
+					<span data-int="3002" class="z-change-intreset">职场</span>
+					<span data-int="3003" class="z-change-intreset">绩效管理</span>
+					<span data-int="3004" class="z-change-intreset">研发</span>
+					<span data-int="3005" class="z-change-intreset">阅读</span>
+					<span data-int="3006" class="z-change-intreset">赢利模式</span>
+					<span data-int="3007" class="z-change-intreset">导购</span>
+					<span data-int="3008" class="z-change-intreset">心理学</span>
+				</div>
+			</div>
+		</div>
+		<div style="margin: 0 3%" data-href="../../html/me/change.html" data-name="change" data-des="0" class="z-column2 z-change-plan box">设置兴趣与学习时间<span class="icon iconfont icon-ch2 fr"></span>
+		</div>
+</body>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<span data-int="{{id}}" class="z-change-intreset">{{title}}</span>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var HeadBar = $api.byId('HeadBar');
+	var ani;
+	var zhuge,td;
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+		id = api.pageParam.des || 0;
+
+		App.openWWW(api.winName);
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('plan',{'Active':'加载'},'学习计划');"});
+		//MD End
+
+		var storage = localStorage.getItem('plan');//没有时可能为String null，也可能是object null
+		if((typeof storage == 'string') && (storage != 'null') && (storage != 'undefined') && (storage != '[object Object]')){
+			if(api.connectionType == 'none'){
+				api.toast({
+				    msg: '未连接网络',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+			}else{
+				Refresh();
+			}
+		}else{
+			if(!App.State()){
+				setTimeout(function(){
+					api.closeWin();
+				},2000);
+			}else{
+				Refresh();
+			}
+		}
+	};
+
+	function Refresh(){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});//数据加载中显示方块
+		api.execScript({name: 'root',script: "XO.GetTag('"+ $api.getStorage('token') +"',{name:'plan',fun:'uptag'},{name:'plan',fun:'fail'});"});
+
+	}
+
+	function uptag(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		var TM = new T7({tm: document.getElementById("list_Tpl")});
+		var html = TM.Tpl(data);
+		document.getElementById('content').innerHTML = html;
+		var domarr = document.querySelectorAll(".z-change-intreset");
+		api.execScript({name: 'root',script: "XO.GetPlan('"+ $api.getStorage('token') +"',{name:'plan',fun:'upview'},{name:'plan',fun:'fail'});"});
+	}
+
+	function upview(data){
+		storage = localStorage.setItem('plan',data);
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		var rate = parseInt(data.completed / data.master * 100) + '%';
+		data.master = toHour(data.master);
+		data.completed = toHour(data.completed);
+		document.querySelector(".z-plan-progress-already").style.width = rate;
+		document.getElementById('rate_1').innerHTML = rate;
+		document.getElementById('rate_2').innerHTML = rate;
+		document.getElementById('plan_a').innerHTML = data.master;
+		document.getElementById('plan_b').innerHTML = data.completed;
+		if(data.interest && data.interest.length > 0){
+			data.interest.forEach(function(arg){
+				document.querySelector("[data-int='"+ arg.id +"']").className = "z-change-intreset active";
+			})
+		}
+
+		App.init();
+		api.hideProgress();
+	}
+
+	function toHour(arg){
+		var h = parseInt(arg/3600);
+		if(h > 0){
+			return h;
+		}else{
+			return String(arg/3600).slice(0,3);
+		}
+	}
+
+	function fail(msg){
+		api.hideProgress();
+		App.tips(msg);
+	}
+
+	function play(){
+
+	}
+
+	function pause(){
+
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

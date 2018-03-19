@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>话题详情</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body class="z-fff">
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">话题详情</div>
+			<span style="font-size: 1.6rem;display: none" id="btn" data-des="0" data-href="../../html/me/updateDynamics.html" data-name="updateDynamics" tapmode="" class="z-head-right icon iconfont icon-yijianfankui">
+			</span>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div class="box-wraper">
+			<div id="con-box" class="box z-column clear">
+				<div class="group-detail-head"></div>
+				<div class="group-detail-below">
+					<img id="face" width="32" height="32" class="group-detail-face" src="../../image/user_default.png" alt="">
+					<span id="nickname"></span>
+					<span id="classbox" class="group-detail-class"></span>
+					<span class="group-detail-message-body-date" id="date"></span>
+				</div>
+				<div id="text" class="group-detail-text"></div>
+				<div id="pic"  class="group-detail-pic"></div>
+				<span style="margin-bottom: 0.8rem" onclick="comment(0)" class="icon iconfont icon-xiaoxi fr group-detail-message"></span>
+			</div>
+			<div id="message" class="box z-column">
+				<dl id="list" class="group-detail-message-box">
+					<dt>全部回复<span class="group-detail-message-number">0</span></dt>
+				</dl>
+			</div>
+		</div>
+		<div onclick="hideChatBox()" style="display: none" class="mask"></div>
+	</div>
+</body>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<dd>
+		<img style="border-radius: 100%" width="32" height="32" src="{{face}}" onerror="this.src='../../image/user_default.png'" class="fl">
+		<div class="group-detail-message-body">
+			<div class="group-detail-message-body-title">
+				<span>{{nickname}}</span>
+				{{#if stage}}<span class="fr">赢利模式{{stage}}班</span>{{/if}}
+			</div>
+			<div class="group-detail-message-body-text">{{text}}</div>
+			<div class="group-detail-message-body-date-box"><span class="group-detail-message-body-date">{{date}}</span><!--
+		<span onclick="DelMessage()" class="icon iconfont icon-iconfont05 del-icon"></span>
+		 --><span onclick="comment({{id}})" class="icon iconfont icon-xiaoxi fr group-detail-message"></span></div>
+			{{#if chat}}
+			<div class="group-detail-chat-box">
+				<div class="group-detail-chat-box-triangle">
+				</div>
+				<ul class="group-detail-chat-box-body">
+					{{#each chat}}
+					<li>
+						<span>{{nickname}}：</span><span class="group-detail-chat-box-text">{{text}}</span>
+						<!-- <div><span onclick="DelMessage()" class="icon iconfont icon-iconfont05 del-icon fr"></span></div> -->
+					</li>
+					{{/each}}
+				</ul>
+			</div>
+			{{/if}}
+		</div>
+	</dd>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var userID;
+	var PageNum = 0;
+	var type = 0;
+	var HeadBar = $api.byId('HeadBar');
+	var playID = 0;
+	var isplay = false;
+	var audio,fs,ani,laba,db;
+	var messageArray = [];
+	var pattern1 = /[\u4e00-\u9fa5]+/g;
+	var userID;
+	var MostPageNum = 0;
+	var user;
+	var UIChatBox;
+	var pattern1 = /[\u4e00-\u9fa5]+/g;
+	var isChat = false;
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+		App.openWWW(api.winName);
+		id = api.pageParam.des || 0;
+		audio = api.require('audio');
+		fs = api.require('fs');
+		db = api.require('db');
+		UIChatBox = api.require('UIChatBox');
+		//comment(id);
+
+		api.addEventListener({
+		    name: 'keyback'
+		}, function(ret, err) {
+			if(isChat){
+				hideChatBox()
+			}else{
+				api.closeWin();
+			}
+		});
+
+		db.selectSql({
+		    name: 'main',
+		    sql: ('select * from groupDetail where uid='+id)
+		}, function(ret, err) {
+	    if (ret.status) {
+	       if(ret.data.length>0){
+						var groupDetail = ret.data[0];
+						groupDetail.pic = JSON.parse(ret.data[0].pic);
+						upview(groupDetail);
+	       }else{
+					 if(!App.State()){
+							setTimeout(function(){
+								api.closeWin();
+							},2000);
+					 }
+	       }
+	    }
+			if(api.connectionType != 'none'){
+				Refresh();
+			}
+		});
+	};
+
+	function Refresh(type){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});
+		api.execScript({name: 'root',script: "XO.GroupDetail('"+ $api.getStorage('token') +"','"+id+"',{name:'groupDetail',fun:'upview'},{name:'groupDetail',fun:'fail'});"});
+	}
+
+	function upview(data){
+		console.log(data);
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		userID = localStorage.getItem('userID');
+		if(userID == data.uid){
+			document.getElementById("btn").style.display = 'block';
+			document.getElementById("btn").setAttribute("data-des",data.id+'/edit');
+		}
+		var sql1 = "select * from groupDetail where id=" + data.id;
+		db.selectSql({name: 'main',sql: sql1},function(ret, err){
+			if(ret.status){
+				var sql1 = "update groupDetail set title='"+data.title+"',face='"+data.face+"',nickname='"+data.nickname+"',stage='"+data.stage+"',vtime='"+data.vtime+"',utime='"+data.utime+"',content='"+data.content+"',commentsnum='"+data.commentsnum+"',cid='"+data.cid+"',uid='"+data.uid+"',type='"+data.type+"',pic='"+JSON.stringify(data.pic)+"',color='"+data.color+"',views='"+data.views+"',likenum='"+data.likenum+"',status='"+data.status+"',tsort='"+data.tsort+"',`delete`='"+data.delete+"' where id=" + data.id;
+				db.executeSql({name: 'main',sql: sql1},function(ret, err){
+				});
+			}else{
+				var sql2 = "insert into groupDetail ( id, title, face, nickname, stage, vtime, utime, content, commentsnum, cid, uid, type, pic, color, views, likenum, status, tsort, `delete`) values ('"+data.id+"','"+data.title+"','"+data.face+"','"+data.nickname+"','"+data.stage+"','"+data.vtime+"','"+data.utime+"','"+data.content+"','"+data.commentsnum+"','"+data.cid+"','"+data.uid+"','"+data.type+"','"+JSON.stringify(data.pic)+"','"+data.color+"','"+data.views+"','"+data.likenum+"','"+data.status+"','"+data.tsort+"','"+data.delete+"')";
+				db.executeSql({name: 'main',sql: sql2},function(ret, err){
+				});
+			}
+		});
+
+		data.date = App.dateFM(data.vtime);
+		document.querySelector(".group-detail-head").innerHTML = data.title;
+		document.getElementById("nickname").innerHTML = data.nickname;
+		document.getElementById("date").innerHTML = data.date;
+		if(data.stage){
+			document.getElementById("classbox").innerHTML = "赢利模式<span style='margin-left: 0;' id='class'>"+data.stage+"</span>班";
+		}else{
+			document.getElementById("classbox").innerHTML ='';
+		}
+		document.getElementById("text").innerHTML = data.content;
+
+		api.execScript({name: 'root', script: "ChatAna('TopicDetail',{'title':'" + data.title.replace("'","") + "'},'帖子详情');"});
+
+		if(data.face){
+			var _file = App.file(data.face);
+			fs.exist({
+			    path: (api.fsDir + '/file/' +_file.full)
+			}, function(ret, err) {
+			    if (ret.exist) {
+			    		data.face = (api.fsDir + '/file/' +_file.full);
+			    		document.getElementById("face").src = data.face;
+			    }else{
+			    	if(data.face.indexOf('/') == 0){
+						var dface = App.url + data.face;
+					}else{
+						var dface = data.face;
+					}
+			    		api.download({
+					    url: dface,
+					    savePath: ('fs://file/' +_file.full),
+					    cache: true,
+					    allowResume: true
+					}, function(ret, err) {
+						data.face = (api.fsDir + '/file/' +_file.full);
+						document.getElementById("face").src = data.face;
+					});
+			    }
+			});
+		}
+		if(data.pic && (data.pic.length>0)){
+			cachpics(0,data.pic.length,data.pic);
+		}
+
+
+		if(data.commentsnum != 0){
+			document.querySelector(".group-detail-message-number").innerHTML = data.commentsnum;
+		}
+
+		if(data.comment.length > 0){
+			data.comment.forEach(function(ar){
+				ar.date = App.dateFM(ar.vtime);
+				ar.text = ar.content;
+				if(ar.text){
+					var msg = ar.text;
+					var str = msg.match(pattern1);
+
+					if(str && str.length>0){
+						for(var i =0; i<str.length;i++){
+							var newstr = App.face(str[i]);
+							msg = msg.replace('['+ str[i] +']',newstr);
+						}
+						ar.text = msg;
+					}
+				}
+				if(ar.chat){
+					ar.chat.forEach(function(arg){
+						arg.text = arg.content;
+						if(arg.text){
+							var msg = arg.text;
+							var str = msg.match(pattern1);
+
+							if(str && str.length>0){
+								for(var i =0; i<str.length;i++){
+									var newstr = App.face(str[i]);
+									msg = msg.replace('['+ str[i] +']',newstr);
+								}
+								arg.text = msg;
+							}
+						}
+						arg.date = App.dateStr(arg.vtime);
+					});
+				}
+			});
+			CACH(0,data.comment.length,data.comment,document.getElementById("list_Tpl"),document.getElementById('list'))
+		}
+
+		App.init();
+		api.hideProgress();
+	}
+
+	function CACH(i,max,data,template,box){
+		if(i<max){
+			if(data[i].face){
+				var _file = App.file(data[i].face);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i].face = (api.fsDir + '/file/' +_file.full);
+				    		CACH(i+1,max,data,template,box);
+				    }else{
+				    	if(data[i].face.indexOf('/') == 0){
+							var dface = App.url + data[i].face;
+						}else{
+							var dface = data[i].face;
+						}
+				    		api.download({
+						    url: dface,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i].face = (api.fsDir + '/file/' +_file.full);
+							CACH(i+1,max,data,template,box);
+						});
+				    }
+				});
+			}else{
+       			CACH((i + 1),max,data,template,box);
+       		}
+		}else{
+			//结束
+			var TM = new T7({tm: template});
+			var html = TM.Tpl(data);
+			box.innerHTML = box.querySelector('dt').outerHTML+html;
+
+			App.init();
+		}
+	}
+
+	function cachpics(i,max,data){
+		if(i<max){
+			if(data[i]){
+				var _file = App.file(data[i]);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i] = (api.fsDir + '/file/' +_file.full);
+				    		var img = document.createElement("img");
+				    		img.src = data[i];
+				    		img.className = 'con-img';
+				    		document.getElementById("con-box").appendChild(img);
+				    		cachpics(i+1,max,data);
+				    }else{
+				    	if(data[i].indexOf('/') == 0){
+							var dface = App.url + data[i];
+						}else{
+							var dface = data[i];
+						}
+				    		api.download({
+						    url: dface,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i] = (api.fsDir + '/file/' +_file.full);
+							var img = document.createElement("img");
+				    		img.src = data[i];
+				    		img.className = 'con-img';
+				    		document.getElementById("pic").appendChild(img);
+							cachpics(i+1,max,data);
+						});
+				    }
+				});
+			}else{
+       			cachpics((i + 1),max,data);
+       		}
+		}
+	}
+
+	// function up(){
+	// 	PageNum++;
+	// 	GetRank('token',PageNum,upview,fail);
+	// }
+
+	function fail(msg){
+		document.getElementById('list').innerHTML = '';
+		api.hideProgress();
+		App.tips(msg);
+	}
+
+
+	function playAudio(path,id){
+		api.execScript({
+		    name: 'root',
+		    script: "newPlayAudio('"+path+"','"+id+"');"
+		});
+	}
+
+	function DelMessage(id){
+		api.execScript({name: 'root',script: "XO.DelComment('"+ $api.getStorage('token') +"','"+id+"',{name:'message',fun:'DelSuccess'},{name:'message',fun:'Delfail'});"});
+	}
+
+	function DelSuccess(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		document.querySelector("[data-message='"+data.data+"']").parentNode.removeChild(document.querySelector("[data-message='"+data.data+"']"));
+		api.execScript({
+		    name: 'root',
+		    frameName: 'FM',
+		    script: "changenum('com','del','"+data+"');"
+		});
+		api.toast({
+		    msg: '删除成功',
+		    duration: 2000,
+		    location: 'bottom'
+		});
+	}
+
+	function Delfail(data){
+		api.toast({
+		    msg: '删除失败',
+		    duration: 2000,
+		    location: 'bottom'
+		});
+	}
+
+	function comment(_id){
+		isChat = true;
+		document.querySelector(".mask").style.display = "block";
+        UIChatBox.open({
+            placeholder: '',
+            maxRows: 4,
+            autoFocus:true,
+            emotionPath: 'widget://res/chatbox/emotion',
+            texts: {
+                recordBtn: {
+                    normalTitle:'按住说话',
+                    activeTitle:'松开结束'
+                },
+                sendBtn:{
+                    title:'发送'
+                }
+            },
+            styles: {
+                inputBar: {
+                    borderColor: '#d9d9d9',
+                    bgColor: '#f2f2f2'
+                },
+                inputBox: {
+                    borderColor: '#B3B3B3',
+                    bgColor: '#FFFFFF'
+                },
+                emotionBtn: {
+                    normalImg: 'widget://res/chatbox/face1.png'
+                },
+                keyboardBtn: {
+		            normalImg: 'widget://res/chatbox/key3.png'
+		        },
+                indicator: {
+                    target: 'both',
+                    color: '#c4c4c4',
+                    activeColor: '#9e9e9e'
+                },
+                sendBtn: {
+                    titleColor: '#fff',
+                    bg: '#5099FB' ,
+                    activeBg: '#2e73d0',
+                    titleSize: 12
+                }
+            },
+            extras: {
+                titleSize: 12,
+                titleColor: '#a3a3a3',
+                btns: []
+            }
+        }, function(ret, err){
+            if( ret ){
+                if(ret.eventType=='clickExtras'){
+                }else if(ret.eventTyp=='show'){
+                    UIChatBox.popupKeyboard();
+                }else if(ret.eventType=='send'){
+                    var msg = ret.msg;
+                        if(msg.length<3){
+                            api.toast({
+                            msg: '留言过短!',
+                            duration: 2000,
+                            location: 'bottom'
+                        })
+                            return;
+                        }
+                    msg = msg.replace(/(\n)+|(\r\n)+/g, " ");
+
+                    var token = $api.getStorage('token');
+                    if(msg){
+                    	if(_id==0){
+                    		api.execScript({name: 'root',script: "XO.PostTopicMessage('"+ $api.getStorage('token') +"','"+id+"','"+msg+"',{name:'groupDetail',fun:'SendSuccess'},{name:'groupDetail',fun:'SendFail'});"});
+                    	}else{
+                    		api.execScript({name: 'root',script: "XO.PostTopicChat('"+ $api.getStorage('token') +"','"+ id +"','"+ _id +"','"+msg+"',{name:'groupDetail',fun:'SendSuccess'},{name:'groupDetail',fun:'SendFail'});"});
+                    	}
+                    	hideChatBox();
+                    }
+                }
+            }else{
+                 //alert( JSON.stringify( err ) );
+            }
+        });
+
+    }
+
+    function SendSuccess(data){
+    	api.toast({
+		    msg: '发布成功',
+		    duration: 2000,
+		    location: 'bottom'
+		});
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});
+		UIChatBox.closeKeyboard();
+		UIChatBox.close();
+    	isChat = false;
+
+    	document.getElementById("list").blur();
+		api.execScript({name: 'root',script: "XO.GroupDetail('"+ $api.getStorage('token') +"','"+id+"',{name:'groupDetail',fun:'upMessage'},{name:'groupDetail',fun:'fail'});"});
+    }
+
+    function upMessage(data){
+    	if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+    	if(data.commentsnum != 0){
+			document.querySelector(".group-detail-message-number").innerHTML = data.commentsnum;
+		}
+		data.comment.forEach(function(ar){
+			ar.date = App.dateFM(ar.vtime);
+			ar.text = ar.content;
+			if(ar.text){
+				var msg = ar.text;
+				var str = msg.match(pattern1);
+
+				if(str && str.length>0){
+					for(var i =0; i<str.length;i++){
+						var newstr = App.face(str[i]);
+						msg = msg.replace('['+ str[i] +']',newstr);
+					}
+					ar.text = msg;
+				}
+			}
+			if(ar.chat){
+				ar.chat.forEach(function(arg){
+					arg.text = arg.content;
+					if(arg.text){
+						var msg = arg.text;
+						var str = msg.match(pattern1);
+
+						if(str && str.length>0){
+							for(var i =0; i<str.length;i++){
+								var newstr = App.face(str[i]);
+								msg = msg.replace('['+ str[i] +']',newstr);
+							}
+							arg.text = msg;
+						}
+					}
+
+					arg.date = App.dateStr(arg.vtime);
+				});
+			}
+		});
+
+		// var TM = new T7({tm: document.getElementById("my_list_Tpl")});
+		// var html = TM.Tpl(data);
+		// document.getElementById('list').innerHTML = html;
+		CACH(0,data.comment.length,data.comment,document.getElementById("list_Tpl"),document.getElementById('list'))
+		App.init();
+		api.hideProgress();
+    }
+
+    function SendFail(msg){
+    	api.toast({
+		    msg: '发布失败',
+		    duration: 2000,
+		    location: 'bottom'
+		});
+    }
+
+    function hideChatBox(){
+    	document.querySelector(".mask").style.display = "none";
+
+    	isChat = false;
+    	UIChatBox.closeKeyboard();
+    	UIChatBox.close();
+    }
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

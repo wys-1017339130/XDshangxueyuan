@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>互动</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .nowspanstyle {
+            margin-left: 1rem;
+            margin-right: 1rem;
+            color: #9a9a9a;
+            box-sizing: border-box;
+        }
+
+        .beforeclassstyle {
+            color: #d2b379;
+            line-height: 38px;
+            box-sizing: border-box;
+            border-bottom: 3px solid #d2b379;
+        }
+
+        .leftbox {
+            position: relative;
+            display: flex;
+            height: 100%;
+            float: left;
+        }
+
+        .ospanner {
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            margin-top: -15px;
+            background: #ff5317;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .messageboximg {
+            color: #8a8a8a;
+            float: left;
+            margin: auto;
+            width: 25px;
+            height: 25px
+        }
+    </style>
+</head>
+<body style="position: relative;background-color: #f9f9f9;">
+<!--<div style="width: 100%;height:100%;background: red">加载中...</div>-->
+<div id="app">
+    <header id="HeadBar" style="background: #ffffff;border-bottom: 2px solid #f4f4f4">
+        <div class="z-head" style="padding: 0 10px;background: #ffffff">
+            <div class="leftbox">
+                <img @click="openshare" src="../../image/messageer.png" class="messageboximg">
+                <span class="ospanner" v-if="messagenumber!=0">{{messagenumber}}</span>
+            </div>
+
+            <div style="float: right;margin-right: 5px;width: 20px;height: 100%">
+                <i @click="addwork" v-if="spanindex==0"
+                   style="color: #8a8a8a;float: right;font-size: 20px" class="iconfont icon-iconjia"></i>
+                <i @click="writetoken" v-if="spanindex==1 && ifshowwrite==false"
+                   style="color: #8a8a8a;float: right;font-size: 20px"
+                   class="iconfont icon-pinglun"></i>
+            </div>
+
+
+            <div class="z-ellipsis z-head-text">
+                <span v-for="(item,index) in itemlist" @click="changetitle(index)" class="nowspanstyle"
+                      :class="{beforeclassstyle:index==spanindex}">{{item}}</span>
+            </div>
+        </div>
+    </header>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      itemlist: ['圈子', '官方'],
+      spanindex: 0,
+      //消息数量
+      messagenumber: '',
+      ifshowwrite: false
+    },
+    created: function () {
+      apiready = function () {
+        var offlineDataHome;
+        var HeadBar = $api.byId('HeadBar');
+        var pageNum = 0;
+        var id, db, fs;
+        id = api.pageParam.des || 0;//api.pageParam是获取到所有data传参的集合对象
+        $api.fixStatusBar(HeadBar);
+        fs = api.require("fs");
+        db = api.require("db");
+        var posY = $api.offset($api.dom("header")).h;
+        api.addEventListener({
+          name: 'accepts'
+        }, function (ret, err) {
+          app.spanindex = ret.value.titleindex
+        });
+        api.addEventListener({
+          name: 'myEvent'
+        }, function (ret, err) {
+          app.spanindex = ret.value.titleindex;
+        });
+        api.addEventListener({
+          name: 'mynewEvent'
+        }, function (ret, err) {
+          app.spanindex = ret.value.titleindex;
+        });
+        api.openFrame({
+          name: 'groupframe',
+          url: './groupframe.html',
+          rect: {
+            x: 0,
+            y: posY,
+            width: 'auto',
+            h: api.winHeight - posY - 51
+          },
+          bounces: true,
+          hScrollBarEnabled: false,
+          vScrollBarEnabled: false
+        });
+        app.getUnreadCount();
+        app.checkAddOfficialAuth()
+      };
+    },
+    watch:{
+      'spanindex':function (value) {
+        if (value == 3) {
+          api.closeFrame({
+            name: 'groupframe'
+          })
+          api.closeFrame({
+            name: 'smallcontroller'
+          })
+          var posY = $api.offset($api.dom("header")).h;
+          api.openFrame({
+            name: 'groupframe2',
+            url: './groupframe.html',
+            rect: {
+              x: 0,
+              y: posY,
+              width: 'auto',
+              h: api.winHeight - posY - 51
+//              h: api.winHeight - posY - 200
+            },
+            bounces: true,
+            hScrollBarEnabled: false,
+            vScrollBarEnabled: false
+          });
+        }else{
+//          $api.rmStorage('newIndex');
+        }
+      }
+    },
+    filters: {
+      filetersstate: function (a) {
+        switch (a) {
+          case 1:
+            return '已完成状态';
+          case 2:
+            return '未完成';
+        }
+      }
+    },
+    methods: {
+      //选择方式
+      changetitle: function (index) {
+        app.spanindex = index;
+        api.sendEvent({
+          name: 'myEvent',
+          extra: {
+            'titleindex': index,
+          }
+        });
+      },
+      //增加
+      addwork: function () {
+        api.openFrame({
+          name: 'groupadd',
+          url: './groupadd.html',
+          rect: {
+            x: 0,
+            y: 0,
+            w: 'auto',
+            h: 'auto'
+          },
+          bgColor: 'rgba(0,0,0,.5)'
+        });
+      },
+      //写评论
+      writetoken: function () {
+        api.openWin({
+          name: 'writecreatwin',
+          url: './writecreatwin.html',
+        })
+      },
+      //获取消息数量
+      getUnreadCount: function () {
+        var post = {
+          hash: $api.getStorage('token')
+        };
+        sendAjax(this, post, '/Api/Message/getUnreadCount', function (res) {
+          if (res.data <= 9) {
+            app.messagenumber = res.data
+          } else {
+            app.messagenumber = '9+'
+          }
+        })
+      },
+//			没用的！一定要删除了(不要删除了！ 我改了  注释可改)
+      openshare: function () {
+        api.openWin({
+          name: 'news_win',
+          url: '../indexgroup/news.html',
+        });
+      },
+//			检测当前用户书否有评论权限
+      checkAddOfficialAuth: function () {
+        var post = {
+          hash: $api.getStorage('token'),
+        };
+        sendAjax(this, post, '/Api/Official/checkAddOfficialAuth', function (res) {
+          if (res.data == 0) {
+            app.ifshowwrite = true
+          }
+        })
+      }
+    }
+  });
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+</html>

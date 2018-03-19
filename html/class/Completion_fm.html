@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>考试完成情况</title>
+</head>
+<link rel="stylesheet" href="../../css/api.css"/>
+<link rel="stylesheet" href="../../css/style.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+<style>
+    #app {
+        background: white;
+    }
+
+    #header {
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        height: 2.2rem;
+        line-height: 2.2rem;
+    }
+
+    .left-box {
+        font-size: 1rem;
+        margin-left: 0.5rem;
+    }
+
+    .right-box {
+        position: absolute;
+        font-size: 0.75rem;
+        right: 0.5rem;
+    }
+</style>
+<body style="background-color: #f2f2f2;">
+<div id='app'>
+    <header class="aui-bar aui-bar-nav" id="header">
+        <a class="left-box iconfont icon-jiantou z-fanhui" @click="closeWindow()"></a>
+        <span class="aui-title aui-ellipsis-1">《{{names}}》课后练习</span>
+    </header>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      name: '',
+      names: '考试情况',
+      id: '',
+      rid: ''
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        app.names = api.pageParam.nameText
+        app.name = api.pageParam.texts
+        app.id = api.pageParam.id //练习id
+        app.rid = api.pageParam.rid
+        api.openFrame({
+          name: 'Completion_win_01',
+          url: "./Completion_win_01.html",
+          rect: {
+            x: 0,
+            y: $api.offset($api.dom('header')).h,
+            w: 'auto'
+          },
+          pageParam: {
+            mYname: app.name,
+            id: app.id,
+            rid: app.rid
+          }
+        });
+        app.u_getPerPractice();
+      }
+    },
+    methods: {
+      u_getPerPractice: function () {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token,
+          practice_id: app.id,
+          rid: app.rid
+        }
+        sendAjax(this, post, '/Api/Ucenter/u_getPerPractice', function (res) {
+          api.hideProgress();
+          app.names = res.data.radio_title;
+        })
+      },
+      closeWindow: function () {
+        api.closeWin()
+      }
+    }
+  })
+</script>
+</html>

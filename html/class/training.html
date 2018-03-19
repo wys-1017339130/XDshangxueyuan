@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<meta name="viewport"
+      content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+<link rel="stylesheet" href="../../css/api.css"/>
+<link rel="stylesheet" href="../../css/style.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+<style>
+  body {
+    background: #f2f2f2;
+  }
+
+  #header {
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    height: 44px;
+    line-height: 44px;
+  }
+
+  .left-box {
+    font-size: 1rem;
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+  }
+
+  .right-box {
+    position: absolute;
+    right: 10px;
+    font-size: 0.7rem;
+  }
+
+  .title {
+    height: 10px;
+    background-color: transparent;
+    width: 100%;
+  }
+
+  .nckiname {
+    display: -webkit-box;
+    -webkit-box-align: center;
+    padding: 0 10px;
+    height: 3rem;
+    background-color: #ffffff;
+  }
+
+  .nckiname > div {
+    -webkit-box-flex: 1;
+    background-color: #FFFFFF;
+
+    height: 3rem;
+  }
+
+  .nckiname > div > textarea {
+    width: 100%;
+    height: 3rem;
+    background-color: #FFFFFF;
+    resize: none;
+  }
+
+  .nckiname > p {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 100%;
+    background: #f1f1f1;
+    font-size: 16px;
+    color: #FFF;
+  }
+
+  .Identification {
+    display: -webkit-box;
+    -webkit-box-align: center;
+    padding-left: 20px;
+    height: 40px;
+    font-size: 12px;
+    line-height: 40px;
+  }
+
+  .Identification > p {
+    width: 16px;
+    height: 16px;
+    border-radius: 100%;
+    color: #ffffff;
+    background-color: #ff3300;
+    text-align: center;
+    margin: 10px;
+    line-height: 16px;
+  }
+</style>
+<body>
+<div id='app'>
+  <header class="aui-bar aui-bar-nav" id="header">
+    <a class="left-box" @click="closeWindow()">取消</a>
+    <span class="aui-title">贏利模式</span>
+    <span class="right-box" @click="complete()">完成</span>
+  </header>
+  <div class="title"></div>
+  <div class="nckiname">
+    <div><textarea v-model="training" type="text" placeholder="请输入期数"></textarea></div>
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      training: ''
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        if ($api.getStorage('myTraining') != 'undefined') {
+          app.training = $api.getStorage('myTraining')
+        }
+      }
+    },
+    methods: {
+      closeWindow: function () {
+        api.closeWin()
+      },
+      complete: function () {
+        $api.setStorage('myTraining', app.training)
+        api.sendEvent({
+          name: 'myAddress',
+        });
+        api.closeWin()
+      }
+    }
+  })
+</script>
+</html>

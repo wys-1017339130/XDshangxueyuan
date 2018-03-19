@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title>我的下载</title>
+	<link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/static.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body>
+<div id="HeadBar">
+	<div class="z-head">
+		<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+		<div class="z-ellipsis z-head-text">我的下载</div>
+		<span id="delete_btn" onclick="toDel()" class="z-head-right icon iconfont icon-iconfont05">
+			</span>
+		<div style="display: none" id="cancel" onclick="stopDel()" class="z-head-preview">取消</div>
+	</div>
+</div>
+<div id="main">
+	<div id="fixStatus"></div>
+	<ul class="z-index-head clear z-border-bottom">
+		<li class="z-sub fl dt"><span class="z-subfont z-dongtai z-active">已下载</span></li>
+		<li class="z-sub fl xy"><span class="z-subfont z-xiaoyou">下载中</span></li>
+		<li class="z-slider"></li>
+	</ul>
+	<ul id="list" class="box-wraper">
+	</ul>
+	<ul class="download-menu hide">
+		<li onclick="selectAll()" class="flex-con">全选</li>
+		<li onclick="willdel()" class="flex-con">删除</li>
+	</ul>
+</div>
+</body>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<li data-active='{{id}}' data-id-{{id}} data-type="{{type}}" data-tid="{{tid}}" onclick="toggleSelected({{id}})" class="box z-column clear">
+		<span style="display: none" data-id={{id}} class="icon iconfont icon-xuanzhong"></span>
+		<img width="60" height="60" src="{{pic}}" class="list-img" onerror="this.src='../../image/download.png'">
+		<div class="download-font-box">
+			<div data-title="{{id}}" class="list-title">{{title}}</div>
+			<div class="list-text"><span class="tags">大小 {{size}} MB</span><span class="tags">时长 {{len}}</span></div>
+		</div>
+	</li>
+	{{/data}}
+</script>
+<!--{{#if des}}<div data-box-{{id}} class="tags des">{{des}}</div><br />{{/if}}-->
+<script id="list2_Tpl" type="text/template">
+	{{#data}}
+	<li data-active='{{id}}' data-id-{{id}} data-id='{{id}}' data-status="{{status}}" class="box z-column clear">
+		<span style="display: none" data-id={{id}} class="icon iconfont icon-xuanzhong"></span>
+		<img width="60" height="60" src="{{pic}}" onerror="this.src='../../image/download.png'" class="list-img">
+		<div data-box='{{id}}' class="download-font-box">
+			<div class="list-title">{{title}}</div>
+			{{#if downing}}
+			<div data-down='{{id}}' class="list-text flex-wrap download-progress-box">
+				<span class="flex-con download-progress">
+					<div data-at='{{id}}' style="width: {{at}}%" class="download-up"></div>
+					<div class="download-down"></div>
+				</span>
+				<span class="nosize"></span>
+			</div>
+			{{else}}
+			<div data-text='{{id}}' class="list-text">{{text}}</div>
+			{{/if}}
+		</div>
+	</li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+  var status = 1;
+  var PageNum = 0;
+  var HeadBar = $api.byId('HeadBar');
+  var MType = 0;
+  var db,fs;
+  var GData = [];
+  var Tabs = 1;
+  var ShowNum = 0;
+
+  function fixfile(i,len,files){
+    if(i<len){
+      fs.exist({
+        path: (api.fsDir + '/blocks/' +files[i].hash + '.db')
+      }, function(ret, err) {
+        if((!ret || !ret.exist) && (files[i].status == 3)) {
+          db.executeSql({name: 'main',sql: "delete from downfile where `hash`='"+ files[i].hash +"'"},function(ret, err){});
+        }
+        fixfile(i+1,len,files);
+      });
+    }
+  }
+
+  apiready = function(){
+    $api.fixStatusBar(HeadBar);
+    slider();
+    db = api.require('db');
+    fs = api.require('fs');
+
+    //MD Start
+    api.execScript({name: 'root', script: "ChatAna('DownManage',{'Active':'加载'},'下载管理界面');"});
+    //MD End
+
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from downfile')
+    }, function(ret, err) {
+      fixfile(0,ret.data.length,ret.data);
+      console.log(JSON.stringify(ret.data));
+    });
+
+    var menu1 = document.querySelector(".dt");
+    var menu2 = document.querySelector(".xy");
+    menu1.onclick = function(){
+      if(Tabs == 1){return;}
+      Tabs = 1;
+      GData = [];
+      App.State();
+      var cl = menu1.querySelector(".z-dongtai").className;
+      if(/z-active/.test(cl)){
+        return;
+      }else{
+        document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+        document.querySelector(".z-active").className = document.querySelector(".z-active").className.replace(/ z-active/,'');
+        menu1.querySelector(".z-dongtai").className += ' z-active';
+        slider();
+      }
+      MType = 0;
+      db.selectSql({
+        name: 'main',
+        sql: ('select * from downfile where status=3 group by id')
+      }, function(ret, err) {
+        sett = setInterval(function(){sel(MType)},3000);
+        if(ret.status){
+          if(ret.data.length>0){
+            checkDone(ret.data,0,ret.data.length);
+          }else{
+            if(!document.querySelector('.nomessage')){
+              document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+            }
+          }
+        }else{
+          if(!document.querySelector('.nomessage')){
+            document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+          }
+        }
+      });
+      stopDel();
+    };
+
+    menu2.onclick = function(){
+      if(Tabs == 2){return;}
+      Tabs = 2;
+      GData = [];
+      App.State();
+      var cl = menu2.querySelector(".z-xiaoyou").className;
+      if(/z-active/.test(cl)){
+        return;
+      }else{
+        document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+        document.querySelector(".z-active").className = document.querySelector(".z-active").className.replace(/ z-active/,'');
+        menu2.querySelector(".z-xiaoyou").className += ' z-active';
+        slider();
+      }
+      MType = 1;
+      db.selectSql({
+        name: 'main',
+        sql: ('select * from downfile where status<>3 group by id')
+      }, function(ret, err) {
+        sett = setInterval(function(){sel(MType)},1000);
+        if(ret.status){
+          if(ret.data.length>0){
+            GData = ret.data;
+            checkLoad(ret.data,0,ret.data.length);
+          }else{
+            if(!document.querySelector('.nomessage')){
+              document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+            }
+          }
+        }else{
+          if(!document.querySelector('.nomessage')){
+            document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+          }
+        }
+      });
+      document.getElementById("delete_btn").style.display = 'none';
+      document.getElementById("cancel").style.display = 'none';
+      if(document.querySelectorAll("[data-id]").length>0){
+        var dm = document.querySelectorAll("[data-id]");
+        for(i in dm){
+          if(typeof dm[i] == 'object'){
+            dm[i].style.display= "none";
+            dm[i].className = 'icon iconfont icon-xuanzhong';
+          }
+        }
+      }
+      stopDel();
+    }
+
+    //Refresh(type);
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from downfile where status=3 group by id')
+    }, function(ret, err) {
+      sett = setInterval(function(){sel(MType)},3000);
+      if(ret.status){
+        if(ret.data.length>0){
+          checkDone(ret.data,0,ret.data.length);
+        }else{
+          if(!document.querySelector('.nomessage')){
+            document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+          }
+        }
+      }else{
+        if(!document.querySelector('.nomessage')){
+          document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+        }
+      }
+    });
+  }
+
+  function checkDone(data,start,len){
+    clearInterval(sett);
+    if(start<len){
+      db.selectSql({
+        name: 'main',
+        sql: ('select id,type from downfile where status<>3 and id=' + data[start].id)
+      }, function(ret, err) {
+        if(ret.status){
+          if(ret.data.length>0){
+            data[start] = '';
+          }
+          checkDone(data,(start + 1),len);
+        }
+      });
+    }else{
+      var _temp = [];
+      for(var i in data){
+        if(typeof data[i] == 'object'){
+          _temp.push(data[i]);
+        }
+      }
+      Rsview(_temp,0);
+    }
+  }
+
+  function checkLoad(data,start,len){
+    clearInterval(sett);
+    if(start<len){
+      db.selectSql({
+        name: 'main',
+        sql: ('select id,type from downfile where status<>3 and id=' + data[start].id)
+      }, function(ret, err) {
+        if(ret.status){
+          if(ret.data.length<1){
+            data[start] = '';
+          }
+          checkLoad(data,(start + 1),len);
+        }
+      });
+    }else{
+      var _temp = [];
+      for(var i in data){
+        if(typeof data[i] == 'object'){
+          _temp.push(data[i]);
+        }
+      }
+      GData = _temp;
+      Rsview(_temp,1);
+    }
+  }
+
+  var sett;
+  function sel(type){
+    clearInterval(sett);
+    if(status == 1){
+      if(type == 0){
+        db.selectSql({
+          name: 'main',
+          sql: ('select * from downfile where status=3 group by id')
+        }, function(ret, err) {
+          if(ret.status){
+            if(ret.data.length>0){
+              ShowNum = ret.data.length;
+              if(ret.data.length !=ShowNum){
+                ShowNum = ret.data.length;
+                checkDone(ret.data,0,ret.data.length);
+              }else{
+                if(Tabs == 2){
+                  checkDone(ret.data,0,ret.data.length);
+                }
+              }
+            }else{
+              if(!document.querySelector('.nomessage')){
+                document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+              }
+            }
+          }else{
+            //ShowNum
+            if(!document.querySelector('.nomessage')){
+              document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+            }
+          }
+        });
+      }else{
+        checkLoad(GData,0,GData.length);
+      }
+    }
+  }
+
+  function slider(){
+    var rect = document.querySelector(".z-active").getBoundingClientRect();
+    document.querySelector(".z-slider").style.width = rect.width + "px";
+    document.querySelector(".z-slider").style.left = rect.left + "px";
+  }
+
+  function selected2(id,status){
+    if(status==4){
+      api.execScript({name: 'root', script: 'DownManage('+ id +',\'start\');'});
+    }else{
+      api.execScript({name: 'root', script: 'DownManage('+ id +',\'cancel\');'});
+    }
+  }
+
+  var Rs1 = [];
+  function Rsview(data,Type){
+    //alert('Rsview|' + JSON.stringify(data));
+    Rs1 = [];
+    var sql1 = '';
+    var sql2 = '';
+    for(var i in data){
+      if(data[i].type == 0){
+        if(sql1 == ''){
+          sql1 = data[i].id;
+        }else{
+          sql1 = sql1 + ',' + data[i].id;
+        }
+      }else{
+        if(sql2 == ''){
+          sql2 = data[i].id;
+        }else{
+          sql2 = sql2 + ',' + data[i].id;
+        }
+      }
+    }
+
+    if((sql1.length>0) || !isNaN(sql1)){
+      db.selectSql({
+        name: 'main',
+        sql: ('select * from weekly where id in('+ sql1 +')')
+      }, function(ret, err) {
+        if(ret.status){
+          if((sql2.length>0) || !isNaN(sql2)){
+            db.selectSql({
+              name: 'main',
+              sql: ('select * from coursecontent where id in('+ sql2 +')')
+            }, function(rets, errs) {
+              if(ret.data.length>0){
+                for(var ii in ret.data){
+                  Rs1.push({id:ret.data[ii].id,title:ret.data[ii].title,pic:ret.data[ii].pic,des:ret.data[ii].des,lecturer:ret.data[ii].lecturer,size:ret.data[ii].size,len:ret.data[ii].duration,tid:ret.data[ii].tid,type:ret.data[ii].type});
+                }
+              }
+              if(rets.data.length>0){
+                for(var ii in rets.data){
+                  Rs1.push({id:rets.data[ii].id,title:rets.data[ii].title,pic:rets.data[ii].pic,des:rets.data[ii].note,lecturer:rets.data[ii].speaker,size:rets.data[ii].size,len:rets.data[ii].duration,tid:rets.data[ii].tid,type:rets.data[ii].type});
+                }
+              }
+              if(Type){
+                RsAgin(Rs1,0,Rs1.length);
+              }else{
+                upview(Rs1);
+              }
+            });
+          }else{
+            if(ret.data.length>0){
+              for(var ii in ret.data){
+                Rs1.push({id:ret.data[ii].id,title:ret.data[ii].title,pic:ret.data[ii].pic,des:ret.data[ii].des,lecturer:ret.data[ii].lecturer,size:ret.data[ii].size,len:ret.data[ii].duration,tid:ret.data[ii].tid,type:ret.data[ii].type});
+              }
+            }
+            if(Type){
+              RsAgin(Rs1,0,Rs1.length);
+            }else{
+              upview(Rs1);
+            }
+          }
+        }
+      });
+    }else if((sql2.length>0) || !isNaN(sql2)){
+      db.selectSql({
+        name: 'main',
+        sql: ('select * from coursecontent where id in('+ sql2 +')')
+      }, function(rets, errs) {
+        if(rets.data.length>0){
+          for(var ii in rets.data){
+            Rs1.push({id:rets.data[ii].id,title:rets.data[ii].title,pic:rets.data[ii].pic,des:rets.data[ii].note,lecturer:rets.data[ii].speaker,size:rets.data[ii].size,len:rets.data[ii].duration,tid:rets.data[ii].tid,type:rets.data[ii].type});
+          }
+        }
+        if(Type){
+          RsAgin(Rs1,0,Rs1.length);
+        }else{
+          upview(Rs1);
+        }
+      });
+    }
+  }
+
+  function upview(data){
+    clearInterval(sett);
+    if(data.length == 0){
+      sett = setTimeout(function(){sel(MType)},3000);
+      if(!document.querySelector('.nomessage')){
+        document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+      }
+      App.init();
+      api.hideProgress();
+      return;
+    }
+
+    if(typeof data == 'string'){
+      var data = JSON.parse(data);
+    }
+
+    //alert('upview|' + JSON.stringify(data));
+    //return;
+    data.forEach(function(arg){
+      if((arg.des == "undefined") ||(arg.des == undefined)|| !arg.des){
+        arg.des == false;
+      }
+      arg.downing = true;
+      var h,m,s;
+      h = parseInt(arg.len/3600);
+      m = parseInt(arg.len%3600/60);
+      s = parseInt(arg.len%60);
+      h = h < 10 ? '0'+h:h;
+      m = m < 10 ? '0'+m:m;
+      s = s < 10 ? '0'+s:s;
+      arg.len = h+':'+m+':'+s;
+    });
+
+    document.getElementById('list').innerHTML = '';
+    cachepics(0,data.length,data,document.getElementById("list_Tpl"),document.getElementById('list'))
+
+    App.init();
+    api.hideProgress();
+  }
+
+  function RsAgin(data,len,max){
+    if(len<max){
+      db.selectSql({
+        name: 'main',
+        sql: ('select * from downfile where id='+ data[len].id)
+        //sql: ('select sum(`at`) as allat,count(*) as allnum from downfile where id='+ data[len].id + " group by id")
+      }, function(ret, err) {
+        if(ret.status){
+          if(ret.data.length>0){
+            var allstatus = [0,0,0,0];
+            var allat = 0;
+            for(var i in ret.data){
+              allat += parseInt(ret.data[i].at);
+              if(ret.data[i].status == 1){
+                allstatus[0]++;
+              }else if(ret.data[i].status == 2){
+                allstatus[1]++;
+              }else if(ret.data[i].status == 3){
+                allstatus[2]++;
+              }else if(ret.data[i].status == 4){
+                allstatus[3]++;
+              }
+            }
+            if(allstatus[3]>0){
+              data[len].status = 4;
+            }else if((allstatus[1]>0) || ((allstatus[0]>0) && (allstatus[2]>0))){
+              data[len].status = 2;
+            }else if(allstatus[0]>0){
+              data[len].status = 1;
+            }
+            data[len].at = parseInt(allat/(ret.data.length * 100) * 100);
+          }else{
+            data[len] = '';
+          }
+          RsAgin(data,(len + 1),max);
+        }
+      });
+    }else{
+      var _temp = [];
+      for(var i in data){
+        if(typeof data[i] == 'object'){
+          _temp.push(data[i]);
+        }
+      }
+      upview2(_temp);
+    }
+  }
+
+  function upview2(data){
+    clearInterval(sett);
+    if(data.length == 0){
+      sett = setInterval(function(){sel(MType)},1000);
+      if(!document.querySelector('.nomessage')){
+        document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+      }
+      App.init();
+      api.hideProgress();
+      return;
+    }
+
+    data.forEach(function(arg){
+      if(arg.status==2){
+        arg.downing = true;
+      }else{
+        arg.downing = false;
+      }
+      if(arg.status == 1){
+        arg.text = '待下载';
+      }else if(arg.status == 2){
+        arg.text = '进行中';
+      }else if(arg.status == 3){
+        arg.text = '下载完成';
+      }else if(arg.status == 4){
+        arg.text = '已取消';
+      }else if(arg.status == 5){
+        arg.text = '<span style="color:#ff0000">失败</span>';
+      }
+    });
+
+    cachepics(0,data.length,data,document.getElementById("list2_Tpl"),document.getElementById('list'));
+    App.init();
+    api.hideProgress();
+  }
+
+  function fail(msg){
+    api.hideProgress();
+    App.tips(msg);
+  }
+
+  function selected(id,_type,_tid){
+    if(status == 0){
+      var t = document.querySelector("[data-title='"+id+"']");
+      var type = 1;
+      if(/active/g.test(t.className)){
+        type = 2;
+      }
+
+      api.sendEvent({name: 'IndexEvent',extra: {page: name}});
+      api.execScript({
+        name: 'root',
+        script: "changePlayStatusToFalse();"
+      });
+      var bounces = false;//新开窗口是否弹动
+      var reload = false;
+      var animation = {};
+      var name = 'audio';
+      var link = '../../html/indexgroup/audio.html';
+      if(link.length<10){return;}
+      if(!App.iphone){
+        animation = {
+          type:"movein",
+          subType:"from_right",
+          duration:300
+        };
+        api.openWin({
+          name: name,
+          url: link,
+          slidBackEnabled:false,
+          pageParam:{
+            name: name,
+            des:id,
+            type:type,
+            category:_type,
+            tid:_tid,
+            down:true
+          },
+          reload:reload,
+          animation:animation,
+          bounces: bounces,
+          customRefreshHeader: 'UIPullRefresh',
+          rect: {
+            x: 0,
+            y: 0,
+            w: 'auto',
+            h: 'auto'
+          }
+        });
+      }else{
+        api.openWin({
+          name:name,
+          url: link,
+          reload:true,
+          slidBackEnabled:false,
+          slidBackEnabled:true,
+          pageParam:{
+            name: name,
+            des:id,
+            type:type,
+            category:_type,
+            tid:_tid,
+            down:true
+          },
+        });
+      }
+    }else{
+      var btn = document.querySelector("[data-id='"+id+"']");
+      var className = btn.className;
+      if(/selected/g.test(className)){
+        btn.className = className.replace(/selected/g,'').replace(/(^\s*)|(\s*$)/g, "");
+      }else{
+        btn.className = btn.className + ' selected';
+      }
+    }
+  }
+
+  function toggleSelected(id){
+    var el = document.querySelector("[data-active='"+id+"']");
+    if(!el.getAttribute('data-status') && (status == 1)){
+      var tp = el.getAttribute('data-type');
+      var tid = el.getAttribute('data-tid');
+      api.openWin({
+        name:'audio',
+        url: '../../html/indexgroup/audio.html',
+        reload:true,
+        slidBackEnabled:false,
+        pageParam:{
+          name: 'audio',
+          des:id,
+          type:tp,
+          tid:tid,
+          down:true
+        },
+        slidBackEnabled:true
+      });
+    }
+    var btn = document.querySelector("[data-active='"+id+"'] .icon-xuanzhong");
+    var className = btn.className;
+    if(/selected/g.test(className)){
+      btn.className = className.replace(/selected/g,'').replace(/(^\s*)|(\s*$)/g, "");
+    }else{
+      btn.className = className + ' selected';
+    }
+  }
+	// 全选
+  function selectAll(){
+    var obj = document.querySelectorAll("[data-active] .icon-xuanzhong");
+    for(i in obj){
+      if(typeof obj[i] == 'object'){
+        obj[i].style.display = 'inline-block';
+        obj[i].className = 'icon iconfont icon-xuanzhong selected';
+      }
+    }
+  }
+	//  删除
+  function willdel(){
+    api.showProgress({
+      style: 'default',
+      animationType: 'fade',
+      title: '正在删除',
+      modal: false
+    });
+    del();
+  }
+
+  function del(){
+    var obj = document.querySelectorAll(".icon-xuanzhong.selected");
+    var box = document.getElementById('list');
+    if((box.children).length == 0){
+      api.hideProgress();
+      if(document.querySelectorAll("[data-active]").length ==0){
+        document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+      }
+      stopDel();
+    }else{
+      if(typeof obj[0] == 'object'){
+        var did = obj[0].getAttribute('data-id');
+
+        if(document.querySelector("[data-active='"+did+"']")){
+          document.querySelector("[data-active='"+did+"']").remove();
+        }
+        if(did && !isNaN(did)){
+          db.selectSql({
+            name: 'main',
+            sql: ('select * from downfile where id='+did)
+          }, function(ret, err) {
+            if(ret.status){
+              if(ret.data.length>0){
+                var Storageblocks = $api.getStorage('blocks');
+                for(var i in ret.data){
+                  if(Storageblocks && (Storageblocks == ret.data[i].hash)){
+                    del();
+                  }else{
+                    console.log('del ===>' + ret.data[i].hash);
+                    fs.removeSync({path: 'fs://blocks/' + ret.data[i].hash + '.db'});
+                    db.executeSql({name: 'main',sql: ('delete from downfile where id='+did)}, function(ret, err) {
+                      del();
+                    });
+                  }
+                }
+              }else{
+                db.executeSql({name: 'main',sql: ('delete from downfile where id='+did)}, function(ret, err) {
+                  del();
+                });
+              }
+            }
+          });
+        }else{
+          del();
+        }
+      }else{
+        api.hideProgress();
+        if(document.querySelectorAll("[data-active]").length ==0){
+          document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无下载</div></li>';
+        }
+        stopDel();
+      }
+    }
+  }
+  // 开启删除按钮
+  function toDel(){
+    if(document.querySelectorAll(".nomessage").length<1){
+      status = 0;
+      document.querySelector('.download-menu').className = "download-menu flex-wrap";
+      var dom = document.querySelectorAll("[data-active] .icon-xuanzhong");
+      for(i in dom){
+        if(typeof dom[i] == 'object'){
+          dom[i].style.display = "inline-block";
+          var id = dom[i].getAttribute('data-id');
+          if(document.querySelector("[data-box-"+ id +"]")){
+            document.querySelector("[data-box-"+ id +"]").className = 'tags des w6'
+          }
+        }
+      }
+      document.getElementById("delete_btn").style.display = 'none';
+      document.getElementById("cancel").style.display = 'block';
+    }
+  }
+	// 取消下载
+  function stopDel(){
+    status = 1;
+    document.getElementById("delete_btn").style.display = 'inline-block';
+    document.getElementById("cancel").style.display = 'none';
+    var dom = document.querySelectorAll("[data-active] .icon-xuanzhong");
+    for(i in dom){
+      if(typeof dom[i] == 'object'){
+        dom[i].style.display = "none";
+        var id = dom[i].getAttribute('data-id');
+        if(document.querySelector("[data-box-"+ id +"]")){
+          document.querySelector("[data-box-"+ id +"]").className = 'tags des'
+        }
+      }
+    }
+    document.querySelector('.download-menu').className = "download-menu hide";
+  }
+
+  function cachepics(i,max,data,template,box,callFr){
+    if(i<max){
+      if(!data || !data[i]){
+        return;
+      }
+      if(data[i].pic){
+        var _file = App.file(data[i].pic);
+        fs.exist({
+          path: (api.fsDir + '/file/' +_file.full)
+        }, function(ret, err) {
+          if (ret.exist) {
+            data[i].pic = (api.fsDir + '/file/' +_file.full);
+            cachepics(i+1,max,data,template,box,callFr);
+          }else{
+            if(data[i].pic.indexOf('/') == 0){
+              var dpic = App.url + data[i].pic;
+            }else{
+              var dpic = data[i].pic;
+            }
+            api.download({
+              url: dpic,
+              savePath: ('fs://file/' +_file.full),
+              cache: true,
+              allowResume: true
+            }, function(ret, err) {
+              data[i].pic = (api.fsDir + '/file/' +_file.full);
+              cachepics(i+1,max,data,template,box,callFr);
+            });
+          }
+        });
+      }else{
+        cachepics((i + 1),max,data,template,box,callFr);
+      }
+    }else{
+      clearInterval(sett);
+      if(MType == 1){
+        sett = setInterval(function(){sel(MType)},1000);
+      }else{
+        sett = setInterval(function(){sel(MType)},3000);
+      }
+
+      var _data = [];
+      var Hasdata = 0;
+      var HasEl = '';
+      var nomessage = document.querySelectorAll('.nomessage').length;
+      var TM = new T7({tm: template});
+      for(var i in data){
+        HasEl = HasEl + '|' + data[i].id;
+        if(document.querySelector('[data-id-'+ data[i].id +']')){
+          Hasdata++;
+          if(MType == 1){
+            var temp = document.querySelector('[data-id-'+ data[i].id +']');
+            var st = temp.getAttribute('data-status');
+            if(data[i].status == 3){
+              temp.remove();
+            }else if((st<4) && (data[i].status == 4)){
+              temp.remove();
+              $api.append(box,TM.Tpl([data[i]]));
+            }else if((st == 4) && (data[i].status < 3)){
+              temp.remove();
+              $api.prepend(box,TM.Tpl([data[i]]));
+            }else if((st == 1) && (data[i].status == 2)){
+              temp.remove();
+              $api.prepend(box,TM.Tpl([data[i]]));
+            }else if((st == 2) && (data[i].status == 2)){
+              document.querySelector('[data-id-'+ data[i].id +'] .download-up').style.width = data[i].at + '%';
+              console.log(JSON.stringify(data))
+
+              var nosize = (parseFloat(data[i].size)*parseFloat(data[i].at/100)).toFixed(2);
+              var totalsize = data[i].size;
+              if (totalsize != '') {
+                document.querySelector('[data-id-'+ data[i].id +'] .nosize').innerHTML = nosize + 'MB /' + totalsize + 'MB';
+							}else{
+                document.querySelector('[data-id-'+ data[i].id +'] .nosize').innerHTML =  '0MB / 0MB';
+							}
+            }
+          }
+        }else{
+          if(nomessage){
+            nomessage = 0;
+            box.innerHTML = '';
+          }
+          $api.append(box,TM.Tpl([data[i]]));
+        }
+      }
+
+      if(MType){
+        var objs = document.querySelectorAll('[data-status]');
+        for(var i in objs){
+          if(typeof objs[i] == 'object'){
+            var obj = objs[i];
+            var oid = obj.getAttribute('data-id');
+            if(('|' + HasEl + '|').indexOf('|' + oid + '|')<0){
+              obj.remove();
+            }else{
+              obj.onclick = function(){
+                var id = this.getAttribute('data-id');
+                if(status == 0){
+                  toggleSelected(id);
+                }else{
+                  var s = this.getAttribute('data-status');
+                  selected2(id,s);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      App.init();
+      if(callFr){
+        callFr();
+      }
+    }
+  }
+
+  function cachepicsadddownload(i,max,data,template,box,callFr){
+    if(i<max){
+      if(!data || !data[i]){
+        return;
+      }
+      if(data[i].pic){
+        var _file = App.file(data[i].pic);
+        fs.exist({
+          path: (api.fsDir + '/file/' +_file.full)
+        }, function(ret, err) {
+          if (ret.exist) {
+            data[i].pic = (api.fsDir + '/file/' +_file.full);
+            cachepics(i+1,max,data,template,box,callFr);
+          }else{
+            if(data[i].pic.indexOf('/') == 0){
+              var dpic = App.url + data[i].pic;
+            }else{
+              var dpic = data[i].pic;
+            }
+            api.download({
+              url: dpic,
+              savePath: ('fs://file/' +_file.full),
+              cache: true,
+              allowResume: true
+            }, function(ret, err) {
+              data[i].pic = (api.fsDir + '/file/' +_file.full);
+              cachepics(i+1,max,data,template,box,callFr);
+            });
+          }
+        });
+      }else{
+        cachepics((i + 1),max,data,template,box,callFr);
+      }
+    }else{
+      //结束
+      var TM = new T7({tm: template});
+      var html = TM.Tpl(data);
+      box.innerHTML = box.innerHTML+html;
+
+      App.init();
+      if(callFr){
+        callFr();
+      }
+    }
+  }
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>详情</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+</head>
+<body>
+<div id="app">
+    <!--头-->
+    <header class="aui-bar aui-bar-nav">
+        <a class="aui-pull-left aui-btn" style="margin-left: 0.5rem;" @click="close()">
+            <span class="iconfont icon-jiantou"></span>
+        </a>
+        <div class="aui-title">{{title}}</div>
+        <a class="aui-pull-right aui-btn" @click="openShare()">
+            <span class="iconfont icon-fenxiang3"></span>
+        </a>
+    </header>
+</div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      title: '企业家·浓缩EMBA'
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        app.title = api.pageParam.title;
+        api.openFrame({
+          name: 'courseInfo_fm',
+          url: './courseInfo_fm.html',
+          rect: {
+            x: 0,
+            y: $api.offset($api.dom("header")).h,
+            w: 'auto',
+            h: 'auto'
+          },
+          pageParam: {
+            des: api.pageParam.des,
+            title: app.title
+          }
+        });
+      }
+    },
+    methods: {
+      close: function () {
+        api.closeWin();
+      },
+//      分享
+      openShare: function () {
+        api.execScript({name: 'courseInfo_win', frameName: 'courseInfo_fm', script: "app.share()"});
+      }
+    }
+  })
+</script>
+</body>
+</html>

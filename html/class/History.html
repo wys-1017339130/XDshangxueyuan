@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+  <link rel="stylesheet" href="../../css/api.css"/>
+  <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+</head>
+<style type="text/css">
+  #header {
+    /*border-bottom: 1px solid #ccc;*/
+    display: flex;
+    position: fixed;
+    height: 2.2rem;
+    line-height: 2.2rem;
+  }
+
+  .left-box {
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+  }
+
+  .List {
+    display: -webkit-box;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+    padding: 0.75rem 0.5rem;
+    background-color: white;
+    margin-top: 10px;
+  }
+
+  .List > div {
+    /*border:1px solid red;*/
+  }
+
+  .List_title {
+    font-size: 0.8rem;
+    color: #252525;
+    padding-bottom: 0.5rem;
+  }
+
+  .List_time {
+    font-size: 0.575rem;
+    padding-bottom: 0.5rem;
+    color: #999999;
+  }
+
+  .List_buttom {
+    background-color: #d2b379;
+    color: #fff;
+    padding: 0 0.5rem;
+    border-radius: 3px;
+    height: 0.9rem;
+    font-size: 0.575rem;
+    line-height: 0.9rem;
+  }
+
+  .List_box {
+    color: #d9b270;
+    border: 1px solid #D9B270;
+    padding: 0 5px;
+    border-radius: 3px;
+    height: 0.9rem;
+    line-height: 0.9rem;
+    font-size: 0.575rem;
+  }
+</style>
+<body style="background-color: #f2f2f2;">
+<div id='app'>
+  <header class="aui-bar aui-bar-nav" id="header">
+    <a class="left-box iconfont icon-jiantou z-fanhui" @click="closeWindow()"></a>
+    <span class="aui-title">历史成绩</span>
+  </header>
+  <div id="fixStatus"></div>
+  <div class="List" v-for="(item,index) in List">
+    <div style="width: 80%;">
+      <div class="List_title">{{item.title}}</div>
+      <div class="List_time">{{item.complete_time}}</div>
+      <div><span class="List_box" v-if="item.certificate != null">获得“{{item.certificate}}”证书</span><span
+          class="List_buttom" v-else="item.certificate == null" @click="zailai(item)">再来一次</span></div>
+    </div>
+    <div style="font-size: 0.6rem; color: #d2b379;">
+      <span style="font-size: 2.2rem;">{{item.test_score}}</span>分
+    </div>
+  </div>
+  <div v-show="List.length != 0" style="text-align: center;font-size: 0.6rem;margin-top: 0.75rem;color: #999999;">
+    没有更多了
+  </div>
+  <div v-show="List.length == 0"
+       style=";position: absolute;top: 0px;width: 100%;height: 100%;display: -webkit-box;-webkit-box-pack: center;">
+    <div style="margin-top:4.75rem">
+      <div style="display: -webkit-box;-webkit-box-pack: center;-webkit-box-align: center;">
+        <img style="width: 7.25rem;" src="../../image/nostudyList.png" alt="">
+      </div>
+      <p style="text-align: center;font-size: 0.6rem;color: #999999;">还木有参加过考试</p>
+    </div>
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      List: [],
+      rote: false,
+      load: false,
+      overlate: false,
+      parPage: 10,
+      page: 1
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        app.u_getExamHistory('none')
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 5 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+        }, function (ret, err) {
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.u_getExamHistory(false)
+        });
+      }
+
+    },
+    methods: {
+      u_getExamHistory: function (No) {
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token,
+          parPage: app.parPage,
+          page: app.page
+        }
+        sendAjax(this, post, '/Api/Ucenter/u_getExamHistory', function (res) {
+          if (No) {
+            app.List = res.data.list;
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          } else {
+            app.List = app.List.concat(res.data.list);
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          }
+          if (res.data.list.length == 0) {
+            app.overlate = true;
+            app.rote = false;
+            app.load = false
+          }
+//          api.refreshHeaderLoadDone();
+        })
+      },
+      zailai: function (item) {
+        api.openWin({
+          name: 'Examination_fm',
+          url: './Examination_fm.html',
+          pageParam: {
+            texts: item.title,
+            id: item.exam_id,
+            cid: item.cid
+          }
+        })
+      },
+      closeWindow: function () {
+        api.closeWin()
+      }
+    }
+  })
+</script>
+</html>

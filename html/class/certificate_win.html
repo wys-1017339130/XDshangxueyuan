@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<meta name="viewport"
+      content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+<link rel="stylesheet" href="../../css/api.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+<style>
+  .certificate {
+    background-color: #FFF;
+    border-bottom: 1px solid #f2f2f2;
+    padding: 0.5rem;
+  }
+
+  .certificate > div {
+    display: -webkit-box;
+    line-height: 1rem;
+  }
+
+  .certificate > p {
+    line-height: 1rem;
+  }
+
+  .certificate > div > p {
+    -webkit-box-flex: 1;
+  }
+
+  .certificate_title {
+    font-size: 0.8rem;
+    color: #020202;
+  }
+
+  .certificate_time {
+    font-size: 0.6rem;
+    color: #c0c0c0;
+  }
+
+  .bottomdiv {
+    clear: both;
+    width: 100%;
+    height: 2rem;
+    text-align: center;
+    line-height: 2rem;
+    color: black;
+  }
+
+  .uptext {
+    color: #bfbfbf;
+    font-size: 13px;
+  }
+
+  .publicfont {
+    width: 1rem;
+    height: 1rem;
+    margin: auto;
+  }
+
+
+  .certificate_desc {
+    font-size: 0.65rem;
+    color: #666666;
+    padding: 0 0.5rem;
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    white-space: normal !important;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+  }
+</style>
+<body style="background-color: #f2f2f2;">
+<div id="add">
+  <p style="height: 5px;width: 100%;background-color: #f2f2f2"></p>
+  <div class="certificate" v-for="(item,index) in infoList">
+    <div @click="alearts(item.certificate)">
+      <p class="certificate_title">《{{item.certificate}}》课程结业证书</p>
+      <p class="certificate_time" style="width: 50%;text-align: right">{{item.complete_time}}</p>
+    </div>
+    <P class="certificate_desc">完成{{item.title}}课程考试，并且分数达到{{item.min_score}}分以上获得</P>
+  </div>
+  <div class="bottomdiv">
+    <span v-if="rote" class="uptext">---查看更多---</span>
+    <img v-if="load" class="publicfont" src="../../image/timg.gif">
+    <span v-if="overlate" class="uptext">没有更多了...</span>
+  </div>
+  <div v-show="infoList.length == 0" style="position: absolute;top: 0px;width: 100%;height: 100%;display: -webkit-box;-webkit-box-pack: center;background-color: #f2f2f2;">
+    <div style="margin-top: 4.75rem;">
+      <div style="display: -webkit-box;-webkit-box-pack: center;-webkit-box-align: center;"><img style="width: 7.25rem;" src="../../image/nostudyList.png" alt=""></div>
+      <p style="text-align: center;font-size: 0.6rem;color: #999999;">暂无证书</p>
+    </div>
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#add',
+    data: {
+      infoList: [],
+      perPage: 10,
+      page: 1,
+      rote: false,
+      load: false,
+      overlate: false,
+
+    },
+    created: function () {
+      apiready = function () {
+        app.u_getMyCert('none')
+        api.setCustomRefreshHeaderInfo({
+          bgColor: '#efefef',
+          image: {
+            pull: 'widget://res/refresh/pull_image.png',
+            transform: [
+              'widget://res/refresh/refreshing_image_frame_01.png',
+              'widget://res/refresh/refreshing_image_frame_02.png',
+              'widget://res/refresh/refreshing_image_frame_03.png',
+              'widget://res/refresh/refreshing_image_frame_04.png',
+              'widget://res/refresh/refreshing_image_frame_05.png',
+              'widget://res/refresh/refreshing_image_frame_06.png',
+              'widget://res/refresh/refreshing_image_frame_07.png',
+              'widget://res/refresh/refreshing_image_frame_08.png',
+              'widget://res/refresh/refreshing_image_frame_09.png',
+              'widget://res/refresh/refreshing_image_frame_10.png',
+              'widget://res/refresh/refreshing_image_frame_11.png',
+              'widget://res/refresh/refreshing_image_frame_12.png'
+            ],
+            load: [
+              'widget://res/refresh/pull_end_image_frame_01.png'
+            ]
+          }
+        }, function () {
+          app.page = 1
+          //下拉刷新被触发，使用 api.refreshHeaderLoadDone() 结束加载中状态
+          if (api.connectionType == 'none') {
+            api.refreshHeaderLoadDone();
+            api.toast({
+              msg: '未连接网络',
+              duration: 2000,
+              location: 'bottom'
+            });
+          } else {
+            app.u_getMyCert('none')
+          }
+        });
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 5 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+        }, function (ret, err) {
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.u_getMyCert(false)
+        });
+      }
+    },
+    methods: {
+      u_getMyCert: function (No) {
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token,
+          perPage: app.perPage,
+          page: app.page
+        }
+        sendAjax(this, post, '/Api/Ucenter/u_getMyCert', function (res) {
+//          alert(JSON.stringify(res))
+          if (No) {
+            app.infoList = res.data.info
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          } else {
+            app.infoList = aapp.infoList.concat(res.data.info);
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          }
+          if (res.data.info.length == 0) {
+            app.overlate = true;
+            app.rote = false;
+            app.load = false
+          }
+
+//          app.infoList = res.data.info
+          api.refreshHeaderLoadDone();
+        })
+      },
+      alearts:function(title){
+        api.openFrame({
+          name: 'alert',
+          url: './alert.html',
+          rect: {
+            x: 0,
+            y: 0,
+            w: 'auto',
+            h: 'auto'
+          },
+          pageParam: {
+            title: title,
+          }
+        })
+      }
+    }
+  })
+</script>
+</html>

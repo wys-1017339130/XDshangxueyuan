@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>编辑资料</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+    <style>
+    	select {
+		    background-color: #fff;
+		    background-position: right center;
+		    background-repeat: no-repeat;
+		    box-sizing: border-box;
+		    height: 30px;
+		    margin-right: 4px;
+		}
+		select:not(:-internal-list-box) {
+		    overflow: visible !important;
+		}
+		select {
+            background-color: #fff;
+            border: 0;
+            appearance:none;
+            -moz-appearance:none;
+            -webkit-appearance:none;
+            padding-right: 14px;
+            font-size: .9rem;
+        }
+        select::-ms-expand { display: none; }
+    </style>
+</head>
+<body>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">编辑资料</div>
+		</div>
+	</div>
+	<div id="main" class="z-fff">
+		<div id="fixStatus"></div>
+		<div class="z-edit-avatar-box-box">
+			<div class="z-edit-avatar-box">
+				<div id="up_face" class="z-user-avatar-box2">
+					<img data-u='face' id="face" width="70" height="70" src="../../image/user_default.png" onerror="this.src='../../image/user_default.png'" alt="">
+					<span class="icon iconfont icon-xiangji1"></span>
+				</div>
+				<p class="z-edit-tip">头像会用作公开资料</p>
+			</div>
+			<img class="z-edit-back" src="../../image/edit.png" alt="">
+		</div>
+		<div class="box">
+			<div class="z-column6">
+				<label for="nickname" class="z-row z-border-bottom z-edit">
+					<span>*姓名：</span>
+					<input onblur="setValue('nickname');" id="nickname" value="" type="text">
+				</label>
+			</div>
+			<div class="z-login-column" style="padding: 0 15px;">
+				<label style="border-bottom: 1px solid #ddd;">
+					<span style="font-size: 0.8rem;color: #333" class="text-span">*性别：</span>
+					<label onclick="choseSex(1)" style="width: 20% !important;display: inline-block !important;margin-left: 15px;font-size: 0.8rem" for="man">
+						<img style="vertical-align: middle;margin-right: 0.4rem" id="man_pic" class="ch" width="20" src="../../image/checked.png" alt="">男
+					</label>
+					<label onclick="choseSex(0)" style="width: 20% !important;display:inline-block !important;font-size: 0.8rem" for="woman">
+						<img style="vertical-align: middle;margin-right: 0.4rem" class="ch" width="20" src="../../image/check.png" id="woman_pic">女
+					</label>
+				</label>
+			</div>
+			<div class="z-column6">
+				<div class="z-row z-edit">
+					<span>出生年份：</span>
+					<select name="" id="select_year" rel='1980'></select>年
+					<select name="" id="select_month" rel='1'></select>月
+					<select name="" id="select_day" rel='1'></select>日
+				</div>
+			</div>
+		</div>
+
+		<div class="box">
+			<div onclick="selectorIndustry();" class="z-column6">
+				<label for="industry" class="z-row z-border-bottom z-edit">
+					<span>*行业：</span>
+					<input id="industry" value="" type="text" readonly="true">
+				</label>
+			</div>
+			<div class="z-column6">
+				<label for="company" class="z-row z-border-bottom z-edit">
+					<span>*公司：</span>
+					<input onblur="setValue('company');" id="company" value="" type="text">
+				</label>
+			</div>
+			<div onclick="selectorProfession();" class="z-column6">
+				<label for="profession" class="z-row z-border-bottom z-edit">
+					<span>*职务：</span>
+					<input id="profession" value="" type="text" readonly="true">
+				</label>
+			</div>
+			<div onclick="selectorProvince();" class="z-column6">
+				<label for="province" class="z-row z-border-bottom z-edit">
+					<span>省份：</span>
+					<input id="province" value="" type="text" readonly="true">
+				</label>
+			</div>
+			<div class="z-column6">
+				<label for="address" class="z-row z-border-bottom z-edit">
+					<span>详细地址：</span>
+					<input onblur="setValue('address')" id="address" value="" type="text">
+				</label>
+			</div>
+			<div class="z-column6">
+				<label class="z-row z-edit">
+					<span style="line-height: 1.4;width: auto !important;margin-right: 0.6rem" class="fl">赢利模式(新训)：</span>
+					<div class="edit-class">
+						<p class="edit-class-column">第<input onblur="setValue('new_stages');" id="new_stages" class="edit-class-text"  value="" type="number" style="width: 60px">期</p>
+					</div>
+				</label>
+			</div>
+		</div>
+	</div>
+	<div id="photo_btn">
+		<ul>
+			<li id="photo_back">取消</li>
+			<li id="photo_save">完成</li>
+		</ul>
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/birthday.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+	var HeadBar = $api.byId('HeadBar');
+	var fs;
+	var FNImageClip;
+	var photo_file = '';
+	var sex = ['女','男'];
+	var UIActionSelector;
+	var Last = 0;
+	var nickname = '';
+
+	var sexJSON = [{"name":"女"},{"name":"男"}];
+	var sexIndex = [1];
+	var NEWsex;
+
+	var yearJSON = $api.getStorage('yearJSON');
+	if(yearJSON){
+		yearJSON = JSON.parse(yearJSON);
+	}else{
+		yearJSON = [];
+		for(var i = 1949; i < 2017;i++){
+			yearJSON.push({"name":i});
+		}
+		$api.setStorage('yearJSON',JSON.stringify(yearJSON));
+	}
+	var yearIndex = [0];
+
+	var industryJSON = [
+		{"name":"互联网/电子商务/IT"},
+		{"name":"金融业"},
+		{"name":"零售业"},
+		{"name":"制造业"},
+		{"name":"广告/传媒"},
+		{"name":"教育/培训"},
+		{"name":"房地产/建筑"},
+		{"name":"服务业"},
+		{"name":"物流/运输"},
+		{"name":"制药/医疗"},
+		{"name":"政府/非盈利"},
+		{"name":"其他"}
+	];
+	var industryIndex = [0];
+
+	var professionJSON = [
+		{"name":"董事长/老板"},
+		{"name":"总经理/CEO/总裁"},
+		{"name":"高层管理(部门负责人/分总/副总)"},
+		{"name":"中层管理"},
+		{"name":"职员"},
+		{"name":"创业者"},
+		{"name":"其他"}
+	];
+	var professionIndex = [0];
+	var type = 0;
+
+	var isSelector = false;//优化back键，当选择器弹出时back键为关闭弹窗，每次打开弹窗此值变true，弹窗回掉事件中变false，cancel和ok都要变
+	var _font = 16;
+
+	apiready = function(){
+	    $api.fixStatusBar(HeadBar);
+	    UIActionSelector = api.require('UIActionSelector');
+	    FNImageClip = api.require('FNImageClip');
+	    //App.openWWW(api.winName);
+	    fs = api.require("fs");
+
+			//MD Start
+			api.execScript({name: 'root', script: "ChatAna('UserInfo',{'Active':'加载'},'个人资料');"});
+			//MD End
+
+	    api.addEventListener({
+			    name: 'keyback'
+			}, function(ret, err) {
+				api.execScript({name: 'root',frameName: 'home',script: "Refresh();"});
+				if(isSelector){
+					UIActionSelector.close();
+				}else{
+					api.closeWin();
+				}
+			});
+
+	    if(!App.iphone){
+	    	_font = 14;
+	    }
+
+		document.getElementById('up_face').onclick = function(){
+			api.actionSheet({
+			    cancelTitle: '取 消',
+			    buttons: ['相册', '拍照']
+			}, function(ret, err) {
+			    var index = ret.buttonIndex;
+			    if(index == 1){
+			    		api.getPicture({
+					    sourceType: 'album',
+					    encodingType: 'jpg',
+					    mediaValue: 'pic',
+					    destinationType: 'url',
+					    allowEdit: true,
+					    quality: 100,
+					    saveToPhotoAlbum: false
+					}, function(ret, err) {
+					    if (ret) {
+					    		if(App.iphone){
+					    			if(ret){
+					    				$api.setStorage('face',ret.data);
+					    				api.setPrefs({key:'face',value:ret.data});
+											//api.execScript({name: 'root',frameName:'me', script: 'up();'});
+											upface(ret.data);
+					    			}
+					    		}else{
+					    			var file = ret.data.split('/picture/');
+						    		photo_file = 'fs://picture/' + file[1];
+						    		FNImageClip.open({
+								    rect: {
+								        x: 0,
+								        y: 0,
+								        w: api.winWidth,
+								        h: api.winHeight - 60
+								    },
+								    srcPath: photo_file,
+								    style: {
+								        mask: '#000',
+								        clip: {
+								            w: (api.winWidth - 80),
+								            h: (api.winWidth - 80),
+								            x: 40,
+								            y: (api.winHeight - (api.winWidth - 80) - 60)/2,
+								            borderColor: '#fff',
+								            borderWidth: 1,
+								            appearance: 'rectangle'
+								        }
+								    },
+								    fixedOn: api.frameName,
+								    mode:'image'
+								}, function(ret, err) {
+									document.getElementById('photo_btn').style.display = 'block';
+								});
+					    }
+					  }
+					});
+			    }else if(index == 2){
+			    		api.getPicture({
+					    sourceType: 'camera',
+					    encodingType: 'jpg',
+					    mediaValue: 'pic',
+					    destinationType: 'url',
+					    allowEdit: true,
+					    quality: 100,
+					    saveToPhotoAlbum: false
+					}, function(ret, err) {
+					    if (ret) {
+					    		if(App.iphone){
+					    			if(ret){
+					    				$api.setStorage('face',ret.data);
+					    				api.setPrefs({key:'face',value:ret.data});
+			        				//App.Uinfo();
+											//api.execScript({name: 'root',frameName:'me', script: 'up();'});
+											upface(ret.data);
+					    			}
+					    		}else{
+					    			var file = ret.data.split('/picture/');
+						    		photo_file = 'fs://picture/' + file[1];
+						    		FNImageClip.open({
+								    rect: {
+								        x: 0,
+								        y: 0,
+								        w: api.winWidth,
+								        h: api.winHeight - 60
+								    },
+								    srcPath: photo_file,
+								    style: {
+								        mask: '#000',
+								        clip: {
+								            w: (api.winWidth - 80),
+								            h: (api.winWidth - 80),
+								            x: 40,
+								            y: (api.winHeight - (api.winWidth - 80) - 60)/2,
+								            borderColor: '#fff',
+								            borderWidth: 1,
+								            appearance: 'rectangle'
+								        }
+								    },
+								    fixedOn: api.frameName,
+								    mode:'image'
+								}, function(ret, err) {
+									document.getElementById('photo_btn').style.display = 'block';
+								});
+					    		}
+					    }
+					});
+			    }
+			});
+		};
+		document.getElementById('photo_save').onclick = function(){
+			FNImageClip.save({
+			    destPath: photo_file,
+			    copyToAlbum: false,
+			    quality: 1
+			}, function(ret, err) {
+			    if(ret){
+			        $api.setStorage('face',ret.destPath);
+			        api.setPrefs({key:'face',value:ret.destPath});
+			        FNImageClip.close();
+							//api.execScript({name: 'root',frameName:'me', script: 'up();'});
+			        document.getElementById('photo_btn').style.display = 'none';
+			        upface(ret.destPath);
+			    }
+			});
+		};
+		document.getElementById('photo_back').onclick = function(){
+			document.getElementById('photo_btn').style.display = 'none';
+			FNImageClip.close();
+		};
+		var storage = localStorage.getItem('edit');
+		if((typeof storage == 'string') && (storage != 'null') && (storage != 'undefined') && (storage != '[object Object]')){
+			upview(storage);
+			if(api.connectionType == 'none'){
+				api.toast({
+				    msg: '未连接网络',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+			}else{
+				Refresh();
+			}
+		}else{
+			if(!App.State()){
+				setTimeout(function(){
+					api.closeWin();
+				},2000);
+			}else{
+				Refresh();
+			}
+		}
+	};
+
+
+	function Refresh(){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});//数据加载中显示方块
+		api.execScript({name: 'root',script: "XO.GetUinfo('"+ $api.getStorage('token') +"',{name:'edit',fun:'upview'},{name:'edit',fun:'fail'});"});
+	}
+
+	function upview(data){//这个函数在refresh中触发了，是获取数据的函数
+		if(typeof data == 'string'){
+			localStorage.setItem('edit',data);
+			var data = JSON.parse(data);
+		}
+		if(data.sex != ''){
+			NEWsex = data.sex;
+			choseSex(data.sex,1)
+		}
+		if(data.birthday){
+			var arr = data.birthday.split('-');
+			if(arr.length == 1){
+				document.getElementById("select_year").setAttribute('rel',arr[0]);
+			}else{
+				document.getElementById("select_year").setAttribute('rel',arr[0]);
+				document.getElementById("select_month").setAttribute('rel',arr[1]);
+				document.getElementById("select_day").setAttribute('rel',arr[2]);
+			}
+
+		}
+
+		Last = data.last;
+		if(data.last>=2){
+			document.getElementById('nickname').setAttribute('readonly','true');
+			document.getElementById('nickname').onclick = function (){
+				api.toast({
+				    msg: '真实姓名不可修改',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+				return;
+			}
+		}
+
+		 $(function() {
+        $.ms_DatePicker({
+            YearSelector: "#select_year",
+            MonthSelector: "#select_month",
+            DaySelector: "#select_day"
+        });
+	    });
+
+
+    	document.getElementById("select_day").onchange = function(){
+				var new_stages = document.getElementById('new_stages').value;
+				if(Last<2){
+					nickname = document.getElementById('nickname').value;
+				}
+	    	//var nickname = document.getElementById('nickname').value;
+	    	//$api.setStorage('nickname',nickname);
+	    	var company = document.getElementById('company').value;
+	    	var address = document.getElementById('address').value;
+	    	var province = document.getElementById('province').value;
+	    	var birthday = document.getElementById('select_year').value + '-' +document.getElementById('select_month').value + '-' + document.getElementById('select_day').value;
+	    	var industry = document.getElementById('industry').value;
+	    	var profession = document.getElementById('profession').value;
+	    	api.execScript({name: 'root',script: "XO.PostUser('"+ $api.getStorage('token') +"','"+nickname+"','"+NEWsex+"','"+birthday+"','"+company+"','"+industry+"','"+profession+"','"+province+"','"+address+"','"+new_stages+"',{name:'edit',fun:'savesuccess'},{name:'edit',fun:'fail'});"});
+		}
+
+		if(!data.nickname){
+			if($api.getStorage('nickname')){
+				data.nickname = $api.getStorage('nickname');
+			}
+		}
+		if(data.nickname){
+			nickname = data.nickname;
+		}
+		for(i in data){
+			if(document.getElementById(i)){
+				document.getElementById(i).value = data[i];
+			}
+		}
+
+		console.log(JSON.stringify(data));
+
+  	localStorage.setItem('new_stages',data.stage);
+  	if(data.stage){
+  		document.getElementById('new_stages').value = data.stage;
+  	}
+
+		cachesinglepic(data)
+		App.init();//动态生产html后腰重新绑定事件
+		api.hideProgress();
+	}
+
+
+
+	function savesuccess(data){
+		if(Last<2){
+			nickname = document.getElementById('nickname').value;
+			$api.setStorage('nickname', nickname);
+		}
+		var company = document.getElementById('company').value;
+		var profession = document.getElementById('profession').value;
+
+		if(type == 1){
+			if(localStorage.getItem('promoterPIC')){
+				if(!nickname || (nickname.length<2) || (nickname  != $api.setStorage('nickname'))){
+					if(nickname  == $api.setStorage('nickname')){
+						var _file = App.file(localStorage.getItem('promoterPIC'));
+						fs.exist({
+						    path: (api.fsDir + '/file/' +_file.full)
+						}, function(ret, err) {
+						  if (ret.exist) {
+					    	fs.remove({
+							    path: (api.fsDir + '/file/' +_file.full)
+								}, function(ret, err) {
+									if(ret){
+										localStorage.removeItem('promoterPIC')
+									}
+								});
+						  }
+						});
+					}
+				}
+			}
+		}
+		api.hideProgress();
+
+		if(nickname && (nickname.length>1)){$api.setStorage('nickname',nickname);}
+		if(profession && (profession.length>1)){$api.setStorage('profession',profession);}
+		if(company && (company.length>1)){$api.setStorage('company',company);}
+
+		api.toast({
+		    msg: '修改成功!',
+		    duration: 2000,
+		    location: 'bottom'
+		});
+
+		localStorage.setItem('new_stages',document.getElementById('new_stages').value);
+	}
+
+	function choseSex(sex){
+		//label触发两次,不影响
+		var man_pic = document.getElementById("man_pic");
+		var woman_pic = document.getElementById("woman_pic");
+		if(sex == 1){
+			woman_pic.src = "../../image/check.png";
+			man_pic.src = "../../image/checked.png";
+			NEWsex = 1;
+		}else if(sex == 0){
+
+			man_pic.src = "../../image/check.png";
+			woman_pic.src = "../../image/checked.png";
+			NEWsex = 0;
+		}
+		if(!arguments[1]){
+				var new_stages = document.getElementById('new_stages').value;
+
+				//var nickname = document.getElementById('nickname').value;
+	    	//$api.setStorage('nickname',nickname);
+				if(Last<2){
+					nickname = document.getElementById('nickname').value;
+				}
+
+				var company = document.getElementById('company').value;
+	    	var address = document.getElementById('address').value;
+	    	var province = document.getElementById('province').value;
+	    	var birthday = document.getElementById('select_year').value + '-' +document.getElementById('select_month').value + '-' + document.getElementById('select_day').value;
+	    	var industry = document.getElementById('industry').value;
+	    	var profession = document.getElementById('profession').value;
+	    	api.execScript({name: 'root',script: "XO.PostUser('"+ $api.getStorage('token') +"','"+nickname+"','"+NEWsex+"','"+birthday+"','"+company+"','"+industry+"','"+profession+"','"+province+"','"+address+"','"+new_stages+"',{name:'edit',fun:'savesuccess'},{name:'edit',fun:'fail'});"});
+		}
+	}
+
+	function fail(data){
+		api.hideProgress();
+		api.toast({
+		    msg: '修改失败！请重试',
+		    duration: 2000,
+		    location: 'bottom'
+		});
+	}
+
+	function upface(img_path){
+		$api.setStorage('face', img_path);
+		api.execScript({name: 'root',frameName: 'home',script: "upface();"});
+		var token = $api.getStorage('token');
+		if(token){
+			api.ajax({
+			    url: App.url + '/?r=up&a=face&token='+token,
+			    method: 'post',
+			    data: {
+			        files: {
+			            file: img_path
+			        }
+			    }
+			}, function(ret, err) {
+			    if (ret) {
+			    	App.Uinfo();
+		    		//api.execScript({name: 'root',script: "XO.getInfo('"+ token +"');"});
+			    }
+			});
+		}
+	}
+
+	function setValue(id){
+		// nickname,company,address
+		var title = '';
+		switch(id){
+			case 'nickname':
+				title = '真实姓名';
+				type = 1;
+				break;
+			case 'company':
+				title = '公司名称';
+				type = 0;
+				break;
+			case 'address':
+				title = '详细地址';
+				type = 0;
+				break;
+			case 'new_stages':
+				title = '期数';
+				type = 0;
+				break;
+			case 'profession':
+				title = '职务';
+				type = 0;
+				break;
+			default:
+				return;
+		}
+	    var text = document.getElementById(id).value;
+    	if((id != 'new_stages') && (text.length < 2)){
+			api.toast({
+			    msg: '请输入真实'+title,
+			    duration: 2000,
+			    location: 'bottom'
+			});
+			document.getElementById(id).value = '';
+    	}else{
+    		//ajax
+    		if((id == 'new_stages') && (text != '') && (isNaN(text))){
+    			api.toast({
+				    msg: '期数只能是数字',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+    			return;
+    		}
+    			var new_stages = document.getElementById('new_stages').value;
+
+					//var nickname = document.getElementById('nickname').value;
+					if(Last<2){
+						nickname = document.getElementById('nickname').value;
+					}
+
+        	var company = document.getElementById('company').value;
+        	var address = document.getElementById('address').value;
+        	var province = document.getElementById('province').value;
+        	var birthday = document.getElementById('select_year').value + '-' +document.getElementById('select_month').value + '-' + document.getElementById('select_day').value;
+        	var industry = document.getElementById('industry').value;
+        	var profession = document.getElementById('profession').value;
+
+        	api.execScript({name: 'root',script: "XO.PostUser('"+ $api.getStorage('token') +"','"+nickname+"','"+NEWsex+"','"+birthday+"','"+company+"','"+industry+"','"+profession+"','"+province+"','"+address+"','"+new_stages+"',{name:'edit',fun:'savesuccess'},{name:'edit',fun:'fail'});"});
+    	}
+	}
+
+	function selectorYear(){
+		selector(document.getElementById('birthday'),yearJSON,yearIndex);
+	}
+
+	function selectorIndustry(){
+		selector(document.getElementById('industry'),industryJSON,industryIndex);
+	}
+
+	function selectorProfession(){
+		selector(document.getElementById('profession'),professionJSON,professionIndex);
+	}
+
+	function selector(input,json,_index){
+		isSelector = true;
+
+		var v = input.value;
+		if(v != '' && json[_index[0]].name != v){
+			json.every(function(arg,index){
+				if(arg.name == v){
+					_index[0] = index;
+					return false;
+				}
+				return true;
+			});
+		}
+
+		UIActionSelector.close();
+		UIActionSelector.open({
+		    datas: json,
+		    layout: {
+		        row: 7,
+		        col: 1,
+		        height: 30,
+		        size: _font,
+		        sizeActive: _font+2,
+		        rowSpacing: 2,
+		        colSpacing: 2,
+		        maskBg: 'rgba(0,0,0,0.2)',
+		        bg: '#fff',
+		        color: '#888',
+		        colorActive: '#2f63a8',
+		        colorSelected: '#2f63a8'
+		    },
+		    animation: true,
+		    cancel: {
+		        text: '取消',
+		        size: _font,
+		        w: 90,
+		        h: 35,
+		        bg: '#eee',
+		        bgActive: '#ccc',
+		        color: '#888',
+		        colorActive: '#fff'
+		    },
+		    ok: {
+		        text: '确定',
+		        size: _font,
+		        w: 90,
+		        h: 35,
+		        bg: '#eee',
+		        bgActive: '#ccc',
+		        color: '#888',
+		        colorActive: '#fff'
+		    },
+		    title: {
+		        text: '',
+		        size: 16,
+		        h: 44,
+		        bg: '#eee',
+		        color: '#888'
+		    },
+		    fixedOn: api.frameName
+		 }, function(ret, err) {
+		    if (ret) {
+		      isSelector = false;
+		      if(ret.eventType == 'ok'){
+		        	input.value = ret.selectedInfo[0].name;
+
+		        	//var nickname = document.getElementById('nickname').value;
+							if(Last<2){
+								nickname = document.getElementById('nickname').value;
+							}
+
+		        	var company = document.getElementById('company').value;
+		        	var address = document.getElementById('address').value;
+		        	var province = document.getElementById('province').value;
+		        	var birthday = document.getElementById('select_year').value + '-' +document.getElementById('select_month').value + '-' + document.getElementById('select_day').value;
+		        	var industry = document.getElementById('industry').value;
+		        	var profession = document.getElementById('profession').value;
+
+		        	api.execScript({name: 'root',script: "XO.PostUser('"+ $api.getStorage('token') +"','"+nickname+"','"+NEWsex+"','"+birthday+"','"+company+"','"+industry+"','"+profession+"','"+province+"','"+address+"','"+new_stages+"',{name:'edit',fun:'savesuccess'},{name:'edit',fun:'fail'});"});
+		        }
+		        UIActionSelector.close();
+		    } else {
+		        //alert(JSON.stringify(err));
+		        UIActionSelector.close();
+		    }
+		});
+
+		setTimeout(function(){
+			UIActionSelector.setActive({
+			    actives: _index
+			});
+		},800)
+	}
+
+	function selectorProvince(input){
+		isSelector = true;
+		UIActionSelector.close();
+		UIActionSelector.open({
+		    datas: "widget://res/address.json",
+		    layout: {
+		        row: 7,
+		        col: 2,
+		        height: 30,
+		        size: _font,
+		        sizeActive: _font+2,
+		        rowSpacing: 2,
+		        colSpacing: 2,
+		        maskBg: 'rgba(0,0,0,0.2)',
+		        bg: '#fff',
+		        color: '#888',
+		        colorActive: '#0084ff',
+		        colorSelected: '#0084ff'
+		    },
+		    animation: true,
+		    cancel: {
+		        text: '取消',
+		        size: _font,
+		        w: 90,
+		        h: 35,
+		        bg: '#eee',
+		        bgActive: '#ccc',
+		        color: '#888',
+		        colorActive: '#fff'
+		    },
+		    ok: {
+		        text: '确定',
+		        size: _font,
+		        w: 90,
+		        h: 35,
+		        bg: '#eee',
+		        bgActive: '#ccc',
+		        color: '#888',
+		        colorActive: '#fff'
+		    },
+		    title: {
+		        text: '',
+		        size: 16,
+		        h: 44,
+		        bg: '#eee',
+		        color: '#888'
+		    },
+		    fixedOn: api.frameName
+		}, function(ret, err) {
+		    if (ret) {
+		        isSelector = false;
+		        if(ret.eventType == 'ok'){
+		        	document.getElementById("province").value = ret.selectedInfo[0].name+' '+ret.selectedInfo[1].name;
+
+							//var nickname = document.getElementById('nickname').value;
+							if(Last<2){
+								nickname = document.getElementById('nickname').value;
+							}
+
+		        	var company = document.getElementById('company').value;
+		        	var province = document.getElementById('province').value;
+		        	var address = document.getElementById('address').value;
+		        	var new_stages = document.getElementById('new_stages').innerHTML;
+		        	var birthday = document.getElementById('select_year').value + '-' +document.getElementById('select_month').value + '-' + document.getElementById('select_day').value;
+		        	var industry = document.getElementById('industry').value;
+		        	var profession = document.getElementById('profession').value;
+		        	api.execScript({name: 'root',script: "XO.PostUser('"+ $api.getStorage('token') +"','"+nickname+"','"+NEWsex+"','"+birthday+"','"+company+"','"+industry+"','"+profession+"','"+province+"','"+address+"','"+new_stages+"',{name:'edit',fun:'savesuccess'},{name:'edit',fun:'fail'});"});
+		        }
+		        UIActionSelector.close();
+		    } else {
+		        //alert(JSON.stringify(err));
+		        UIActionSelector.close();
+		    }
+		});
+	}
+
+
+	function cachesinglepic(data){
+		if(data.face){
+			var _file = App.file(data.face);
+			fs.exist({
+			    path: (api.fsDir + '/file/' +_file.full)
+			}, function(ret, err) {
+			    if (ret.exist) {
+			    		data.face = (api.fsDir + '/file/' +_file.full);
+			    		document.getElementById("face").src = data.face;
+			    }else{
+			    	if(data.face.indexOf('/') == 0){
+							var dface = App.url + data.face;
+						}else{
+							var dface = data.face;
+						}
+				    api.download({
+						    url: dface,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data.face = (api.fsDir + '/file/' +_file.full);
+							document.getElementById("face").src = data.face;
+						});
+			    }
+			});
+		}
+		//结束
+		App.init();
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

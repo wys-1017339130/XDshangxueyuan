@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html style="height: auto">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>商学院</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/swiper-3.4.2.min.css"/>
+    <style>
+        html, body {
+            background-color: #f3f3f3;
+        }
+
+        /*底部上拉加载更多样式*/
+        .bottomdiv {
+            clear: both;
+            width: 100%;
+            height: 2rem;
+            text-align: center;
+            line-height: 2rem;
+            color: black;
+        }
+
+        .uptext {
+            color: #bfbfbf;
+            font-size: 13px;
+        }
+
+        .publicfont {
+            width: 1rem;
+            height: 1rem;
+            margin: auto;
+        }
+
+        /*重构*/
+        .list-item {
+            clear: both;
+            width: 100%;
+            padding: 0.5rem 0;
+            border-top: 1px solid #eaeaea;
+        }
+
+        .left-box {
+            width: 25%;
+            float: left;
+            position: relative;
+        }
+
+        .img_box {
+            width: 4.2rem;
+            height: 4.8rem;
+            border-radius: 5px;
+            margin: 0 0.5rem;
+        }
+
+        .left-box .icon-box {
+            position: absolute;
+            bottom: 0.5rem;
+            right: 0.5rem;
+            color: #fff;
+            width: 1rem;
+            height: 1rem;
+            line-height: 1rem;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .right_box {
+            float: left;
+            width: 70%;
+            margin-left: 0.5rem;
+        }
+
+        .title_box {
+            text-align: left;
+            padding-top: 0.2rem;
+            font-size: 0.8792rem;
+            font-weight: 300;
+            color: #434343;
+        }
+
+        .small_title_box {
+            color: #999;
+            font-size: 0.7rem;
+            padding: 0.2rem 0;
+        }
+
+        .new_class_box {
+            margin-top: 0.2rem;
+            width: 100%;
+            color: #999;
+        }
+
+        .new_class_box div {
+            width: 75%;
+            float: left;
+        }
+
+        .new_class_box p {
+            width: 25%;
+            float: right;
+            text-align: right;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        /*直播*/
+        .live_box {
+            width: 100%;
+            background-color: white;
+        }
+
+        .live_top_box {
+            width: 94%;
+            color: #252525;
+            font-weight: 300;
+            font-size: 0.8792rem;
+            height: 2.25rem;
+            line-height: 2.25rem;
+            padding: 0 3%;
+            border-bottom: 1px solid #f4f4f4;
+            background-color: white;
+        }
+
+        .live_message_box {
+            width: 100%;
+            height: 8rem;
+            color: white;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        .live_now_btn {
+            width: 30%;
+            margin: 1rem auto 0 auto;
+            padding: 0.3rem 0;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 0.6rem;
+            background-color: #F3CA7F;
+        }
+
+        /*专业课程*/
+        .ask_box {
+            width: 100%;
+            height: 5rem;
+            background-image: url("../../image/ask_bg.png");
+            background-repeat: no-repeat;
+            background-size: cover;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .ask_title {
+            position: absolute;
+            top: 2.7rem;
+            left: 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #7a3c19;
+        }
+
+        .search-box {
+            height: 1.5rem;
+            line-height: 1.5rem;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            /*background-color: red;*/
+            text-align: left;
+            padding-left: 0.5rem;
+            color: #969696;
+        }
+
+        /*导航栏消息icon*/
+        .news_box {
+            margin-right: 0.3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .num_box {
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 0.9rem;
+            border-radius: 100%;
+            background: #ff5317;
+            color: white;
+            position: absolute;
+            top: 0;
+            right: -0.5rem;
+            font-size: 12px;
+        }
+
+        .messageboximg {
+            /*margin-top: 0.8rem;*/
+            color: #8a8a8a;
+            width: 25px;
+            height: 25px
+        }
+
+        .fm-swiper-box, .fm-banner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .swiper-container .swiper-pagination {
+            text-align: right;
+            bottom: 20px !important;
+            right: 20px !important;
+        }
+
+        .swiper-container .swiper-pagination-bullet {
+            border-radius: 0;
+            width: 12px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .swiper-container .swiper-pagination-bullet-active {
+            background-color: rgba(255, 255, 255, 1);
+        }
+
+        .bg-box {
+            width: 100%;
+            height: 10rem;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .makestyle {
+            transition: background-color 1s, color 1s, border 1s;
+            background-color: rgba(0, 0, 0, .3);
+            border: 1px solid #FF9A35;
+            color: #FF9A35;
+        }
+
+        .fm-menu img {
+            margin: 0 !important;
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+    <div class="main-box">
+        <div id="fixStatus"></div>
+        <div style="position: relative;">
+            <div class="fm-search-box" style="background-color: #fff;height:44px;">
+                <div class="flex-wrap fm-search" style="padding-top:10px;">
+                    <div data-href="../../html/fm/search.html" data-name="search" class="flex-con search-box"
+                         style="">
+                        <span style="font-size: 0.8rem;text-align: center;line-height: 1.6rem;"
+                              class="icon iconfont icon-fangdajing"></span>
+                        <span class="">请搜索感兴趣的内容</span>
+                    </div>
+                    <!--消息通知icon-->
+                    <div tapmode="" class="news_box" onclick="app.tidings()">
+                        <img src="../../image/messageer.png" class="messageboximg">
+                        <span class="num_box" id="num_box" style="display: none"></span>
+                    </div>
+                </div>
+            </div>
+            <!--<img style="z-index: 2;" style="width: 100%" class="z-home-bg" src="../../image/fmbanner.jpg" alt="">-->
+        </div>
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide bg-box" v-for="(item,index) in swiperList" @click="openBannerFm(index)"
+                     :style="{'background-image': 'url(' + formatSwiper(item.pic) + ')'}">
+                </div>
+            </div>
+            <!-- 如果需要分页器 -->
+            <div class="swiper-pagination"></div>
+        </div>
+        <ul class="fm-menu flex-wrap">
+            <li data-href="../../html/me/download.html" data-name="download" data-des="0" class="flex-con">
+                <img width="24" height="24" src="../../image/fmicon1.png" alt="">
+                <div>离线下载</div>
+            </li>
+            <li class="flex-con" data-des="0" data-href="../../html/class/studyList_win.html" data-name="studylist">
+                <img width="24" height="24" src="../../image/fmicon2.png" alt="">
+                <div>学习记录</div>
+            </li>
+            <!--<li class="flex-con" data-des="0" data-href="../../html/class/myclass_win.html" data-name="studylist">-->
+            <!--<img width="24" height="24" src="../../image/fmicon2.png" alt="">-->
+            <!--<div>我的课程</div>-->
+            <!--</li>-->
+            <li class="flex-con" onclick="ranking()">
+                <img width="24" height="24" src="../../image/fmicon3.png" alt="">
+                <div>学霸排行</div>
+            </li>
+            <li data-href="../../html/me/promoter.html" data-name="promoter" data-des="0" class="flex-con">
+                <img width="24" height="24" src="../../image/fmicon4.png" alt="">
+                <div>学习代言</div>
+            </li>
+        </ul>
+        <!--新春-->
+        <!--<ul class="fm-menu flex-wrap">-->
+        <!--<li data-href="../../html/me/download.html" data-name="download" data-des="0" class="flex-con">-->
+        <!--<img width="40" height="40" src="../../image/c_icon.png" alt="">-->
+        <!--<div>离线下载</div>-->
+        <!--</li>-->
+        <!--<li class="flex-con" data-des="0" data-href="../../html/class/studyList_win.html" data-name="studylist">-->
+        <!--<img width="40" height="40" src="../../image/j_icon.png" alt="">-->
+        <!--<div>学习记录</div>-->
+        <!--</li>-->
+        <!--&lt;!&ndash;<li class="flex-con" data-des="0" data-href="../../html/class/myclass_win.html" data-name="studylist">&ndash;&gt;-->
+        <!--&lt;!&ndash;<img width="24" height="24" src="../../image/fmicon2.png" alt="">&ndash;&gt;-->
+        <!--&lt;!&ndash;<div>我的课程</div>&ndash;&gt;-->
+        <!--&lt;!&ndash;</li>&ndash;&gt;-->
+        <!--<li class="flex-con" onclick="ranking()">-->
+        <!--<img width="40" height="40" src="../../image/k_icon.png" alt="">-->
+        <!--<div>学霸排行</div>-->
+        <!--</li>-->
+        <!--<li data-href="../../html/me/promoter.html" data-name="promoter" data-des="0" class="flex-con">-->
+        <!--<img width="40" height="40" src="../../image/l_icon.png" alt="">-->
+        <!--<div>学习代言</div>-->
+        <!--</li>-->
+        <!--</ul>-->
+
+        <div id="zt" style="display:none">
+            <div style="height:10px;background-color: #ebeef3;"></div>
+            <div class="fm-column">
+                <div class="fm-column-top">
+                    <img width="26" height="26" src="../../image/fm_special.png" alt="">
+                    <span id="zt_tip">2017行动教育校长年会</span>
+                    <span class="fr" id="zt_num">已参与4500人</span>
+                </div>
+                <div data-href="../../html/me/chat.html" data-name="chat" data-des="0" class="clear fm-column2">
+                    <div class="fm-column-info-box">
+                        <div class="fm-column-info-title" id="zt_title">“预判·赢在下一个10年”专题</div>
+                        <div class="fm-column-info-info" id="zt_des">2017年9月9日在上海行动在线商学院正式发布</div>
+                    </div>
+                    <img class="fm-sjj" width="8" height="12" src="../../image/youjiantou.png" alt="">
+                </div>
+            </div>
+        </div>
+        <div style="height: 10px;background-color: #f5f5f5;"></div>
+        <div class="bixiuke">
+            <div class="bixiuke-title">企业家必修课<img style="display: none;" class="bixiuke-listen-btn" tapmode=""
+                                                  src="../../image/listen.png" alt=""></div>
+            <div class="bixiuke-padding clear">
+                <img data-href="../../html/me/weekly.html" data-name="weekly" data-des="0"
+                     data-href="../../html/me/weekly.html" data-name="weekly" data-des="0" class="fl" width="55"
+                     height="55" src="../../image/lijian.png" alt="">
+                <div data-href="../../html/me/weekly.html" data-name="weekly" data-des="0" class="bixiuke-info">
+                    <div class="bixiuke-info-title">李践：浓缩EMBA</div>
+                    <div class="bixiuke-info-info">15堂永恒不变的课程原声音频</div>
+                </div>
+                <div class="fm-sjj">
+                    <img onclick="listen()" src="../../image/fmplay.png"/><br/>马上听课
+                </div>
+            </div>
+        </div>
+        <div style="height: 10px;background-color: #f5f5f5;"></div>
+        <!--企业家必修课结束-->
+        <!--直播开始-->
+        <!--<div class="live_box" style="display: block" v-if="zhibo_deilde.visible == true">-->
+        <!--<div class="live_top_box">-->
+        <!--<div style="float:left;font-weight: 400;">{{zhibo_deilde.name}}-->
+        <!--</div>-->
+        <!--<div style="float: right;font-size: 0.7rem;color:#ccc;" @click="zhibo">{{zhibo_deilde.count_yuyue}}人已预约-->
+        <!--<span> &gt;</span>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="live_message_box" :style="'background-image: url('+ formatImg(zhibo_deilde.img) +')'"-->
+        <!--@click="zhibo">-->
+        <!--<div style="font-size: 1rem;padding-top:1.5rem;padding-left: 1rem;">{{zhibo_deilde.name}}-->
+        <!--</div>-->
+        <!--<div style="font-size: 0.6rem;padding:0.3rem 0;padding-left: 1rem;">{{zhibo_deilde.des}}</div>-->
+        <!--<div style="font-size: 0.7rem;padding-left: 1rem;">{{Year}}年{{yue}}月{{day}}日 {{times}}准时开启</div>-->
+        <!--<div class="live_now_btn" id="liveBtn"-->
+        <!--@click.stop.prevent="yuyues()">-->
+        <!--{{appointment}}-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--直播结束-->
+        <!--问卷调查开始-->
+        <!--<div class="live_box">-->
+        <!--<div class="live_top_box">-->
+        <!--<div style="float:left;font-weight: 400;">问卷调查 <img src="../../image/xingbi_cion.png" alt=""-->
+        <!--style="width:3rem;height:auto"></div>-->
+        <!--</div>-->
+        <!--<div class="ask_box" onclick="app.getmesgdata()">-->
+        <!--<div class="ask_title">V{{version}}新版本问卷调查</div>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--问卷调查结束-->
+        <div class="yanjiuyuan">
+            <div class="yjy-title">
+                专业课程
+            </div>
+            <ul id="list2" class="profession-list" style="background-color: #fff;"
+                v-show="CoursesList.coursesListContent.length=== 0">
+                <li class="padding-3" style="box-sizing: border-box;">
+                    <div class="z-FM-img-box">
+                        <img width="75" height="75" style="border-radius: 0;" src="../../image/list1@error.png">
+                    </div>
+                    <div class="fm-profession-list">
+                        <div style="background-color: #efefef" class="fm-list-title"></div>
+                        <div class="fm-list-text">
+                            <div style="background-color: #efefef;height: 0.7rem;margin-bottom: 0.4rem"></div>
+                            <div style="background-color: #efefef;height: 0.7rem"></div>
+                        </div>
+                        <div class="fm-below"><span
+                                style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"
+                                class="fm-list-date"></span><span
+                                style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"></span>
+                        </div>
+                    </div>
+                </li>
+                <li class="padding-3" style="box-sizing: border-box;">
+                    <div class="z-FM-img-box">
+                        <img width="75" height="75" style="border-radius: 0;" src="../../image/list1@error.png">
+                    </div>
+                    <div class="fm-profession-list">
+                        <div style="background-color: #efefef" class="fm-list-title"></div>
+                        <div class="fm-list-text">
+                            <div style="background-color: #efefef;height: 0.7rem;margin-bottom: 0.4rem"></div>
+                            <div style="background-color: #efefef;height: 0.7rem"></div>
+                        </div>
+                        <div class="fm-below"><span
+                                style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"
+                                class="fm-list-date"></span><span
+                                style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"></span>
+                        </div>
+                    </div>
+                </li>
+                <li class="padding-3" style="box-sizing: border-box;">
+                    <div class="z-FM-img-box">
+                        <img width="75" height="75" style="border-radius: 0;" src="../../image/list1@error.png">
+                    </div>
+                    <div class="fm-profession-list">
+                        <div style="background-color: #efefef" class="fm-list-title"></div>
+                        <div class="fm-list-text">
+                            <div style="background-color: #efefef;height: 0.7rem;margin-bottom: 0.4rem"></div>
+                            <div style="background-color: #efefef;height: 0.7rem"></div>
+                        </div>
+                        <div class="fm-below"><span
+                                style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"
+                                class="fm-list-date"></span><span
+                                style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"></span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <div id="list">
+                <div class="list-item" v-for="(item,index) in CoursesList.coursesListContent"
+                     @click="professionDetail2(index)">
+                    <div class="left-box">
+								<span class="icon-box">
+									<span class="icon iconfont icon-1"></span>
+								</span>
+                        <img class="img_box" :src="formatImg(item.pic)">
+                        <!--</div>-->
+                    </div>
+                    <div class="right_box">
+                        <span class="title_box">{{item.title}}</span><br/>
+                        <span class="small_title_box aui-ellipsis-1">
+										{{item.lecturer}} &nbsp;|&nbsp;{{item.produce | mySubStr}}
+									</span>
+                        <!--<p class="textbox aui-ellipsis-1">{{item.produce}}</p>-->
+                        <div class="aui-ellipsis-1 flex-wrap"
+                             style="color: #999;align-items: center;-webkit-align-items: center;"><span
+                                class="fm-below-new">最新</span>{{item.tag}}
+                        </div>
+                        <!--<div class="new_class_box">-->
+                        <!--<div class="aui-ellipsis-1" v-if="item.buyed == 0">{{item.canyuCount}}人已参与</div>-->
+                        <!--<div class="aui-ellipsis-1" v-else>{{item.buyCount}}人已购买</div>-->
+                        <!--<p style="color:#d9b270;" v-cloak v-if="item.buyed == 0">{{item.price === "0.00" ?-->
+                        <!--"限时免费" :-->
+                        <!--"¥"+-->
+                        <!--item.price }}</p>-->
+                        <!--<p style="color:#d9b270;" v-else>已购</p>-->
+                        <!--</div>-->
+                        <div class="new_class_box">
+                            <div class="aui-ellipsis-1">{{item.canyuCount}}人已参与</div>
+                            <p style="color:#d9b270;">立即听课</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bottomdiv">
+                    <span v-if="rote" class="uptext">---查看更多---</span>
+                    <img v-if="load" class="publicfont" src="../../image/timg.gif">
+                    <span v-if="overlate" class="uptext">没有更多了...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="padding-top: 3%"></div>
+</div>
+<div id="hsminiplay" style="height: 10px;background-color: #f5f5f5"></div>
+<div id="fm-bottom-tips"
+     style="position: fixed;width: 100%;left: 0;bottom: 16px;text-align: center;z-index: 10;display: none">
+    <div id="fm-bottom-tips-text"
+         style="background-color: #0084ff;color: #fff;z-index: 10;border-radius: 10px;font-size: 0.75rem;line-height: 2;text-align: center;max-width: 80%;display: inline-block;padding: 0 10px;box-sizing: border-box;-webkit-box-sizing: border-box;vertical-align: top;"
+         class="z-ellipsis">
+    </div>
+    <br>
+    <span style="border-top: 10px solid #0084ff;border-left: transparent solid 10px;border-right: transparent solid 10px;display: inline-block;vertical-align: top;"></span>
+</div>
+</body>
+<script id="list2_Tpl" type="text/template">
+    {{#data}}
+    <li data-des="{{id}}" data-href="../../html/fm/professionDetail.html" data-name="professionDetail"
+        data-path="{{file}}">
+        <img src="{{banner}}" onerror="this.src='../../image/yjy.jpg'">
+        <div class="yjy-text">{{course}}</div>
+    </li>
+    {{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/swiper-3.4.2.min.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+  var manage_num = 0;
+  var guess_num = 0;
+  var manage_data = {};
+  var guess_data = {};
+  var weekly_data = [];
+  var pro_data = [];
+  var fs, db, UIActionProgress, dialogBox, browser;
+  var ani;
+  var act_id = 0;
+  var bar_height;
+  var wx;
+  var isFirst = 1;
+  var BroURL = 'http://www.xdcg100.com/plus/list.php?tid=52';
+
+  apiready = function () {
+    api.showProgress({
+      title: '努力加载中...',
+      modal: false
+    });
+    api.setStatusBarStyle({
+      style: 'dark'
+    });
+//    $api.clearStorage ();
+    console.log($api.getStorage('token'));
+    fs = api.require("fs");
+    db = api.require("db");
+    wx = api.require("wx");
+    browser = api.require('webBrowser');
+    app.version = api.version;
+    $api.fixStatusBar(document.querySelector(".fm-search-box"));
+//    bar_height = document.querySelector(".fm-search-box").offsetHeight;
+    UIActionProgress = api.require('UIActionProgress');
+    dialogBox = api.require('dialogBox');
+    //    行币奖励
+    api.addEventListener({
+      name: 'barIndex'
+    }, function (ret, err) {
+      app.checkTime();
+    });
+    //    获取轮播图
+    app.getBanner(function () {
+      app.initSwiper();
+    });
+    app.getCourses(true, function () {
+      Refresh();
+    }, function () {
+    });
+    app.checkTime();
+//    获取未读消息数量
+    app.getUnreadCount();
+    //直播
+    app.get_live_info();
+    // var _date = new Date();
+    // document.getElementById("year").innerHTML = _date.getFullYear();
+    // document.getElementById("week").innerHTML = getWeekNumber();
+    api.addEventListener({
+      name: 'keyback'
+    }, function (ret, err) {
+      if (Browsered) {
+        browserBack();
+        return;
+      }
+      if (Will == 0) {
+        Will = Will + 1;
+        api.toast({
+          msg: '再次返回将退出应用',
+          duration: 2000,
+          location: 'bottom'
+        });
+      } else {
+        api.execScript({name: 'root', script: "XO.CWidget()"});
+      }
+    });
+    api.addEventListener({
+      name: 'scrolltobottom',
+      extra: {
+        threshold: 5 //设置距离底部多少距离时触发，默认值为0，数字类型
+      }
+    }, function (ret, err) {
+      app.load = true;
+      app.rote = false;
+      app.overlate = false;
+      app.page++;
+      app.getCourses(false);
+    });
+//        监听支付成功
+    api.addEventListener({
+      name: 'paySuccess'
+    }, function (ret, err) {
+      api.closeWin({
+        name: 'classPay_win'
+      });
+      app.getCourses(true);
+      app.getUnreadCount();
+    });
+    //MD Start
+    api.execScript({name: 'root', script: "ChatAna('TabPage1',{'Active':'加载'},'商学院界面');"});
+    //MD End
+    if (App.iphone) {
+      var sy = 0, my = 0;
+      var isTouch = true;
+      var s_scrollY = 0;
+      var m_mcrollY = 0;
+      document.querySelector('body').addEventListener('touchstart', function () {
+        isTouch = true;
+        sy = event.changedTouches[0].pageY;
+        s_scrollY = window.scrollY;
+      });
+
+      document.querySelector('body').addEventListener('touchend', function () {
+        if (!isTouch) {
+          return;
+        }
+
+        my = event.changedTouches[0].pageY;
+        if (my < sy) {
+          api.execScript({name: 'root', script: "Swipeup();"});
+        } else if (my > sy) {
+          api.execScript({name: 'root', script: "Swipedown();"});
+        }
+
+        isTouch = false;
+      });
+    } else {
+      api.addEventListener({
+        name: 'swipedown'
+      }, function (ret, err) {
+        api.execScript({name: 'root', script: "Swipedown();"});
+      });
+
+      api.addEventListener({
+        name: 'swipeup'
+      }, function (ret, err) {
+        api.execScript({name: 'root', script: "Swipeup();"});
+      });
+    }
+    app.pullRefresh(false);
+    App.checkToken();
+    //      读取缓存
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from fm')
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          var fm = ret.data[0];
+          fm.everyweek = JSON.parse(ret.data[0].everyweek);
+          fm.profession = JSON.parse(ret.data[0].profession);
+//					alert(JSON.stringify(fm.profession));
+          upview(fm);
+        }
+      }
+      if (App.State()) {
+        Refresh();
+      }
+    });
+    var BrURL = $api.getStorage('BroURL');
+    if (BrURL && (BrURL.length > 10)) {
+      BroURL = BrURL;
+    }
+    console.log('开始检查下载');
+    api.execScript({name: 'root', script: 'DownManage(0,\'doit\');'});
+    api.execScript({name: 'root', script: "XO.Pin()"});
+    api.execScript({name: 'root', script: "XO.Bind();"});
+    checkUpdate();
+    App.init();
+  };
+  function initBanner() {
+    var banner1 = $api.getStorage('banner1');
+    var banner_href1 = $api.getStorage('banner_href1');
+    var banner_name1 = $api.getStorage('banner_name1');
+    var banner_id1 = $api.getStorage('banner_id1');
+    if (banner1 && (banner1.length > 10)) {
+      fs.exist({
+        path: banner1
+      }, function (ret, err) {
+        if (ret.exist) {
+          document.getElementById("fm-banner1").src = banner1;
+          if (banner_href1 && banner_id1 && banner_name1 && (banner_name1.length > 0) && (banner_href1.length > 0) && (banner_id1.length > 0)) {
+            document.getElementById("fm-banner1").setAttribute('data-href', banner_href1);
+            document.getElementById("fm-banner1").setAttribute('data-des', banner_id1);
+            document.getElementById("fm-banner1").setAttribute('data-name', banner_name1);
+          }
+        }
+      });
+    }
+    var banner2 = $api.getStorage('banner2');
+    var banner_href2 = $api.getStorage('banner_href2');
+    var banner_name2 = $api.getStorage('banner_name2');
+    var banner_id2 = $api.getStorage('banner_id2');
+    if (banner2 && (banner2.length > 10)) {
+      fs.exist({
+        path: banner2
+      }, function (ret, err) {
+        if (ret.exist) {
+          document.getElementById("fm-banner2").src = banner2;
+          if (banner_href2 && banner_id2 && banner_name2 && (banner_name2.length > 0) && (banner_href2.length > 0) && (banner_id2.length > 0)) {
+            document.getElementById("fm-banner2").setAttribute('data-href', banner_href2);
+            document.getElementById("fm-banner2").setAttribute('data-des', banner_id2);
+            document.getElementById("fm-banner2").setAttribute('data-name', banner_name2);
+          }
+        }
+      });
+    }
+    var banner3 = $api.getStorage('banner3');
+    var banner_href3 = $api.getStorage('banner_href3');
+    var banner_name3 = $api.getStorage('banner_name3');
+    var banner_id3 = $api.getStorage('banner_id3');
+    if (banner3 && (banner3.length > 10)) {
+      fs.exist({
+        path: banner3
+      }, function (ret, err) {
+        if (ret.exist) {
+          document.getElementById("fm-banner3").src = banner3;
+          if (banner_href3 && banner_id3 && banner_name3 && (banner_name3.length > 0) && (banner_href3.length > 0) && (banner_id3.length > 0)) {
+            document.getElementById("fm-banner3").setAttribute('data-href', banner_href3);
+            document.getElementById("fm-banner3").setAttribute('data-des', banner_id3);
+            document.getElementById("fm-banner3").setAttribute('data-name', banner_name3);
+          }
+        }
+      });
+    }
+  }
+
+  function CheckBD() {
+    var tk = $api.getStorage('token');
+    if (tk && (tk != App.guest)) {
+      if (!App.telInfo(0)) {
+        App.telInfo(1);
+      } else if (!App.bindWeChat(0)) {
+        App.bindWeChat(1);
+      }
+    }
+  }
+  function Refresh() {
+    api.refreshHeaderLoadDone();
+    if (document.querySelector('.active')) {
+      act_id = document.querySelector('.active').getAttribute('data-title');
+    }
+    api.execScript({
+      name: 'root',
+      script: "XO.BroURL('" + $api.getStorage('token') + "',{name:'FM',fun:'GETBroURL'},{name:'FM',fun:'fail'});"
+    });
+    api.execScript({
+      name: 'root',
+      script: "XO.GetFirst('" + $api.getStorage('token') + "',{name:'FM',fun:'upview'},{name:'FM',fun:'getFMfail'});"
+    });
+//    api.execScript({
+//      name: 'root',
+//      script: "XO.GetBanner('" + $api.getStorage('token') + "',{name:'FM',fun:'app.init'},{name:'FM',fun:'fail'});"
+//    });
+//    initBanner();
+    App.init();
+  }
+  function ranking() {
+    api.openWin({
+      name: 'Ranking',
+      url: '../class/Ranking.html',
+      pageParam: {}
+    })
+  }
+
+  function GetBanner(data) {
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+    if (data && (data.length > 1)) {
+      cachebanner(0, 3, data);
+    }
+  }
+
+  function cachebanner(i, len, data) {
+    if (i < len) {
+//      alert(JSON.stringify(data[0])+'---'+data[0].banner.length+'---'+data[0].banner);
+//      if(data[i] && (data[i].banner.length>9) && (data[i].banner.indexOf('http://')>0) && ((data[i].banner.indexOf('.jpg')>0 || data[i].banner.indexOf('.png')>0 ))){
+      if (data[i] && data[i].banner.length > 9) {
+        if (document.getElementById("fm-banner" + (i + 1))) {
+          document.getElementById("fm-banner" + (i + 1)).setAttribute('tapmode', false);
+          document.getElementById("fm-banner" + (i + 1)).src = data[i].banner;
+          document.getElementById("fm-banner" + (i + 1)).setAttribute('data-href', data[i].href);
+          document.getElementById("fm-banner" + (i + 1)).setAttribute('data-des', data[i].id);
+          document.getElementById("fm-banner" + (i + 1)).setAttribute('data-name', data[i].name);
+
+          $api.setStorage('banner_href' + (i + 1), data[i].href);
+          $api.setStorage('banner_name' + (i + 1), data[i].name);
+          $api.setStorage('banner_id' + (i + 1), data[i].id);
+          App.init();
+        }
+        api.imageCache({url: data[i].banner}, function (ret, err) {
+          if (ret.status) {
+            $api.setStorage('banner' + (i + 1), ret.url);
+          } else {
+//            app.swiperList = [
+//              {
+//                banner: '../../image/fmbanner.jpg',
+//                id: data[i].id
+//              }
+//            ]
+          }
+          cachebanner((i + 1), len, data);
+        });
+      }
+    }
+  }
+
+  function YuPan(Ty, Title, des, tip, Num) {
+    if (Ty == 1) {
+      document.querySelector("#zt_num").innerHTML = '已参与' + Num + '人';
+      document.querySelector("#zt_title").innerHTML = Title;
+      document.querySelector("#zt_des").innerHTML = des;
+      document.querySelector("#zt_tip").innerHTML = tip;
+      document.querySelector("#zt").style.display = 'block';
+    } else {
+      document.querySelector("#zt").style.display = 'none';
+    }
+  }
+
+  var pro_num = 0;
+  function change() {
+    if (pro_data[4 * (pro_num + 1) + 3]) {
+      pro_num++;
+      var _pro = pro_data.slice(pro_num * 4, pro_num * 4 + 4);
+      cachepics(0, _pro.length, _pro, document.getElementById("list2_Tpl"), document.getElementById('list2'), 1);
+    } else {
+      pro_num = 0;
+      var _pro = pro_data.slice(0, 4);
+      cachepics(0, _pro.length, _pro, document.getElementById("list2_Tpl"), document.getElementById('list2'), 1);
+    }
+  }
+
+  function upview(data) {
+    if (!((api.connectionType == 'none') || (api.connectionType == '2g'))) {
+      var listData = app.CoursesList;
+      if (typeof data == 'string') {
+        var data = JSON.parse(data);
+      }
+      var sql1 = "delete from fm";
+      db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+      });
+      cachepics(0, app.CoursesList.coursesListContent.length, app.CoursesList.coursesListContent, false, false, 0);
+      var sql2 = "insert into fm ( everyweek, profession ) values ('" + JSON.stringify(data.everyweek) + "','" + JSON.stringify(listData) + "')";
+      db.executeSql({name: 'main', sql: sql2}, function (ret, err) {
+      });
+    } else {
+      app.CoursesList = data.profession;
+    }
+
+    weekly_data = data.everyweek;
+
+//    var wk = data.everyweek[0];
+//    document.querySelector(".bixiuke-info-title").innerHTML = wk.speaker + '：' + wk.course;
+//    document.querySelector(".bixiuke-info-info").innerHTML = wk.text;
+//      cachepics(0,app.CoursesList.coursesListContent.length,app.CoursesList.coursesListContent,false,false,0);
+
+//    if (false && (isFirst == 1)) {//先隐藏
+//      var sql = 'select * from currentaudio';
+//      db.selectSql({
+//        name: 'main',
+//        sql: sql
+//      }, function (ret, err) {
+//        if (ret) {
+//          if (ret.data.length > 0) {
+//            var d = ret.data[0];
+//            document.getElementById('fm-bottom-tips-text').innerHTML = d.title + '您已听了' + parseInt(d.progress / 60) + '分钟';
+//            document.getElementById('fm-bottom-tips').style.display = 'block';
+//            document.getElementById('fm-bottom-tips').onclick = function () {
+//              api.execScript({
+//                name: 'root',
+//                script: "MenuClick(1);"
+//              });
+//              document.getElementById('fm-bottom-tips').style.display = 'none';
+//            }
+//            setTimeout(function () {
+//              document.getElementById('fm-bottom-tips').style.display = 'none';
+//            }, 5000);
+//          }
+//        }
+//      })
+//    }
+
+    App.init();
+    api.hideProgress();
+  }
+
+  function fail(msg) {
+    api.hideProgress();
+    app.swiperList = [
+      {
+        banner: '../../image/fmbanner.jpg'
+      },
+      {
+        banner: '../../image/fmbanner.jpg'
+      },
+      {
+        banner: '../../image/fmbanner.jpg'
+      }
+    ]
+    //App.tips(msg);
+  }
+
+  function getFMfail(msg) {
+    api.hideProgress();
+    App.tips(msg);
+    //$api.clearStorage();
+    //api.rebootApp();
+  }
+
+  function playAudio(path, id) {
+    api.execScript({
+      name: 'root',
+      script: "newPlayAudio('" + path + "','" + id + "');"
+    });
+  }
+
+  function play(id) {
+    document.getElementById('fm-bottom-tips').style.display = 'none';
+    var domTitle = document.querySelector("[data-title='" + id + "']");
+    var actTitle = document.querySelector('.active');
+
+    if (domTitle) {
+      if (actTitle) {
+        actTitle.className = actTitle.className.replace(/ active/, '');
+        domTitle.className = domTitle.className + ' active';
+      } else {
+        domTitle.className = domTitle.className + ' active';
+      }
+    } else {
+      if (actTitle) {
+        actTitle.className = actTitle.className.replace(/ active/, '');
+      }
+    }
+  }
+
+  function pause(id) {
+    act_id = 0;
+    if (document.querySelector('.active')) {
+      document.querySelector('.active').className = document.querySelector('.active').className.replace(/ active/, '');
+    }
+  }
+
+
+  function cachepics(i, max, data, template, box, type) {
+    if (i < max) {
+      if (!data || !data[i]) {
+        return;
+      }
+      if (type == 1) {
+        var str = 'banner';
+      } else {
+        var str = 'pic';
+      }
+      if (data[i][str]) {
+        var _file = App.file(data[i][str]);
+        fs.exist({
+          path: (api.fsDir + '/file/' + _file.full)
+        }, function (ret, err) {
+          if (ret.exist) {
+            data[i][str] = (api.fsDir + '/file/' + _file.full);
+            app.CoursesList.coursesListContent[i].pic = data[i][str];
+//                      alert(JSON.stringify(app.CoursesList.coursesListContent[i].pic));
+//				    		document.getElementById('img'+i).src = data[i][str];
+            // document.getElementById('text'+i).innerHTML = data[i].course;
+//				    		document.getElementById('fmli'+i).setAttribute('data-des',data[i].id);
+            cachepics(i + 1, max, data, template, box, type);
+          } else {
+            if (data[i][str].indexOf('/') == 0) {
+              var dpic = App.url + data[i][str];
+            } else {
+              var dpic = data[i][str];
+            }
+            api.download({
+              url: dpic,
+              savePath: ('fs://file/' + _file.full),
+              cache: true,
+              allowResume: true
+            }, function (ret, err) {
+//				    	  偶尔报错
+              data[i][str] = (api.fsDir + '/file/' + _file.full);
+//									document.getElementById('img'+i).src = data[i][str];
+              // document.getElementById('text'+i).innerHTML = data[i].course;
+//					    		document.getElementById('fmli'+i).setAttribute('data-des',data[i].id);
+              cachepics(i + 1, max, data, template, box, type);
+            });
+          }
+        });
+      } else {
+        cachepics((i + 1), max, data, template, box, type);
+      }
+    } else {
+      //结束
+      App.init();
+    }
+  }
+
+  function playBTN() {
+    var hasList = localStorage.getItem('mp3');
+    if (typeof hasList == 'string' && hasList != 'null') {
+      hasList = JSON.parse(hasList);
+      api.execScript({
+        name: 'root',
+        script: "newPlayAudio('" + hasList.path + "','" + hasList.id + "');"
+      });
+    } else {
+      api.execScript({
+        name: 'root',
+        script: "isplaying();"
+      });
+    }
+  }//逻辑有问题
+
+  //APP更新
+  function checkUpdate() {
+    var mam = api.require('mam');
+    mam.checkUpdate(function (ret, err) {
+      if (ret.result) {
+        var result = ret.result;
+        if (result.update == true && result.closed == false) {
+          var str = '系统发布了新版本:' + result.version + ';更新描述:' + result.updateTip;
+          dialogBox.alert({
+            texts: {
+              title: '发现新版本',
+              content: str,
+              leftBtnTitle: '取消',
+              rightBtnTitle: '立即升级'
+            },
+            styles: {
+              bg: '#fff',
+              w: 300,
+              corner: 4,
+              title: {
+                marginT: 30,
+                bold: true,
+                titleSize: 20,
+                titleColor: '#252525'
+              },
+              content: {
+                marginT: 20,
+                marginB: 20,
+                color: '#252525',
+                size: 16
+              },
+              left: {
+                marginB: 7,
+                marginL: 20,
+                w: 130,
+                h: 35,
+                corner: 2,
+                bg: '#fff',
+                size: 18
+              },
+              right: {
+                marginB: 7,
+                marginL: 10,
+                w: 130,
+                h: 35,
+                corner: 2,
+                bg: '#fff',
+                size: 18
+              }
+            }
+          }, function (ret) {
+            if (ret.eventType == 'left') {
+              var dialogBox = api.require('dialogBox');
+              dialogBox.close({
+                dialogName: 'alert'
+              });
+            } else {
+              var dialogBox = api.require('dialogBox');
+              dialogBox.close({
+                dialogName: 'alert'
+              });
+              if (api.systemType == "android") {
+                UIActionProgress.open({
+                  maskBg: 'rgba(0,0,0,0.5)',
+                  styles: {
+                    h: 108,
+                    bg: '#fff',
+                    title: {
+                      size: 20,
+                      color: '#000',
+                      marginT: 10
+                    },
+                    msg: {
+                      size: 14,
+                      color: '#000',
+                      marginT: 5
+                    },
+                    lable: {
+                      size: 14,
+                      color: '#696969',
+                      marginB: 5
+                    },
+                    progressBar: {
+                      size: 2,
+                      normal: '#000',
+                      active: '#4876FF',
+                      marginB: 35,
+                      margin: 5
+                    }
+                  },
+                  data: {
+                    title: '正在更新',
+                    msg: '更新至 v' + result.version + ' ' + result.updateTip,
+                    value: 0
+                  }
+                }, function (ret) {
+                  api.download({
+                    url: result.source,
+                    report: true,
+                    cache: false,
+                    allowResume: true
+                  }, function (ret, err) {
+                    if (ret && 0 == ret.state) {
+                      Popinstall(ret.percent);
+                    } else if (ret && 1 == ret.state) {
+                      UIActionProgress.close();
+                      var savePath = ret.savePath;
+                      api.installApp({
+                        appUri: savePath
+                      });
+                    }
+                  });
+                });
+              }
+              if (api.systemType == "ios") {
+                api.installApp({
+                  appUri: result.source
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+  function Popinstall(rate) {
+    UIActionProgress.setData({
+      data: {
+        title: '正在更新',
+        msg: '正在更新至最新版本',
+        value: parseInt(rate)
+      }
+    });
+  }
+  function listen() {
+    api.execScript({name: 'root', script: "ChatAna('AutoPlay',{'frompage':'FM'},'商学院-立即播放');"});
+    App.checkLogin();
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from currentaudio where tid=1 order by `time` desc')
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          App.addpage('audio');
+          api.openWin({
+            name: 'audio',
+            url: '../../html/indexgroup/audio.html',
+            reload: false,
+            slidBackEnabled: false,
+            bgColor: '#fff',
+            pageParam: {
+              name: 'audio',
+              des: ret.data[0].id,
+              tid: 1,
+              pro: ret.data[0].progress,
+              category: 0,
+              auto: true
+            },
+            slidBackEnabled: true
+          });
+        } else {
+          App.addpage('audio');
+          api.openWin({
+            name: 'audio',
+            url: '../../html/indexgroup/audio.html',
+            reload: false,
+            pageParam: {
+              name: 'audio',
+              des: 0
+            },
+            slidBackEnabled: true
+          });
+        }
+      }
+    });
+  }
+
+  var dpic = '';
+  var lpic = "widget://res/logo.png";
+  function upviewlittle(data) {
+    //小兔地址data+1_,下载下来
+    var _file = App.file(data);
+    fs.exist({
+      path: (api.fsDir + '/file/' + _file.full)
+    }, function (ret, err) {
+      if (ret.exist) {
+        data = (api.fsDir + '/file/' + _file.full);
+        lpic = 'fs://file/' + _file.full;
+      } else {
+        if (data.indexOf('/') == 0) {
+          var dface = App.url + data;
+
+        } else {
+          var dface = data;
+        }
+        api.download({
+          url: dface,
+          savePath: ('fs://file/' + _file.full),
+          cache: false,
+          allowResume: false
+        }, function (ret, err) {
+          data = (api.fsDir + '/file/' + _file.full);
+          lpic = 'fs://file/' + _file.full;
+        });
+      }
+    });
+  }
+
+  function upshare(data) {
+    //小兔地址data+1_,下载下来
+
+    var little = data.split('/');
+    var littleURL = '';
+
+    if (little.length > 0) {
+      for (var i = 1; i < little.length - 1; i++) {
+        littleURL += '/' + little[i];
+      }
+      littleURL += '/1_' + little[little.length - 1];
+    }
+    upviewlittle(littleURL);
+    // api.imageCache({
+    //     url: App.url+data
+    // }, function(ret, err) {
+    //     document.getElementById("promoter").src = ret.url;
+    //     api.hideProgress();
+    // });
+    localStorage.setItem('promoterPIC', data);
+    var _file = App.file(data);
+    fs.exist({
+      path: (api.fsDir + '/file/' + _file.full)
+    }, function (ret, err) {
+      if (ret.exist) {
+        data = (api.fsDir + '/file/' + _file.full);
+        dpic = 'fs://file/' + _file.full;
+        fs.getAttribute({
+          path: dpic
+        }, function (ret, err) {
+          if (ret.status) {
+            if (parseInt(ret.size) < 1000) {
+              fs.remove({
+                path: dpic
+              }, function (ret, err) {
+                api.execScript({
+                  name: 'root',
+                  script: "XO.GetPromoter('" + $api.getStorage('token') + "',{name:'FM',fun:'upshare'},{name:'FM',fun:'fail'});"
+                });
+              });
+            }
+          }
+        });
+        api.hideProgress();
+      } else {
+        if (data.indexOf('/') == 0) {
+          var dface = App.url + data;
+        } else {
+          var dface = data;
+        }
+        api.download({
+          url: dface,
+          savePath: ('fs://file/' + _file.full),
+          cache: false,
+          allowResume: false
+        }, function (ret, err) {
+          data = (api.fsDir + '/file/' + _file.full);
+          dpic = 'fs://file/' + _file.full;
+          api.hideProgress();
+        });
+      }
+    });
+  }
+
+  var apiKey = 'wxcfe803c780dc2647';
+  //  document.querySelector('.icon-fenxiang3').onclick = function () {
+  //    if ($api.getStorage('nickname')) {
+  //      share();
+  //    } else {
+  //      var token = $api.getStorage('token');
+  //      if (token && (token == App.guest)) {
+  //        api.sendEvent({name: 'IndexEvent', extra: {page: 'login'}});
+  //        api.openWin({
+  //          name: 'login',
+  //          url: '../../html/me/login.html',
+  //          reload: false,
+  //          pageParam: {
+  //            name: 'authentication'
+  //          },
+  //          slidBackEnabled: true
+  //        });
+  //        return;
+  //      }
+  //      api.toast({
+  //        msg: '完善个人资料后才可以分享',
+  //        duration: 2000,
+  //        location: 'bottom'
+  //      });
+  //    }
+  //  }
+
+  function waitopen() {
+    api.toast({
+      msg: '敬请期待',
+      duration: 2000,
+      location: 'middle'
+    });
+  }
+
+  function share() {
+
+    //MD Start
+    api.execScript({name: 'root', script: "ChatAna('TabPage1',{'Active':'开始分享'},'商学院-开始分享');"});
+    //MD End
+
+    dialogBox.actionMenu({
+      rect: {
+        h: 170
+      },
+      texts: {
+        cancel: '取消分享'
+      },
+      items: [
+        {
+          text: '微信好友',
+          icon: 'widget://res/icon/icon-wx.png'
+        },
+        {
+          text: '微信朋友圈',
+          icon: 'widget://res/icon/icon-pyq.png'
+        }
+      ],
+      styles: {
+        bg: '#FFF',
+        column: 2,
+        itemText: {
+          color: '#000',
+          size: 12,
+          marginT: 8
+        },
+        itemIcon: {
+          size: 60
+        },
+        cancel: {
+          bg: '#fff',
+          color: '#000',
+          h: 44,
+          size: 14
+        }
+      },
+      tapClose: true
+    }, function (ret) {
+      dialogBox.close({dialogName: 'actionMenu'});
+      if (ret.eventType == 'click') {
+        if (dpic.length > 0) {
+          switch (ret.index) {
+            case 0:
+              var wx = api.require('wx');
+              wx.isInstalled(function (ret, err) {
+                if (ret.installed) {
+                  wx.shareImage({
+                    apiKey: apiKey,
+                    scene: 'session',
+                    thumb: lpic,
+                    contentUrl: dpic
+                  }, function (ret, err) {
+                    if (ret.status) {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':true,'sharingMethod':'session','page':'TabPage1'},'商学院-分享成功');"
+                      });
+                      api.toast({
+                        msg: '分享成功',
+                        duration: 2000,
+                        location: 'bottom'
+                      });
+                    } else {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':false,'sharingMethod':'session','page':'TabPage1'},'商学院-取消分享');"
+                      });
+                    }
+                  });
+                }
+              });
+              break;
+            case 1:
+              var wx = api.require('wx');
+              wx.isInstalled(function (ret, err) {
+                if (ret.installed) {
+                  wx.shareImage({
+                    apiKey: apiKey,
+                    scene: 'timeline',
+                    thumb: lpic,
+                    contentUrl: dpic
+                  }, function (ret, err) {
+                    if (ret.status) {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':true,'sharingMethod':'timeline','page':'TabPage1'},'商学院-分享成功');"
+                      });
+                      api.toast({
+                        msg: '分享成功',
+                        duration: 2000,
+                        location: 'bottom'
+                      });
+                    } else {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':false,'sharingMethod':'timeline','page':'TabPage1'},'商学院-取消分享');"
+                      });
+                    }
+                  });
+                }
+              });
+              break;
+            default:
+          }
+        }
+      }
+    });
+  }
+
+  function GETBroURL(data) {
+    if (data && (data.length > 9) && (data.indexOf('ttp://') > 0)) {
+      $api.setStorage('BroURL', data);
+      BroURL = data;
+    }
+  }
+
+  var Browsered = false;
+  function openBrowser() {
+    Browsered = true;
+    api.execScript({name: 'root', script: "(Browsered = true);"});
+
+    var sysType = api.systemType;
+    if (sysType == 'ios') {
+      var _h = 64;
+    } else if (sysType == 'android') {
+      if (parseFloat(api.systemVersion) >= 4.4) {
+        var _h = 69;
+      } else {
+        var _h = 64;
+      }
+    } else {
+      var _h = 64;
+    }
+    api.openFrame({
+      name: 'fmtop',
+      url: '../../html/indexgroup/fmtop.html',
+      rect: {
+        x: 0,
+        y: 0,
+        w: api.winWidth,
+        h: _h
+      }
+    });
+
+    browser.openView({
+      url: BroURL,
+      rect: {
+        x: 0,
+        y: _h,
+        w: 'auto',
+        h: api.winHeight - _h
+      }
+    }, function (ret, err) {
+      if (ret) {
+        if (ret.state == 3) {
+          if (ret.title.length > 0) {
+            api.execScript({
+              frameName: 'fmtop',
+              script: "setTop('" + ret.title + "');"
+            });
+          }
+        } else if ((ret.state == 0) || (ret.state == 2) || (ret.state == 4)) {
+          api.execScript({
+            frameName: 'fmtop',
+            script: "setURL('" + ret.url + "');"
+          });
+        }
+      }
+    });
+  }
+
+  function browserBack() {
+    browser.historyBack(function (ret, err) {
+      if (!ret.status) {
+        api.execScript({name: 'root', script: "(Browsered = false);"});
+        Browsered = false;
+        browser.closeView();
+        api.closeFrame({
+          name: 'fmtop'
+        });
+      }
+    });
+  }
+  var app = new Vue({
+    el: '#main',
+    data: {
+      page: 1,
+      perPage: 6,
+      CoursesList: {
+        coursesListContent: [],
+        CoursesListPic: []  //离线缓存课程图片
+      },
+      formatSwiper: formatImg,
+      allcount: allcountFun,
+      rote: false,
+      load: false,
+      overlate: false,
+      cha: '',
+      first: true,
+      firstTime: '',
+      num: '',
+      swiperList: [
+        {
+          pic: '../../image/fmbanner.jpg'
+        },
+        {
+          pic: '../../image/fmbanner.jpg'
+        },
+        {
+          pic: '../../image/fmbanner.jpg'
+        }
+      ],  //轮播
+      classInfo: {},  //系统通知课程内容
+      zhibo_deilde: {},
+      appointment: '',
+      makeApp: false,
+      Year: '',
+      yue: '',
+      day: '',
+      times: '',
+      roomId: '',
+      paweed: '',
+      nick: '',
+      version: '',
+      session: {}
+    },
+    filters: {
+      mySubStr: function (str) {
+        if (str) {
+          if (str.length > 10) {
+            return str.substr(0, 10) + '…';
+          } else {
+            return str;
+          }
+        } else {
+          return '';
+        }
+      }
+    },
+    created: function () {
+    },
+    methods: {
+//        课程列表
+      getCourses: function (ref, callback) {
+        api.hideProgress();
+        if (ref) {
+          app.page = 1;
+        }
+        var post = {
+          page: app.page,
+          perPage: app.perPage,
+          hash: $api.getStorage('token')
+        };
+        sendAjax(this, post, '/Api/Pay/getCourses', function (res) {
+          api.hideProgress();
+          if (ref) {
+            app.CoursesList.coursesListContent = res.data.proList;
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          } else {
+            app.CoursesList.coursesListContent = app.CoursesList.coursesListContent.concat(res.data.proList);
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          }
+          if (res.data.proList.length == 0) {
+            app.overlate = true;
+            app.rote = false;
+            app.load = false
+          }
+          if (callback) {
+            callback();
+          }
+        })
+      },
+//      课程详情(列表)
+      professionDetail2: function (index) {
+//        收费 跳转购买页
+//        if (app.CoursesList.coursesListContent[index].price > 0 && app.CoursesList.coursesListContent[index].buyed == 0) {
+//          api.openWin({
+//            name: 'courseInfo_win',
+//            url: '../fm/courseInfo_win.html',
+//            pageParam: {
+//              des: app.CoursesList.coursesListContent[index].id,
+//              price: app.CoursesList.coursesListContent[index].price,
+//              buyed: app.CoursesList.coursesListContent[index].buyed,
+//              title: app.CoursesList.coursesListContent[index].title
+//            }
+//          });
+////        价格为零 跳转课程列表页
+//        } else {
+        api.openWin({
+          name: 'professionDetail2',
+          url: '../fm/professionDetail3.html',
+          pageParam: {
+            des: app.CoursesList.coursesListContent[index].id,
+            price: app.CoursesList.coursesListContent[index].price,
+            buyed: app.CoursesList.coursesListContent[index].buyed,
+            title: app.CoursesList.coursesListContent[index].title
+          }
+        });
+//        }
+      },
+//      判断行币弹框
+      checkTime: function () {
+//        $api.rmStorage('setXBDate');
+        var token = $api.getStorage('token');
+        if (token && token != App.guest) {
+          var XBDate = $api.getStorage('setXBDate');
+          var now = new Date();
+          var nowDate = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+          if (XBDate != nowDate) {
+            app.getYesterdayXB();
+          }
+          app.sendMissionMessage();  // 检测尚未完成的以及过期的任务
+          app.getHomeLink();
+        }
+        app.getHomeLink();
+      },
+//      检测尚未完成的以及过期的任务
+      sendMissionMessage: function () {
+        var post = {
+          hash: $api.getStorage('token')
+        };
+        sendAjax(this, post, '/Api/Sys/getYesterdayXB', function (res) {
+        })
+      },
+//      获取行币奖励
+      getYesterdayXB: function () {
+        var post = {
+          hash: $api.getStorage('token')
+        };
+        sendAjax(this, post, '/Api/Sys/getYesterdayXB', function (res) {
+          console.log(JSON.stringify(res));
+          var message = res.data.message;
+          var messageID = res.data.last_learn_id;
+//          行币状态为1时 弹窗
+          if (res.data.get_score == 1) {
+            var now = new Date();
+            var nowDate = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate();
+            $api.setStorage('setXBDate', nowDate);
+            api.openFrame({
+              name: 'dialogXB_fm',
+              url: './dialogXB.html',
+              rect: {
+                x: 0,
+                y: 0,
+                w: 'auto',
+                h: 'auto'
+              },
+              bgColor: 'rgba(0,0,0,.5)',
+              pageParam: {
+                message: message,
+                messageID: messageID
+              }
+            });
+          }
+        })
+      },
+//      获取系统通知图片
+      getHomeLink: function () {
+//        $api.rmStorage('coverID');
+        var post = {};
+        sendAjax(this, post, '/Api/Sys/getNotices', function (res) {
+          if (res.data != null) {
+            app.classInfo = res.data;
+            var coverID = $api.getStorage('coverID');
+            if (coverID && coverID == res.data.id) {
+              return false;
+            } else {
+              $api.setStorage('coverID', res.data.id);
+              api.openFrame({
+                name: 'dialog_fm',
+                url: './dialog.html',
+                rect: {
+                  x: 0,
+                  y: 0,
+                  w: 'auto',
+                  h: 'auto'
+                },
+                bgColor: 'rgba(0,0,0,.5)',
+                pageParam: {
+                  title: res.data.title,
+                  des: res.data.value,  //课程ID
+                  type: res.data.type,
+                  imgUrl: res.data.cover
+                }
+              });
+            }
+          }
+        })
+      },
+      //      关闭营销课程
+      closeBox: function () {
+        api.closeFrame({
+          name: 'dialog_fm'
+        });
+      },
+//      关闭行币弹窗
+      closeXBbox: function () {
+        api.closeFrame({
+          name: 'dialogXB_fm'
+        });
+      },
+      //      消息通知
+      tidings: function () {
+        api.openWin({
+          name: 'news_win',
+          url: './news.html',
+          pageParam: {}
+        });
+      },
+      openAskpaper: function () {
+        api.openWin({
+          name: 'askpaper',
+          url: './askpaper.html',
+          pageParam: {}
+        });
+      },
+//      音频播放完成时记录任务进度
+      radioComplete: function () {
+        var post = {
+          hash: $api.getStorage('token'),
+          rid: $api.getStorage('courseID_rid')
+        };
+        sendAjax(this, post, '/Api/Group/radioComplete', function (res) {
+//            alert(JSON.stringify(res));
+        })
+      },
+//      获取未读消息数量
+      getUnreadCount: function () {
+        var post = {
+          hash: $api.getStorage('token')
+        };
+        sendAjax(this, post, '/Api/Message/getUnreadCount', function (res) {
+          app.num = res.data;
+          if (app.num > 0) {
+            if (app.num > 9) {
+              app.num = '9+'
+            }
+            $("#num_box").css("display", "block").html(app.num);
+          } else {
+            $('#num_box').css("display", "none");
+          }
+        })
+      },
+      //      获取问卷调查
+      getmesgdata: function () {
+        var post = {
+          hash: $api.getStorage('token')
+        };
+        sendAjax(this, post, '/Api/Ucenter/u_getQuestionDisplay', function (res) {
+          app.pagerid = res.data;
+          if (res.code == 1) {
+            app.openfindpage()
+          } else if (res.code == -49) {
+            toastMsg('您已写过问答卷')
+          }
+        })
+      },
+//      打开行动商学院的问卷调查
+      openfindpage: function () {
+        api.openWin({
+          name: 'askpaper_win',
+          url: './askpaper_win.html',
+          pageParam: {
+            pagerid: app.pagerid
+          }
+        });
+      },
+//      轮播
+      getBanner: function () {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var post = {};
+        sendAjax(this, post, '/Api/Data/getBanner', function (res) {
+          app.swiperList = res.data;
+          app.$nextTick(function () {
+            var mySwiper = new Swiper('.swiper-container', {
+              pagination: '.swiper-pagination',
+              autoplayDisableOnInteraction: false,
+              loop: true,
+              observer: true,//修改swiper自己或子元素时，自动初始化swiper
+              observeParents: true,//修改swiper的父元素时，自动初始化swiper
+              onSliderMove: function () {
+                app.pullRefresh(true);
+                api.setFrameAttr({
+                  name: 'FM',
+                  bounces: false
+                });
+              },
+              onTouchEnd: function () {
+                app.pullRefresh(false);
+                api.setFrameAttr({
+                  name: 'FM',
+                  bounces: true
+                });
+              },
+              autoplay: 3000//可选选项，自动滑动
+            })
+          })
+        });
+      },
+      initSwiper: function () {
+
+      },
+      pullRefresh: function (bool) {
+        if (bool) {
+          return false;
+        } else {
+          api.setCustomRefreshHeaderInfo({
+            bgColor: '#efefef',
+            image: {
+              pull: 'widget://res/refresh/pull_image.png',
+              transform: [
+                'widget://res/refresh/refreshing_image_frame_01.png',
+                'widget://res/refresh/refreshing_image_frame_02.png',
+                'widget://res/refresh/refreshing_image_frame_03.png',
+                'widget://res/refresh/refreshing_image_frame_04.png',
+                'widget://res/refresh/refreshing_image_frame_05.png',
+                'widget://res/refresh/refreshing_image_frame_06.png',
+                'widget://res/refresh/refreshing_image_frame_07.png',
+                'widget://res/refresh/refreshing_image_frame_08.png',
+                'widget://res/refresh/refreshing_image_frame_09.png',
+                'widget://res/refresh/refreshing_image_frame_10.png',
+                'widget://res/refresh/refreshing_image_frame_11.png',
+                'widget://res/refresh/refreshing_image_frame_12.png'
+              ],
+              load: [
+                'widget://res/refresh/pull_end_image_frame_01.png'
+              ]
+            }
+          }, function () {
+            api.refreshHeaderLoadDone();
+            //下拉刷新被触发，使用 api.refreshHeaderLoadDone() 结束加载中状态
+//		  location.reload();
+            if (api.connectionType == 'none') {
+              api.refreshHeaderLoadDone();
+              api.toast({
+                msg: '未连接网络',
+                duration: 2000,
+                location: 'bottom'
+              });
+            } else {
+              manage_num = 0;
+              guess_num = 0;
+              manage_data = {};
+              guess_data = {};
+              isFirst = 0;
+              Refresh();
+              app.getCourses(true);
+              app.getUnreadCount();
+              app.getBanner();
+              app.get_live_info();
+              //api.refreshHeaderLoadDone();
+            }
+          });
+        }
+      },
+      //      获取课程详情
+      openBannerFm: function (index) {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        setTimeout(function () {
+          api.hideProgress();
+//          toastMsg('网络不给力，请稍后再试')
+        }, 3000)
+        var post = {
+          hash: $api.getStorage('token'),
+          id: app.swiperList[index]['data-id']
+        };
+        sendAjax(this, post, '/Api/Data/getCourse', function (res) {
+          api.hideProgress();
+          app.homeData = res.data;
+//                  买过或者价格为零
+//          if (app.homeData.buyed == 1 || app.homeData.price == '0.00') {
+          api.openWin({
+            name: 'professionDetail2',
+            url: '../fm/professionDetail3.html',
+            pageParam: {
+              des: app.homeData.id,
+              price: app.homeData.price,
+              buyed: app.homeData.buyed,
+              title: app.homeData.title
+            }
+          });
+////没买过
+//          } else {
+//            课程详情
+//          api.openWin({
+//            name: 'courseInfo_win',
+//            url: '../fm/courseInfo_win.html',
+//            pageParam: {
+//              des: app.swiperList[index]['data-id'],
+//              title: app.homeData.title
+//            }
+//          });
+//          }
+        })
+      },
+      //  预约function
+      yuyues: function () {
+        if (app.appointment == '已预约') {
+          app.appointment = '立即预约';
+        } else {
+          app.appointment = '已预约'
+        }
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token
+        }
+        sendAjax(this, post, '/Api/Data/yuyue', function (res) {
+//          app.zhibo();
+          api.toast({
+            msg: res.data,
+            duration: 2000,
+            location: 'bottom'
+          })
+        })
+      },
+      get_live_info: function () {
+        app.getUserInfo();
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token
+        }
+        sendAjax(this, post, '/Api/Data/get_live_info', function (res) {
+          console.log(JSON.stringify(res));
+          app.zhibo_deilde = res.data;
+          app.makeApp = res.data.yuyue;
+          app.roomId = res.data.room_id;
+          app.paweed = res.data.room_pass;
+          $api.setStorage('roomId', res.data.room_id);
+          $api.setStorage('password', res.data.room_pass);
+          if (res.data.yuyue) {
+            app.appointment = '已预约';
+          } else {
+            app.appointment = '立即预约';
+          }
+          app.Year = res.data.start_time.slice(0, 4)
+          app.yue = res.data.start_time.slice(5, 7)
+          app.day = res.data.start_time.slice(8, 10)
+          app.times = res.data.start_time.slice(11, 16)
+        })
+      },
+      getUserInfo: function () {
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token
+        }
+        sendAjax(this, post, '/Api/Ucenter/getUserInfo', function (res) {
+          app.nick = res.data.nickname
+        })
+      },
+      //  直播登录页
+      zhibo: function () {
+        $api.setStorage('nickname', app.nick);
+        app.session = {
+          roomId: app.roomId,
+          password: app.paweed,
+          nickname: app.nick
+        };
+        var core = api.require('gotyeLiveCore');
+        //看看是否设置有appkey及accesssecret，若有则取出
+        var settings = $api.getStorage('settings');
+        if (settings) {
+          core.registerApp({
+            appKey: settings.appKey,
+            accessSecret: settings.accessSecret
+          });
+        }
+        core.setDebugLogEnabled({
+          enabled: true
+        });
+        core.authRoomSession(app.session, function (ret, err) {
+//          alert(JSON.stringify(ret))
+          if (ret) {
+            //验证通过后打开直播画面页
+            app.login(app.roomId, app.paweed, app.nick, ret.role);
+          } else {
+            api.alert({msg: err.description});
+          }
+        });
+      },
+      //   跳转
+      login: function (roomId, password, nickname, role) {
+        var frmName = 'live_player';
+//        var frmName = 'frm_mine';
+        var frmUrl = '../LiveBroadcast/player.html';
+//        var frmUrl = '../LiveBroadcast/frm_mine.html';
+        if (role == '2') {
+          frmName = 'publisher';
+          frmUrl = '../LiveBroadcast/publisher.html';
+        }
+        //以frame类型打开，并且传入roomId、password、nickname
+        api.openWin({
+          name: frmName,
+          url: frmUrl,
+          pageParam: {
+            session: app.session
+          },
+          bounces: false,
+          vScrollBarEnabled: false,
+          hScrollBarEnabled: false
+        });
+      }
+
+    }
+  })
+</script>
+
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

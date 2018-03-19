@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" href="../../css/api.css">
+    <style type="text/css">
+        html, body {
+            background-color: transparent;
+        }
+
+        #werp {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: -webkit-box;
+            -webkit-box-pack: center;
+            -webkit-box-align: center;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+
+        #werp > div {
+            width: 13.6rem;
+            position: relative;
+            background-color: #FFFFFF;
+            padding: 1.5rem 0;
+            box-sizing: border-box;
+            border-radius: 5px;
+        }
+
+        .P_tlitp {
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .fen {
+            text-align: center;
+            font-size: 1.5rem;
+            height: 3rem;
+            line-height: 3rem;
+            color: #ff5317;
+        }
+
+        .Desc {
+            font-size: 0.7rem;
+            color: #252525;
+            padding: 0 1.25rem;
+        }
+
+        .image {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+        }
+
+        .buttom {
+            text-align: center;
+            color: #fff;
+            background-color: #d9b270;
+            height: 2.2rem;
+            line-height: 2.2rem;
+            position: absolute;
+            font-size: 0.8rem;
+            bottom: 0;
+            width: 100%;
+            border-radius: 0 0 5px 5px;
+        }
+    </style>
+</head>
+<body>
+<div id="werp">
+    <div>
+        <p class="P_tlitp">考试评分</p>
+        <div class="fen">{{score}}分</div>
+        <div class="Desc" v-show="state == 1">恭喜，您获得《{{name}}》结业证书，并获得{{money}}行币的奖励</div>
+        <div class="Desc" v-show="state == -1">本次考试获得{{money}}行币的奖励,请再接再励</div>
+        <div style="height: 2.2rem"></div>
+        <img class="image" @click="close()" width="30" src="../../image/close_icon.png" alt="">
+        <div class="buttom" v-show="state == 1" @click="fenxiang()">分享朋友</div>
+        <div class="buttom" v-show="state == -1" @click="close()">关闭</div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#werp',
+    data: {
+      score: '0',
+      money: '0',
+      name: '',
+      image: '',
+      state: '',
+      lpic: 'widget://res/logo.png',
+    },
+    created: function () {
+      apiready = function () {
+        app.score = api.pageParam.score
+        app.money = api.pageParam.money
+        app.name = api.pageParam.titles
+        app.image = api.pageParam.image_html
+        app.state = api.pageParam.state
+        app.upview(api.pageParam.image_html)
+      }
+    },
+    methods: {
+      close: function () {
+        api.closeFrame({
+          name: 'ExaminationAlert'
+        })
+      },
+      //    微信分享功能
+      upviewlittle: function (data) {
+        var fs = api.require("fs")
+        var _file = App.file(data);
+        fs.exist({
+          path: (api.fsDir + '/file/' + _file.full)
+        }, function (ret, err) {
+          if (ret.exist) {
+            data = (api.fsDir + '/file/' + _file.full);
+            app.lpic = 'fs://file/' + _file.full;
+          } else {
+            if (data.indexOf('/') == 0) {
+              var dface = App.url + data;
+            } else {
+              var dface = data;
+            }
+            api.download({
+              url: dface,
+              savePath: ('fs://file/' + _file.full),
+              cache: false,
+              allowResume: false
+            }, function (ret, err) {
+              data = (api.fsDir + '/file/' + _file.full);
+              app.lpic = 'fs://file/' + _file.full;
+            });
+          }
+        });
+      },
+      upview: function (data) {
+        api.hideProgress();
+        //小兔地址data+1_,下载下来
+        var little = data.split('/');
+        var littleURL = '';
+
+        if (little.length > 0) {
+          for (var i = 1; i < little.length - 1; i++) {
+            littleURL += '/' + little[i];
+          }
+          littleURL += '/1_' + little[little.length - 1];
+        }
+
+        this.upviewlittle(littleURL);
+        var fs = api.require("fs")
+        var _file = App.file(data);
+        fs.exist({
+          path: (api.fsDir + '/file/' + _file.full)
+        }, function (ret, err) {
+          if (ret.exist) {
+            data = (api.fsDir + '/file/' + _file.full);
+            app.image = 'fs://file/' + _file.full;
+            fs.getAttribute({
+              path: app.image
+            }, function (ret, err) {
+              if (ret.status) {
+                if (parseInt(ret.size) < 1000) {
+                  fs.remove({
+                    path: app.image
+                  }, function (ret, err) {
+                    app.getSpokesman(id, function () {
+                      this.upview(api.pageParam.image_html);
+                    })
+                  });
+                }
+              }
+            });
+            api.hideProgress();
+          } else {
+            if (data.indexOf('/') == 0) {
+              var dface = App.url + data;
+            } else {
+              var dface = data;
+            }
+            // 下载到相册
+            api.download({
+              url: dface,
+              savePath: ('fs://file/' + _file.full),
+              cache: false,
+              allowResume: false
+            }, function (ret, err) {
+              data = (api.fsDir + '/file/' + _file.full);
+              app.image = 'fs://file/' + _file.full;
+              fs.getAttribute({
+                path: app.image
+              }, function (ret, err) {
+                if (ret.status) {
+                  if (parseInt(ret.size) < 100) {
+                    fs.remove({
+                      path: app.image
+                    }, function (ret, err) {
+
+                    });
+                    setTimeout(function () {
+                      app.getSpokesman(id, function () {
+                        this.upview(api.pageParam.image_html);
+                      })
+                    }, 20000);
+                  } else {
+                    api.hideProgress();
+                  }
+                }
+              });
+
+            });
+          }
+        });
+      },
+      // 选择微信/朋友圈
+      fenxiang: function () {
+        var dialogBox = api.require("dialogBox");
+        dialogBox.actionMenu({
+          rect: {
+            h: 170
+          },
+          texts: {
+            cancel: '取消分享'
+          },
+          items: [
+            {
+              text: '微信好友',
+              icon: 'widget://res/icon/icon-wx.png'
+            },
+            {
+              text: '微信朋友圈',
+              icon: 'widget://res/icon/icon-pyq.png'
+            }
+          ],
+          styles: {
+            bg: '#FFF',
+            column: 2,
+            itemText: {
+              color: '#000',
+              size: 12,
+              marginT: 8
+            },
+            itemIcon: {
+              size: 60
+            },
+            cancel: {
+              bg: '#fff',
+              color: '#000',
+              h: 44,
+              size: 14
+            }
+          },
+          tapClose: true
+        }, function (ret) {
+          var apiKey = 'wxcfe803c780dc2647';
+          dialogBox.close({dialogName: 'actionMenu'});
+          if (ret.eventType == 'click') {
+            if (app.image.length > 0) {
+              switch (ret.index) {
+                case 0:
+                  var wx = api.require('wx');
+                  wx.isInstalled(function (ret, err) {
+                    if (ret.installed) {
+                      wx.shareImage({
+                        apiKey: apiKey,
+                        scene: 'session',
+                        thumb: App.imge_url,
+                        contentUrl: app.image
+                      }, function (ret, err) {
+                        if (ret.status) {
+                          api.toast({
+                            msg: '分享成功',
+                            duration: 2000,
+                            location: 'bottom'
+                          });
+                        } else {
+                          api.toast({
+                            msg: '分享失败',
+                            duration: 2000,
+                            location: 'bottom'
+                          });
+                        }
+                      });
+                    }
+                  });
+                  break;
+                case 1:
+                  var wx = api.require('wx');
+                  wx.isInstalled(function (ret, err) {
+                    if (ret.installed) {
+                      wx.shareImage({
+                        apiKey: apiKey,
+                        scene: 'timeline',
+                        thumb: App.imge_url,
+                        contentUrl: app.image
+                      }, function (ret, err) {
+                        if (ret.status) {
+                          api.toast({
+                            msg: '分享成功',
+                            duration: 2000,
+                            location: 'bottom'
+                          });
+                        } else {
+                          api.toast({
+                            msg: '分享失败',
+                            duration: 2000,
+                            location: 'bottom'
+                          });
+                        }
+                      });
+                    }
+                  });
+                  break;
+                default:
+              }
+            }
+          }
+        });
+      }
+    }
+  })
+</script>
+</html>

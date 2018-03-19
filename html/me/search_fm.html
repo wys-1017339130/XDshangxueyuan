@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>发布任务</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .searchcontent {
+            width: 100%;
+            padding: 0.75rem 12px 0 12px;
+            box-sizing: border-box;
+            background: white;
+        }
+
+        .clearbox {
+            float: right;
+            font-size: 14px;
+            color: #999999;
+        }
+
+        .publicfont {
+            color: #999999;
+            font-size: 15px;
+            margin-right: 5px
+        }
+
+        .historylist {
+            width: 100%;
+            padding-top: 1.2rem;
+            font-size: 14px;
+            color: #727272;
+            background: white;
+            padding-left: 12px;
+            box-sizing: border-box;
+        }
+
+        .ifshowfalsebox {
+            margin: 4rem auto 10px 0;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .ifshowfalsebox img {
+            width: 12rem;
+            height: 12rem;
+        }
+
+        .delimg {
+            float: right;
+            width: 23px;
+            height: 23px;
+            margin-right: 5px;
+        }
+
+        .deliceimg {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin: auto;
+        }
+
+        .imgbox {
+            display: flex;
+            float: right;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body style="background: white">
+<div id="app">
+    <div v-if="boolnumber==0" class="searchbefore">
+        <div class="searchcontent" v-if="searchhistorylist.length != 0">
+            <span style="font-size: 15px">搜索历史</span>
+            <span class="clearbox" @click="clearcontent">
+			<span style="float: right;line-height: 23px">清空</span>
+			<img class="delimg" src='../../image/alldel.png'>
+		</span>
+        </div>
+        <div v-else class="searchafter">
+            <div class="ifshowfalsebox">
+                <img src="../../image/searchnull.png">
+                <p style="color: #a3a3ad">暂无搜索历史</p>
+            </div>
+        </div>
+        <div class="historylist" v-for="(item,index) in searchhistorylist" @click="gotodetails(index)">
+            <span>{{item.name}}</span>
+            <!--<div class="imgbox">-->
+            <!--<img src="../../image/shanchu.png" class="deliceimg">-->
+            <!--</div>-->
+
+        </div>
+    </div>
+    <div v-else class="searchafter">
+        <div v-if="ifdatashow" class="historylist" v-for="(item,index) in searchvaluelist"
+             @click="gotolaearnlist(index)">{{item.name}}
+        </div>
+        <div v-if="ifdatashow==false" class="ifshowfalsebox">
+            <img src="../../image/searchnull.png">
+            <p style="color: #a3a3ad">没有找到相关结果，换个词试试</p>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {
+  });
+  var app = new Vue({
+    el: '#app',
+    data: {
+      searchvalue: '',
+      boolnumber: 0,
+      searchvaluelist: '',
+      ifdatashow: true,
+      newhistorylist: '',
+      searchhistorylist: []
+    },
+    created: function () {
+      apiready = function () {
+        if ($api.getStorage('searchhistory')) {
+          app.searchhistorylist = $api.getStorage('searchhistory');
+        }
+        api.addEventListener({
+          name: 'serchvalueeven'
+        }, function (ret, err) {
+          app.searchvalue = ret.value.serchvalue;
+          if (app.searchvalue.length != 0) {
+            app.getsearchvalue(app.searchvalue);
+          } else {
+            app.boolnumber = 0
+          }
+        });
+      };
+    },
+    filters: {},
+    methods: {
+      clearcontent: function () {
+        app.searchhistorylist = [];
+        $api.setStorage('searchhistory', app.searchhistorylist);
+      },
+      //获取搜索内容
+      getsearchvalue: function (searchvalue) {
+        var post = {
+          hash: $api.getStorage('token'),
+          search: searchvalue
+        };
+        sendAjax(this, post, '/Api/Group/searchMission', function (res) {
+          app.searchvaluelist = res.data;
+          if (searchvalue.length == 0) {
+            app.boolnumber = 0
+          } else {
+            app.boolnumber = 1;
+            if(app.searchvaluelist.length == 0) {
+              app.ifdatashow = false
+            } else {
+              app.ifdatashow = true
+            }
+          }
+        });
+      },
+      //前往任务详情并且存储带本地 的历史纪录
+
+      gotolaearnlist: function (index) {
+        //判断数组里是否有该元素
+        for (var i = 0; i < app.searchhistorylist.length; i++) {
+          if (app.searchhistorylist[i].name == app.searchvaluelist[index].name) {
+            //相同的先切割出去
+            app.searchhistorylist.splice(i, 1);
+            break;
+          }
+        }
+        //无论何种情况 添加到数组最前面
+        app.searchhistorylist.unshift(app.searchvaluelist[index]);
+        if (app.searchhistorylist.length > 10) {
+          //切割最后一位元素
+          app.searchhistorylist.pop();
+        }
+        //最后再一次存储
+        $api.setStorage('searchhistory', app.searchhistorylist);
+        api.openWin({
+          name: 'task_win',
+          url: './task_win.html',
+          pageParam: {
+            mid: app.searchvaluelist[index].id
+          }
+        });
+      },
+      gotodetails: function (index) {
+        api.openWin({
+          name: 'task_win',
+          url: './task_win.html',
+          pageParam: {
+            mid: app.searchhistorylist[index].id
+          }
+        });
+      }
+    }
+  });
+
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+
+</html>

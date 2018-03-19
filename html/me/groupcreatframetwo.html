@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>学生会</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .persondata {
+            background: white;
+            margin-bottom: 20px;
+        }
+
+        .oimgdata {
+            width: 3.3rem;
+            height: 3.3rem;
+            display: block;
+            margin: 1rem auto 0 1.2rem;
+            border-radius: 50%;
+        }
+
+        .persontitle {
+            padding: 0.75rem 0.6rem;
+            font-size: 17px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .groupheader {
+            color: #9d9d9d;
+            font-size: 14px;
+            text-align: center;
+            line-height: 2.5rem;
+        }
+
+        .peoplemessage {
+            width: 100%;
+            background: white;
+        }
+
+        .publicli {
+            padding: 0 10px;
+            box-sizing: border-box;
+            border-bottom: 1px solid #ebebeb;
+            line-height: 3rem;
+            height: 3rem;
+            background: white;
+            color: #898989;
+            font-size: 14px;
+        }
+
+        .publiclipicture {
+            padding: 0 10px;
+            box-sizing: border-box;
+            border-bottom: 1px solid #ebebeb;
+            background: white;
+            color: #898989;
+            font-size: 14px;
+            padding-bottom: 1rem;
+        }
+
+        .publicli input {
+            border: none;
+            text-align: right;
+            float: right;
+            padding: 0.75rem 0;
+        }
+
+        .publicli span {
+            font-size: 15px;
+            color: black;
+        }
+
+        .userpicture {
+            text-align: center;
+            padding-top: 1.3rem;
+            width: 49%;
+            height: 5rem;
+            background: #f3f3f3;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .userpicture p {
+            line-height: 2.5rem;
+        }
+
+        .submitbtn {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            background: #d9b270;
+            text-align: center;
+            height: 2.5rem;
+            line-height: 2.5rem;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .submitbtn:active {
+            background: gainsboro;
+        }
+
+        .publicfont {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 3px 9px;
+            background: #000;
+            opacity: 0.6;
+            color: white;
+            font-size: 25px
+        }
+
+        .rightboxheader {
+            float: right;
+            line-height: 5rem;
+        }
+
+        .laterimg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%
+        }
+
+        .thetitlepic {
+            position: absolute;
+            bottom: -1rem;
+            background: #d2b379;
+            text-align: center;
+            color: white;
+            line-height: 1.5rem;
+            width: 100%;
+            height: 1.5rem;
+            left: 0;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bottomserver {
+            width: 100%;
+            text-align: center;
+            line-height: 2rem;
+            color: #9d9d9d;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body style="position: relative;">
+<div id="app" style="margin-top: 5px;background: #f3f3f3;padding-bottom: 2rem">
+    <div class="persondata">
+        <div class="persontitle">填写资料信息</div>
+        <div style="width: 100%;height: 5rem;text-align: center">
+            <div style="float: left;height: 5rem;display: flex;margin-left: 1.2rem">
+                <img class="oimgdata" style="margin: auto" :src="formatImg(detailsmessage.header)">
+            </div>
+            <div class="rightboxheader">
+				<span style="margin-right: 10px;font-size: 0.8rem">
+					小组头像
+					<i style="color: #b5b5b5;margin-left: 0.5rem;font-size:0.8rem" class="iconfont icon-jiantou"></i>
+				</span>
+            </div>
+        </div>
+    </div>
+    <div class="peoplemessage">
+        <div class="persontitle">个人信息</div>
+        <div class="publicli">
+            <span>小组名称</span>
+            <input disabled="disabled" v-model="detailsmessage.name" type="text" placeholder="请输入小组名称">
+        </div>
+        <div class="publicli">
+            <span>负责人姓名</span>
+            <input disabled="disabled" type="text" placeholder="请输入真实姓名" v-model="detailsmessage.leading">
+        </div>
+        <div class="publicli">
+            <span>身份证号码</span>
+            <input disabled="disabled" type="tel" placeholder="请输入负责人身份证号码" v-model="detailsmessage.id_card">
+        </div>
+        <div class="publiclipicture">
+            <p style="line-height: 3rem">上传身份证照片</p>
+            <div class="userpicture" style="position: relative">
+                <img style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;border-radius: 5px"
+                     :src="formatImg(detailsmessage.id_fphoto)">
+                <div class="thetitlepic">身份证正面照片</div>
+            </div>
+            <div class="userpicture" style="position: relative">
+                <img style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;border-radius: 5px"
+                     :src="formatImg(detailsmessage.id_bphoto)">
+                <div class="thetitlepic">身份证反面照片</div>
+            </div>
+        </div>
+        <div class="publiclipicture">
+            <p style="line-height: 3rem">请上传手持身份证照片</p>
+            <div class="userpicture" style="position: relative">
+                <img style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;border-radius: 5px"
+                     :src="formatImg(detailsmessage.id_hphoto)">
+                <div class="thetitlepic">手持身份证照片</div>
+            </div>
+        </div>
+        <div class="publicli">
+            <span>联系电话</span>
+            <input disabled="disabled" type="tel" placeholder="请输入手机号" v-model="detailsmessage.tel">
+        </div>
+    </div>
+    <!--公司信息-->
+    <div class="peoplemessage" style="margin-top: 8px" v-if="trouble == 1">
+        <div class="publicli" style="font-size: 15px;color:black">公司信息</div>
+        <div class="publicli">
+            <span>公司名称</span>
+            <input disabled="disabled" type="text" placeholder="请输入公司名称" v-model="detailsmessage.company_name">
+        </div>
+        <div class="publicli">
+            <span>组织机构代码</span>
+            <input disabled="disabled" type="text" placeholder="请输入组织机构代码" v-model="detailsmessage.organization_code">
+        </div>
+        <div class="publiclipicture">
+            <p style="line-height: 3rem">营业执照照片</p>
+
+            <div class="userpicture" style="position: relative">
+                <img style="position: absolute;left: 0;top: 0;width: 100%;height: 100%;border-radius: 5px"
+                     :src="formatImg(detailsmessage.business_licence)">
+                <div class="thetitlepic">手持身份证照片</div>
+            </div>
+        </div>
+    </div>
+    <div class="bottomserver">
+        如有疑问请咨询，客服021-60260888
+    </div>
+    <!--审核的-->
+    <div class="submitbtn">正在审核，请耐心等待</div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {
+  });
+  var app = new Vue({
+    el: '#app',
+    data: {
+      formatImg:formatImg,
+      trouble: false,
+      headerimg: '',
+      facepic: '',
+      thebackpic: '',
+      theusertell: '',
+      workpicture: '',
+      trouble: '',
+      detailsmessage: '',
+      form: {
+        groupname: '',
+        id_card: '',
+        username: '',
+        tel: '',
+        company_name: '',
+        organization_code: ''
+      }
+    },
+    created: function () {
+      apiready = function () {
+        app.opentinne = api.pageParam.opentinne;
+        app.detailsmessage = api.pageParam.detailsmessage;
+
+        if (app.opentinne === 1) {
+          app.trouble = 1
+        } else {
+          app.trouble = 0
+        }
+      };
+    },
+    filters: {},
+    methods: {}
+  });
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+</html>

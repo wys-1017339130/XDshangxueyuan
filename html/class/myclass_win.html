@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" href="../../css/api.css"/>
+    <link rel="stylesheet" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <style>
+        #app {
+            background: white;
+        }
+
+        #header {
+            border-bottom: 1px solid #ccc;
+            display: flex;
+            height: 2.2rem;
+            line-height: 2.2rem;
+        }
+
+
+        .left-box{
+            font-size: 1rem;
+            margin-left:0.5rem;
+        }
+
+    </style>
+</head>
+<body>
+<div id='app'>
+    <header class="aui-bar aui-bar-nav" id="header">
+        <a class="left-box iconfont icon-jiantou z-fanhui"  @click="closeWindow()"></a>
+        <span class="aui-title">我的课程</span>
+    </header>
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      userInfo:{},
+      clubId:'',
+      courseId:''
+    },
+    filters: {},
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        api.openFrame({
+          name: 'myclass_fm',
+          url: "./myclass_fm.html",
+          rect: {
+            x: 0,
+            y: $api.offset($api.dom('header')).h,
+            w: 'auto',
+            h: 'auto'
+          },
+          bounces: false,
+//          pageParam: {
+//            clubId:app.clubId,
+//            courseId:app.courseId
+//          }
+        });
+      };
+
+    },
+    methods: {
+      closeWindow: function () {
+        closeWindow();
+      }
+    }
+  })
+</script>

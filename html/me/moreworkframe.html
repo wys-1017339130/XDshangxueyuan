@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>全部小组</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .headerlist {
+            display: flex;
+            background: white;
+            color: #999;
+            line-height: 3rem;
+            height: 3rem;
+            position: fixed;
+            width: 100%;
+            left: 0;
+            top: 0;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .groupstyle {
+            flex: 1;
+            text-align: center;
+            font-size: 15px;
+            color: #666;
+        }
+
+        .beforestyle {
+            border-bottom: 3px solid #d9b270;
+            color: #d9b270;
+        }
+
+        .myuserbox {
+            float: left;
+            padding-top: 5px;
+        }
+
+        .leftimg {
+            width: 20%;
+            padding-top: 10px;
+            text-align: center;
+        }
+
+        .userbox {
+            background: white;
+            width: 100%;
+            padding: 0.4rem;
+            height: 3.5rem;
+            border-bottom: 1px solid gainsboro
+        }
+
+        .leftimg img {
+            width: 2.7rem;
+            height: 2.7rem;
+            border-radius: 50%;
+            margin: auto;
+        }
+
+        .middlebox {
+            width: 70%;
+            text-align: left;
+            box-sizing: border-box;
+            margin-left: 5px;
+        }
+
+        .thenewtext {
+            border-radius: 4px;
+            background: #ec7e3a;
+            color: white;
+            box-sizing: border-box;
+            font-size: 12px;
+            width: 15%;
+            text-align: center;
+        }
+
+        .minteclass {
+            margin-left: 5px;
+            color: #666666;
+            font-size: 12px
+        }
+
+        .bottomdiv {
+            width: 100%;
+            height: 3rem;
+            text-align: center;
+            line-height: 3rem;
+            background: #f2f2f2;
+            color: black;
+        }
+
+        .uptext {
+            color: #bfbfbf;
+            font-size: 13px;
+        }
+
+        .publicfont {
+            width: 20px;
+            height: 20px;
+            margin: auto;
+        }
+
+        .nullbg {
+            margin: 0rem auto 0 auto;
+            padding-top: 7rem;
+            text-align: center;
+        }
+
+        .nullbg img {
+            width: 10rem;
+            text-align: center;
+        }
+
+        .userbox:active {
+            background: gainsboro;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="headerlist">
+        <span class="groupstyle" v-for="(item,index) in allgroupchange" @click="changethistitle(index)"
+              :class="{beforestyle:changetitleindex == index}">{{item}}</span>
+    </div>
+    <!--数据不为空的情况-->
+    <div class="changemainclass" v-if="ifnull==false" style="overflow: hidden;margin-top: 3rem">
+        <div @click="gotoworkdetails(index)" class="userbox" v-for="(item,index) in mygrouplist">
+            <div class="leftimg myuserbox">
+                <img :src="formatImg(item.header)">
+            </div>
+            <div class="middlebox myuserbox">
+                <p style="line-height: 1.7rem;font-size: 15px">{{item.name}}</p>
+                <p class="flex-wrap" style="line-height: 1rem">
+                    <span class="thenewtext">最新</span>
+                    <span class="minteclass"
+                          v-show="item.ago != '' || item.ago == null">{{item.ago}}前，{{item.nickname}}发布了新任务</span>
+                    <span class="minteclass" v-show="item.ago == '' || item.ago == null">暂无动态~</span>
+                </p>
+            </div>
+        </div>
+    </div>
+    <!--数据为空的情况-->
+    <div class="nullbg" v-else>
+        <img src="../../image/creatgroup.png">
+        <p style="color: #a1a1ab;padding: 0.75rem 0">您还木有创建小组~</p>
+    </div>
+    <!--上拉加载-->
+    <div v-if="ifnull==false" class="bottomdiv">
+        <img v-if="load" class="publicfont" src="../../image/timg.gif">
+        <span v-if="overlate" class="uptext">数据已全部加载</span>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {
+  });
+  var app = new Vue({
+    el: '#app',
+    data: {
+      allgroupchange: ['最近使用', '我创建的', '我加入的'],
+      changetitleindex: 0,
+      mygrouplist: '',
+      page: 1,
+      rote: false,
+      overlate: false,
+      load: false,
+      ifnull: false,
+      grouptext: '',
+      formatImg: formatImg
+    },
+    created: function () {
+      apiready = function () {
+        app.getclasse(2, 1);
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 30 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+//                滑动时候改变的值
+        }, function (ret, err) {
+//                app.rote = true;
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.getclasse(app.changetitleindex + 2)
+        });
+      };
+    },
+    filters: {},
+    methods: {
+      //选择我的小组类别
+      changethistitle: function (index) {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        app.page = 1;
+        app.rote = true;
+        app.load = false;
+        app.overlate = false;
+        app.changetitleindex = index;
+        app.getclasse(index + 2, 1)
+      },
+      //小组列表
+      getclasse: function (typeindex, ref) {
+        var post = {
+          hash: $api.getStorage('token'),
+          type: typeindex,
+          page: app.page,
+          perPage: 10
+        };
+        sendAjax(this, post, '/Api/Group/getGroupList', function (res) {
+          console.log('全部小组' + JSON.stringify(res));
+          if (ref == 1) {
+            app.mygrouplist = res.data.proList;
+            app.rote = true;
+            app.load = false;
+            if (res.data.length == 0) {
+              app.ifnull = true;
+            } else {
+              app.ifnull = false
+            }
+          } else {
+            app.mygrouplist = app.mygrouplist.concat(res.data);
+            app.rote = true;
+            app.load = false
+          }
+          if (res.data.length == 0 || res.data == null) {
+            app.overlate = true;
+            app.rote = false;
+            app.load = false
+          }
+        })
+      },
+      //前往任务小组列表
+      gotoworkdetails: function (index) {
+        api.openWin({
+          name: 'grouplist_win',
+          url: './grouplist_win.html',
+          pageParam: {
+            gid: app.mygrouplist[index].id
+          }
+        })
+      }
+    }
+  });
+
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+
+</html>

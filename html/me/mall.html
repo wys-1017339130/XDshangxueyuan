@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>行币商城</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body class="z-fff">
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">行币商城</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div class="mall-user-box">
+			<div class="mall-user clear">
+				<img style="border-radius: 100%" id="face" width="60" height="60" class="fl" src="../../image/user_default.png" onerror="this.src='../../image/user_default.png'" class="mall-avatar">
+				<div class="mall-user-info-box fl">
+					<div id="name" class="mall-user-name"></div>
+					<div>您当前拥有<span id="score" class="normal-price">0</span>行币</div>
+				</div>
+			</div>
+			<img class="mall-user-box-back" src="../../image/mall.png" alt="">
+		</div>
+		<ul id="list" class="box-wraper">
+			<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无内容</div></li>
+		</ul>
+	</div>
+</body>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<li data-des="{{id}}/{{score}}" data-href="../../html/me/mallDetail.html" data-name="mallDetail" class="box mall-box">
+		<div class="mall-coin">{{score}}行币</div>
+		<img class="mall-box-back" src="{{banner}}" onerror="this.src='../../image/mall_default.png'">
+	</li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var PageNum = 0;
+	var HeadBar = $api.byId('HeadBar');
+	var fs,db,userID;
+	var isHasMall = false;
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+		id = api.pageParam.des || 0;
+		fs = api.require("fs");
+		db = api.require("db");
+		App.openWWW(api.winName);
+		userID = localStorage.getItem('userID');
+		db.selectSql({
+		    name: 'main',
+		    sql: ("select * from user where id='"+userID+"'")
+		}, function(ret, err) {
+			if(ret.data.length>0){
+				document.getElementById('face').src = ret.data[0].face;
+				document.getElementById('name').innerHTML = ret.data[0].nickname;
+				document.getElementById("score").innerHTML = ret.data[0].score;
+			}
+		});
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('行币商城',true,{'行为':'打开'},'行币商城');"});
+		//MD End
+
+		db.selectSql({
+		    name: 'main',
+		    sql: ('select * from mall')
+		}, function(ret, err) {
+			if(ret.data.length>0){
+				isHasMall = true;
+				upview(ret.data);
+			}
+		});
+		if(App.State()){
+			Refresh();
+		}
+	}
+
+
+	function Refresh(){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});//数据加载中显示方块
+
+		api.execScript({name: 'root',script: "XO.GetMall('"+ $api.getStorage('token') +"',{name:'mall',fun:'upview'},{name:'mall',fun:'fail'});"});
+
+		api.execScript({name: 'root',script: "XO.SCore('"+ $api.getStorage('token') +"',{name:'mall',fun:'upscore'},{name:'mall',fun:'fail'});"});
+	}
+
+	function upscore(score){
+		document.getElementById("score").innerHTML = score;
+		var sql = "update user set score='"+score+"' where id='"+userID+"'";
+		db.executeSql({
+		    name: 'main',
+		    sql: sql
+		}, function(ret, err) {
+		});
+	}
+
+	function upview(data){
+		if(data == '无信息'){
+			App.tips('无信息');
+			document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无内容</div></li>';
+			App.init();
+			api.hideProgress();
+			return;
+		}
+		if(typeof data == 'string'){
+			localStorage.setItem('mall',data);
+			var data = JSON.parse(data);
+		}
+
+		db.executeSql({
+		    name: 'main',
+		    sql: ('delete from mall')
+		}, function(ret, err) {
+
+		});
+
+		data.forEach(function(arg){
+			var sql1 = "insert into mall (id,type,title,rid,cid,banner,pic,score,num,used,tsort,status,vtime) values ('"+arg.id+"','"+arg.type+"','"+arg.title+"','"+arg.rid+"','"+arg.cid+"','"+arg.banner+"','"+arg.pic+"','"+arg.score+"','"+arg.num+"','"+arg.used+"','"+arg.tsort+"','"+arg.status+"','"+arg.vtime+"')";
+			db.executeSql({
+			    name: 'main',
+			    sql: sql1
+			}, function(ret, err) {
+
+			});
+		});
+
+		cachebanners(0,data.length,data,document.getElementById("list_Tpl"),document.getElementById('list'));
+		cachepics(0,data.length,data,document.getElementById("list_Tpl"),document.getElementById('list'));
+
+		App.init();
+		api.hideProgress();
+	}
+
+
+	function fail(msg){
+		document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">暂无内容</div></li>';
+		api.hideProgress();
+		App.tips(msg);
+	}
+
+	function cachepics(i,max,data,template,box){
+		if(i<max){
+			if(data[i].pic){
+				var _file = App.file(data[i].pic);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i].pic = (api.fsDir + '/file/' +_file.full);
+				    		var sql1 = "update mall set pic='"+data[i].pic+"' where id='"+data[i].id+"'";
+				    		db.executeSql({
+							    name: 'main',
+							    sql: sql1
+							}, function(ret, err) {
+
+							});
+				    		cachepics(i+1,max,data,template,box);
+				    }else{
+				    	if(data[i].pic.indexOf('/') == 0){
+							var dpic = App.url + data[i].pic;
+						}else{
+							var dpic = data[i].pic;
+						}
+				    	api.download({
+						    url: dpic,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i].pic = (api.fsDir + '/file/' +_file.full);
+							var sql1 = "update mall set pic='"+data[i].pic+"' where id='"+data[i].id+"'";
+				    		db.executeSql({
+							    name: 'main',
+							    sql: sql1
+							}, function(ret, err) {
+
+							});
+							cachepics(i+1,max,data,template,box);
+						});
+				    }
+				});
+			}else{
+       			cachepics((i + 1),max,data,template,box);
+       		}
+		}
+	}
+
+	function cachebanners(i,max,data,template,box){
+		if(i<max){
+			if(data[i].banner){
+				var _file = App.file(data[i].banner);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i].banner = (api.fsDir + '/file/' +_file.full);
+				    		cachebanners(i+1,max,data,template,box);
+				    }else{
+				    	if(data[i].banner.indexOf('/') == 0){
+							var dbanner = App.url + data[i].banner;
+						}else{
+							var dbanner = data[i].banner;
+						}
+				    	api.download({
+						    url: dbanner,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i].banner = (api.fsDir + '/file/' +_file.full);
+							cachebanners(i+1,max,data,template,box);
+						});
+				    }
+				});
+			}else{
+       			cachepics((i + 1),max,data,template,box);
+       		}
+		}else{
+			//结束
+			var TM = new T7({tm: template});
+			var html = TM.Tpl(data);
+			box.innerHTML = html;
+			App.init();
+			api.hideProgress();
+		}
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

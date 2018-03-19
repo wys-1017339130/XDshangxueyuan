@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget id="A6054539988584" version="0.0.1">
+    <name>行动在线商学院</name>
+    <description>行动在线商学院</description>
+    <author email="ras@vhkj.com" href="http://www.vhkj.com">未昊科技</author>
+    <content src="index.html"/>
+    <!--<content src="./html/LiveBroadcast/frm_mine.html"/>-->
+    <preference name="pageBounce" value="false"/>
+    <preference name="appBackground" value="rgba(0,0,0,0.0)"/>
+    <preference name="windowBackground" value="rgba(0,0,0,0.0)"/>
+    <preference name="frameBackgroundColor" value="rgba(0,0,0,0.0)"/>
+    <preference name="backgroundMode" value="audio|remote-notification"/>
+    <preference name="customRefreshHeader" value="UIPullRefresh"/>
+    <preference name="hScrollBarEnabled" value="false"/>
+    <preference name="vScrollBarEnabled" value="false"/>
+    <preference name="autoLaunch" value="true"/>
+    <preference name="fullScreen" value="false"/>
+    <preference name="autoUpdate" value="false"/>
+    <preference name="smartUpdate" value="true"/>
+    <preference name="debug" value="true"/>
+    <preference name="statusBarAppearance" value="true"/>
+    <preference name="softInputMode" value="resize"/>
+    <permission name="readPhoneState"/>
+    <permission name="camera"/>
+    <permission name="record"/>
+    <permission name="location"/>
+    <permission name="fileSystem"/>
+    <permission name="internet"/>
+    <permission name="bootCompleted"/>
+    <permission name="hardware"/>
+    <preference name="urlScheme" value="shangxueyuan"/>
+    <preference name="querySchemes" value="shangxueyuan"/>
+    <access origin="*"/>
+    <feature name="wx">
+        <param name="urlScheme" value="wxcfe803c780dc2647"/>
+        <param name="apiKey" value="wxcfe803c780dc2647"/>
+        <param name="apiSecret" value="dfc827d99005b3783814fe4fe33d7e09"/>
+    </feature>
+    <feature name="aMap">
+        <param name="android_api_key" value="0f94418b341b2ccd66d510de6adea166"/>
+        <param name="ios_api_key" value="6b39cc8c778f6f580ffc1fc4dfaca12c"/>
+    </feature>
+    <feature name="ajpush">
+        <param name="app_key" value="833176c660b4ec52762f1abc"/>
+        <param name="channel" value="AppStore"/>
+    </feature>
+    <feature name="wxPay">
+        <param name="urlScheme" value="wxcfe803c780dc2647"/>
+        <param name="apiKey" value="wxcfe803c780dc2647"/>
+        <param name="apiSecret" value="dfc827d99005b3783814fe4fe33d7e09"/>
+    </feature>
+    <feature name="aliPayPlus">
+        <param name="urlScheme" value="AliPayPlusA6054539988584"/>
+    </feature>
+    <!--// 直播-->
+    <feature name="gotyeLiveCore">
+        <param name="appKey" value="dd7e6306c9854ee5aedf41f983a19d28"/>
+        <param name="accessSecret" value="07937d6a598343dc9c57be87ef891815"/>
+    </feature>
+</widget>

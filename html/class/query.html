@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<style>
+  * {
+    padding: 0px;
+    margin: 0px;
+  }
+
+  #header {
+    width:100%;
+    display: -webkit-box;
+    height: 45px;
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+    border-bottom: 1px solid #f2f2f2;
+  }
+
+  .input {
+    -webkit-box-flex: 1;
+    margin: 0px 10px;
+    background-color: #f2f2f2;
+    height: 30px;
+    display: -webkit-box;
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+    border-radius: 5px;
+  }
+
+  .input > div {
+    -webkit-box-flex: 1;
+    padding: 0 10px;
+  }
+
+
+  .fr {
+    float: right;
+    margin-right: 10px;
+    color: #c1c1c1;
+    font-size: 11px;
+  }
+</style>
+<body style="background-color: #ffffff;">
+<div id="app">
+  <header id="header">
+    <div class="input">&nbsp;
+      <img width="20" src="../../image/searchimg.png" alt="">
+      <div>
+        <input type="text" style="border: 0px;background-color:#f2f2f2;font-size: 12px;height: 20px !important;width: 100%;outline: none;" v-model="texts" placeholder="输入昵称/手机号查询">
+      </div>
+    </div>
+    <div @click="closewindow()" style="padding-right: 15px;font-size: 14px;color: #000000;">取消</div>
+  </header>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      texts: ''
+    },
+    wacth: {
+      'texts':function (value) {
+        console.log(value)
+      }
+    },
+    created: function () {
+//      var histiry = localStorage.getItem('List')
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+//        if (histiry != 'null') {
+//          api.openFrame({
+//            name: 'History_searchList',
+//            url: './History_searchList.html',
+//            rect: {
+//              x: 0,
+//              y: 0,
+//              w: $api.offset($api.dom('header')).h,
+//              h: 'auto'
+//            },
+//            pageParam: {}
+//          })
+//        } else {
+//          api.openFrame({
+//            name: 'wuHistory',
+//            url: './wuHistory.html',
+//            rect: {
+//              x: 0,
+//              y: 0,
+//              w: $api.offset($api.dom('header')).h,
+//              h: 'auto'
+//            },
+//            pageParam: {}
+//          })
+//        }
+      }
+    },
+    methods: {
+      closewindow: function () {
+        api.closeWin()
+      }
+    },
+  })
+</script>
+</html>

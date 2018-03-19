@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>排行榜</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">排行榜</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div class="main-box">
+			<div class="z-home-banner-box">
+				<img class="z-home-bg" src="../../image/rank.png" alt="">
+			</div>
+			<div class="up-box">
+				<div id="content" class="z-user-avatar-box">
+					<div class="z-user-avatar-box2">
+						<img id="face" width="66" height="66" src="../../image/user_default.png" onerror="this.src='../../image/user_default.png'">
+					</div>
+					<div id="name" class="z-rank-user-name"></div>
+					<ul class="z-rank-user-info flex-wrap">
+						<li class="flex-con">
+							<div id="index" class="z-rank-user-text bold">未上榜</div>
+							<div class="z-rank-user-title">我的排名</div>
+						</li>
+						<li class="flex-con">
+							<div id="time" class="z-rank-user-text bold">0h</div>
+							<div class="z-rank-user-title">当月学习</div>
+						</li>
+						<li class="flex-con">
+							<div id="coin" class="z-rank-user-text bold">0</div>
+							<div class="z-rank-user-title">奖励行币</div>
+						</li>
+						<li class="flex-con">
+							<div id="level" class="z-rank-user-text">学神</div>
+							<div class="z-rank-user-title">当前等级</div>
+						</li>
+					</ul>
+				</div>
+				<table class="rank_table box">
+					<tbody id="rank">
+						<tr>
+							<th>当前排名</th>
+							<th>本月累计</th>
+							<th>奖励行币</th>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+</body>
+<script id="rank_Tpl" type="text/template">
+	{{#data}}
+	<tr>
+		<td>NO.<span>{{index}}</span><img width="40" height="40" src="{{face}}" onerror="this.src='../../image/user_default.png';"><span class="rank-list-name">{{nickname}}</span></td>
+		<td>{{duration}}</td>
+		<td>{{coin}}</td>
+	</tr>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var PageNum = 0;
+	var HeadBar = $api.byId('HeadBar');
+	var fs,ani,db,userID;
+	var length = 0;
+	var idArray = [];
+	var user = {};
+	var totalRank;
+	var lock = true;
+
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+		id = api.pageParam.des || 0;
+		fs = api.require("fs");
+		db = api.require("db");
+
+		App.openWWW(api.winName);
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('Rank',{'Active':'加载'},'排行榜');"});
+		//MD End
+
+		userID = localStorage.getItem('userID');
+		db.selectSql({
+		    name: 'main',
+		    sql: ("select * from user where id='"+userID+"'")
+		}, function(ret, err) {
+			if(ret.status){
+				if(ret.data.length>0){
+					user = ret.data[0];
+					if(user.duration && !isNaN(user.duration)){
+						user.duration = parseInt(user.duration);
+						if(user.duration<60){
+							user.duration = 0;
+						}else if(user.duration<3600){
+							user.duration = parseInt(user.duration/60)+'m';
+						}else{
+							user.duration = parseInt(user.duration/3600)+'h';
+						}
+					}else{
+						user.duration = 0;
+					}
+					document.getElementById('time').innerHTML = user.duration;
+
+					if(user.face&&(user.face!="undefined")&&(user.face!="null")){
+						document.getElementById('face').src = user.face;
+					}
+
+					if(user.nickname){
+						document.getElementById('name').innerHTML = user.nickname;
+					}
+
+					if(user.dex && (user.dex != 0)){
+						document.getElementById('index').innerHTML = user.dex;
+					}else{
+						user.dex = '未上榜';
+					}
+
+					if(user.score){
+						document.getElementById('coin').innerHTML = user.score;
+					}
+
+					if(user.level){
+						document.getElementById('level').innerHTML = user.level;
+					}
+				}
+			}
+		// 	var sql1 = "delete from rank";
+		// db.executeSql({name: 'main',sql: sql1},function(ret, err){
+		// 	//alert(JSON.stringify(ret)+'study'+JSON.stringify(err));
+		// });
+			db.selectSql({
+			    name: 'main',
+			    sql: ('select * from rank')
+			}, function(ret, err) {
+				if(ret.status){
+					if(ret.data.length>0){
+						upview(ret.data);
+					}
+					if(api.connectionType != 'none'){
+						Refresh();
+					}
+				}
+			});
+		});
+
+		api.addEventListener({
+		    name:'scrolltobottom',
+		    extra:{
+		        threshold:0
+		    }
+		}, function(ret, err){
+			if(App.State()){
+				if(!lock){
+					return;
+				}
+				lock = false;
+				PageNum++;
+				uprank(totalRank.slice(PageNum*10,(PageNum+1)*10));
+			}
+		});
+	};
+
+	function Refresh(){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: true
+		});//数据加载中显示方块
+		//api.execScript({name: 'root',script: "XO.GetRank('"+ $api.getStorage('token') +"',0,{name:'rank',fun:'upview'},{name:'rank',fun:'fail1'});"});
+		api.execScript({name: 'root',script: "XO.GetNewRank('"+ $api.getStorage('token') +"',{name:'rank',fun:'totalview'},{name:'rank',fun:'fail'});"});
+	}
+
+	function totalview(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		totalRank = data;
+		upview(data.slice(0,10));
+
+	}
+
+	function upview(data){
+		idArray = [];
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		length = data.length;
+		data.forEach(function(arg,index){
+			idArray.push(arg.id);
+			arg.index = index+1;
+			var duration = Number(arg.dur) || Number(arg.duration);
+			if(!isNaN(duration)){
+				if(duration<60){
+					duration = 0;
+					arg.duration = 0+'分钟';
+				}else if(duration<3600){
+					duration = parseInt(duration/60);
+					duration = duration + '分钟';
+					arg.duration = duration;
+				}else{
+					// var h = parseInt(duration/3600);
+					// var m = parseInt((duration%3600)/60);
+					// m = m <10?'0'+m:m;
+					// arg.duration = h+'小时'+m+'分钟';
+					arg.duration = (duration/3600).toFixed(1) + '小时';
+				}
+			}else{
+				arg.duration = 0;
+			}
+		});
+
+
+		cachepics(0,data.length,data,document.getElementById("rank_Tpl"),document.getElementById('rank'));
+		var sql1 = "delete from rank";
+		db.executeSql({name: 'main',sql: sql1},function(ret, err){
+			//alert(JSON.stringify(ret)+'study'+JSON.stringify(err));
+		});
+		for(var i = 0;i<data.length;i++){
+			var sql2 = "insert into rank ( id, face, `index`, nickname, dur, coin) values ('"+data[i].id+"','"+data[i].face+"','"+data[i].index+"','"+data[i].nickname+"','"+data[i].dur+"','"+data[i].coin+"')";
+			db.executeSql({name: 'main',sql: sql2},function(ret, err){
+				//alert(JSON.stringify(ret)+'insertstudy'+JSON.stringify(err));
+			});
+		}
+		App.init();
+		api.hideProgress();
+	}
+
+	//  function up(){
+
+	// 	//api.execScript({name: 'root',script: "XO.GetRank('"+ $api.getStorage('token') +"','"+PageNum+"',{name:'rank',fun:'uprank'},{name:'rank',fun:'fail'});"});
+	// }
+
+	function uprank(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		if(data.length<=0){
+			return;
+		}
+		data.forEach(function(arg,index){
+			idArray.push(arg.id);
+			arg.index = index + length +1;
+			if(!isNaN(arg.duration)){
+				arg.duration = parseInt(arg.duration);
+				if(arg.duration<60){
+					arg.duration = 0;
+				}else if(arg.duration<3600){
+					arg.duration = parseInt(arg.duration/60)+'分钟';
+				}else{
+					// var h = parseInt(arg.duration/3600);
+					// var m = parseInt((arg.duration%3600)/60);
+					// m = m <10?'0'+m:m;
+					// arg.duration = h+'小时'+m+'分钟';
+					arg.duration = (arg.duration/3600).toFixed(1) + '小时';
+				}
+			}else{
+				arg.duration = 0;
+			}
+		});
+		length += data.length;
+		cachepics(0,data.length,data,document.getElementById("rank_Tpl"),document.getElementById('rank'));
+
+		App.init();
+		api.hideProgress();
+	}
+
+	function fail(msg){
+		api.hideProgress();
+		App.tips(msg);
+	}
+
+	function fail1(msg){
+		var _user = localStorage.getItem('offlineDataHome');
+		var user = JSON.parse(_user);
+		document.getElementById('face').src = localStorage.getItem('face');
+		document.getElementById('name').innerHTML = user.nickname;
+		document.getElementById('index').innerHTML = user.index;
+		document.getElementById('time').innerHTML = user.duration;
+		document.getElementById('coin').innerHTML = user.coin;
+		document.getElementById('level').innerHTML = user.level;
+		api.hideProgress();
+		App.tips(msg);
+	}
+
+	function cachepics(i,max,data,template,box){
+
+		if(i<max){
+			if(data[i].face){
+				var _file = App.file(data[i].face);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i].face = (api.fsDir + '/file/' +_file.full);
+				    		cachepics(i+1,max,data,template,box);
+				    }else{
+				    	if(data[i].face.indexOf('/') == 0){
+							var dface = App.url + data[i].face;
+						}else{
+							var dface = data[i].face;
+						}
+				    		api.download({
+						    url: dface,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i].face = (api.fsDir + '/file/' +_file.full);
+							cachepics(i+1,max,data,template,box);
+						});
+				    }
+				});
+			}else{
+       			cachepics((i + 1),max,data,template,box);
+       		}
+		}else{
+			//结束
+			var TM = new T7({tm: template});
+			if(PageNum == 0){
+				var str = '<tr><th>当前排名</th><th>当月学习</th><th>奖励行币</th></tr>';
+				var html = TM.Tpl(data);
+				box.innerHTML = str + html;
+			}else{
+				for(var i in data){
+					if((typeof data[i].face != 'string') || data[i].face.length<8){
+						data[i].face = '../../image/user_default.png';
+					}
+					if((typeof data[i].nickname != 'string') || (data[i].nickname.length<2)){
+						data[i].nickname = '用户';
+					}
+					if(isNaN(data[i].coin)){
+						data[i].coin = '0';
+					}
+					$api.append(box,TM.Tpl([data[i]]));
+				}
+			}
+			App.init();
+			lock = true;
+		}
+	}
+
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

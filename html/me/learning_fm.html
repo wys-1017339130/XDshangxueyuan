@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <edittext android:id="@+id/edittext" android:layout_width="match_parent" android:layout_height="wrap_content"
+              android:singleline="true" android:imeoptions="actionSearch"></edittext>
+    <title>小组学习情况</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .plantext {
+            width: 100%;
+            line-height: 25px;
+            background: #f2f2f2;
+            text-align: left;
+            color: #9fa09f;
+            box-sizing: border-box;
+            padding: 0.75rem 0 10px 0.75rem;
+        }
+
+        .rankinglist {
+            width: 100%;
+            padding: 15px 0;
+            height: auto;
+            background: white;
+        }
+
+        .ranktitle {
+            width: 100%;
+            height: 2rem;
+            padding: 0.75rem 0 0 0;
+            display: flex;
+            border-bottom: 1px solid #ebebeb;
+        }
+
+        .ranktitle div {
+            text-align: center;
+        }
+
+        .publispimg {
+            width: 1.5rem;
+            height: 1.5rem;
+            line-height: 1.5rem;
+            float: left;
+            display: block;
+            margin-left: 5px;
+        }
+
+        .nrexrtext {
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 65%;
+        }
+    </style>
+</head>
+<body style="background: #f9f9f9">
+<div id="app">
+    <div class="plantext">按照本月学习时长进行排名。</div>
+    <div class="rankinglist">
+        <div class="ranktitle">
+            <div style="width: 10%">排序</div>
+            <div style="width: 30%">昵称</div>
+            <div style="width: 25%">学位</div>
+            <div style="width: 15%">本月</div>
+            <div style="width: 15%">本月练习</div>
+        </div>
+        <div class="ranktitle" v-for="(item,index) in rankinglistcontent" @click="learndetails(index)">
+            <div style="width: 10%;display: flex">
+                <img v-if="index == 0" class="publispimg" src="../../image/gold.png">
+                <img v-if="index == 1" class="publispimg" src="../../image/yin.png">
+                <img v-if="index == 2" class="publispimg" src="../../image/tie.png">
+                <span v-if="index>=3" class="publispimg" style="font-size: 20px;font-weight: bold">{{index + 1}}</span>
+            </div>
+            <div style="width: 30%">
+                <img v-if="item.face=='' || item.face == null"
+                     style="width: 1.5rem;height: 1.5rem;float: left;border-radius: 50%;margin-left: 5px"
+                     src="../../image/user_default.png">
+                <img v-else style="width: 1.5rem;height: 1.5rem;float: left;border-radius: 50%;margin-left: 5px"
+                     :src="formatImg(item.face)">
+                <span class="nrexrtext" style="line-height: 1.5rem;float: left;display: block;margin-left: 2px">{{item.nickname}}</span>
+            </div>
+            <div style="width: 25%;line-height: 1.5rem;color: #b99561">{{item.levelText}}</div>
+            <div style="width: 15%;line-height: 1.5rem">{{item.learn_len || '0'}}分钟</div>
+            <div style="width: 15%;line-height: 1.5rem">{{item.practice_count || '0'}}次</div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {
+  });
+  var app = new Vue({
+    el: '#app',
+    data: {
+      formatImg:formatImg,
+      rankinglistcontent: '',
+      gid: '',
+      page: 1,
+      mynewlist: ''
+    },
+    created: function () {
+      apiready = function () {
+        api.showProgress({
+          title: '努力加载中...',
+          text: '请稍等...',
+          modal: false
+        });
+        app.gid = api.pageParam.gid;
+        app.grouplearning()
+      };
+    },
+    filters: {},
+    methods: {
+//      获取排行榜
+      grouplearning: function () {
+        var post = {
+          gid: app.gid,
+          page: app.page,
+          perPage: 10
+        };
+        sendAjax(this, post, '/Api/Group/getGroupLearnDur', function (res) {
+          app.rankinglistcontent = res.data.proList;
+          api.hideProgress();
+        })
+      },
+//      前往个人学习信息
+      learndetails: function (index) {
+        api.openWin({
+          name: 'sharepage_win',
+          url: './sharepage_win.html',
+          pageParam: {
+            id: app.rankinglistcontent[index].uid
+          }
+        })
+      }
+    }
+  });
+
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+
+</html>

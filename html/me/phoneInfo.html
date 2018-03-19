@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+  <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>完善资料</title>
+  <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+  <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+  <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+  <style>body{background-color: #fff;}</style>
+</head>
+<body class="z-fff">
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">完善资料</div>
+		</div>
+	</div>
+	<div id="main" style="margin-bottom: 0;position: relative;z-index: 10;padding-top: 30%">
+		<div class="z-login-column" style="padding: 0 15px;">
+			<label style="border-bottom: 1px solid #ddd;" for="phone">
+				<input style="width: 100%;padding-left: 0" placeholder="" readonly id="phone" type="tel" />
+			</label>
+		</div>
+		<div class="z-login-column" style="padding: 0 15px;">
+			<label style="border-bottom: 1px solid #ddd;" for="nickname">
+				<input style="width: 100%;padding-left: 0" placeholder="请输入您的姓名" id="nickname" type="text">
+			</label>
+		</div>
+		<div style="height: 15px"></div>
+		<div style="font-size: 0.8rem;padding: 8px 15px" class="z-login-column z-login-column-btn">
+			<label onclick="next()" style="background-color: #24518e;border-radius: 3px;line-height: 50px;height: 50px;font-size: 0.9rem"> 下一步 </label>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script>
+	var HeadBar = $api.byId('HeadBar');
+	var nickname = '';
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+
+		api.addEventListener({
+		    name: 'keyback'
+		}, function(ret, err) {
+			$api.clearStorage();
+			api.removePrefs({key:'face'});
+			api.removePrefs({key:'token'});
+			api.removePrefs({key:'user_id'});
+			api.removePrefs({key:'nickname'});
+			api.removePrefs({key:'company'});
+			api.removePrefs({key:'tel'});
+			api.closeFrameGroup({name: 'indexFrameGroup'});
+			$api.rmStorage('indexFrameGroup');
+			api.execScript({name: 'root',script: "isLogin(openIndexFrameGroup)"});
+
+			setTimeout(function(){
+				api.closeWin();
+			},500);
+
+		});
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('tel2name',{'Active':'加载'},'手机号码-补充姓名');"});
+		//MD End
+
+		var phone = $api.getStorage('tel');
+		document.querySelector('#phone').value = phone;
+
+	};
+
+	function next(){
+		if(App.State()){
+			nickname = document.getElementById("nickname").value;
+			if(!nickname || (nickname.length < 2)){
+				api.toast({
+			    msg: '请输入真实姓名',
+			    duration: 2000,
+			    location: 'bottom'
+				});
+				return;
+			}
+
+			api.showProgress({
+			    style: 'default',
+			    animationType: 'fade',
+			    title: '提交中...',
+			    modal: false
+			});
+
+			api.execScript({name: 'root',script: "XO.BindUser('"+ $api.getStorage('token') +"',0,'"+ nickname +"',0,0,0,0,{name:'phoneInfo',fun:'success'},{name:'phoneInfo',fun:'fail'});"});
+		}
+	}
+
+	function CloseW(){
+		api.closeWin();
+	}
+
+	function success(){
+		$api.setStorage('nickname', nickname);
+
+		var indexFrameGroup = $api.getStorage('indexFrameGroup');
+		if(!indexFrameGroup || (indexFrameGroup != '1')){
+			api.execScript({name: 'root',script: "openIndexFrameGroup();"});
+		}
+
+		if(!App.bindWeChat(0)){
+			App.bindWeChat(1);
+			setTimeout(function(){
+				api.hideProgress();
+				api.closeWin();
+			},1000);
+		}else{
+			api.execScript({name: 'root',script: "XO.GetUinfo('"+ $api.getStorage('token') +"',{name:'root',fun:'getUinfoUpview'},{name:'root',fun:'getUinfoFail'});"});
+			setTimeout(function(){
+				api.hideProgress();
+				api.closeWin();
+			},1000);
+		}
+	}
+
+	function fail(){
+		api.hideProgress();
+		api.toast({
+			msg: '提交失败!',
+			duration: 2000,
+			location: 'bottom'
+		});
+	}
+</script>
+</html>

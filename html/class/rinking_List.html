@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+    <link rel="stylesheet" href="../../css/api.css"/>
+    <link rel="stylesheet" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+</head>
+<style>
+    .ranking {
+        background-color: white;
+    }
+
+    .tadtle {
+        display: -webkit-box;
+        height: 2rem;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        line-height: 2rem;
+        border-bottom: 1px solid #f2f2f2;
+    }
+
+    .tadtle > div {
+        width: 25%;
+        font-size: 0.7rem;
+        display: -webkit-box;
+        box-sizing: border-box;
+        /*-webkit-box-align: center;*/
+        -webkit-box-pack: center;
+        color: #000;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        word-wrap: break-word;
+        white-space: normal !important;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+    }
+
+    .images > img {
+        height: 1.7rem;
+        margin-top: 0.15rem;
+    }
+
+    .bottomdiv {
+        clear: both;
+        width: 100%;
+        height: 2rem;
+        text-align: center;
+        line-height: 2rem;
+        color: black;
+    }
+
+    .uptext {
+        color: #bfbfbf;
+        font-size: 13px;
+    }
+
+    .publicfont {
+        width: 1rem;
+        height: 1rem;
+        margin: auto;
+    }
+    .padding_box{
+        padding-left:0.6rem;
+    }
+</style>
+<body>
+<div class="ranking" id="Ranking">
+    <div class="tadtle"
+         style="background-color: #fff;height: 1.5rem;line-height: 1.5rem;position: fixed;z-index: 30;width: 100%;text-align: center">
+        <div>当前排名</div>
+        <div>用户昵称</div>
+        <div>当前学习</div>
+        <div>等级</div>
+    </div>
+    <div>
+        <p style="height: 30px"></p>
+        <div class="tadtle" v-for="(item,index) in mYlist">
+            <div style="-webkit-box-align: center;" class="images" v-show="item.index <= 3"><img
+                    v-show="item.index == 1" src="../../image/gold.png"
+                    alt=""><img
+                    v-show="item.index == 2" src="../../image/tie.png" alt=""><img v-show="item.index == 3"
+                                                                                   src="../../image/yin.png" alt="">
+            </div>
+            <div style="-webkit-box-align: center;" class="images" v-show="item.index > 3">{{item.index}}</div>
+
+            <div class="padding_box"><img align="center" style="width: 1rem;height:1rem;border-radius: 100%;"
+                                                   :src="formatImg(item.face)">&nbsp;<span>{{item.nickname}}</span>
+            </div>
+
+            <div class="" style="padding-left:1rem;">{{item.learn_len}}小时</div>
+
+            <div class="padding_box" v-show="item.index == 1"><img width="25" align="center" src="../../image/huangguan02.png" alt="">&nbsp;皇冠
+            </div>
+            <div class="padding_box" v-show="2<= item.index && item.index <= 20"><img width="25" align="center"
+                                                                  src="../../image/zuanshi0.png"
+                                                                  alt="">&nbsp;钻石
+            </div>
+            <div class="padding_box" v-show="21<= item.index && item.index < 100"><img width="25" align="center"
+                                                                   src="../../image/huangjin02.png"
+                                                                   alt="">&nbsp;黄金
+            </div>
+            <div class="padding_box" v-show="100<= item.index && item.index <= 500"><img width="25" align="center"
+                                                                     src="../../image/baiyin02.png"
+                                                                     alt="">&nbsp;白银
+            </div>
+            <div class="padding_box" v-show="500< item.index"><img width="25" align="center" src="../../image/qingtong02.png" alt="">&nbsp;青铜
+            </div>
+            <div class="padding_box" v-show="0 == item.index"><img width="25" align="center" src="../../image/qingtong02.png" alt="">&nbsp;青铜
+            </div>
+        </div>
+        <div class="bottomdiv">
+            <span v-if="rote" class="uptext">---查看更多---</span>
+            <img v-if="load" class="publicfont" src="../../image/timg.gif">
+            <span v-if="overlate" class="uptext">没有更多了...</span>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#Ranking',
+    data: {
+      mYlist: [],
+      rote: false,
+      load: false,
+      overlate: false,
+      porPage: 10,
+      page: 1
+    },
+    created: function () {
+      apiready = function () {
+        app.getRankList(true);
+        api.setCustomRefreshHeaderInfo({
+          bgColor: '#efefef',
+          image: {
+            pull: 'widget://res/refresh/pull_image.png',
+            transform: [
+              'widget://res/refresh/refreshing_image_frame_01.png',
+              'widget://res/refresh/refreshing_image_frame_02.png',
+              'widget://res/refresh/refreshing_image_frame_03.png',
+              'widget://res/refresh/refreshing_image_frame_04.png',
+              'widget://res/refresh/refreshing_image_frame_05.png',
+              'widget://res/refresh/refreshing_image_frame_06.png',
+              'widget://res/refresh/refreshing_image_frame_07.png',
+              'widget://res/refresh/refreshing_image_frame_08.png',
+              'widget://res/refresh/refreshing_image_frame_09.png',
+              'widget://res/refresh/refreshing_image_frame_10.png',
+              'widget://res/refresh/refreshing_image_frame_11.png',
+              'widget://res/refresh/refreshing_image_frame_12.png'
+            ],
+            load: [
+              'widget://res/refresh/pull_end_image_frame_01.png'
+            ]
+          }
+        }, function () {
+          api.refreshHeaderLoadDone();
+          app.page = 1
+          //下拉刷新被触发，使用 api.refreshHeaderLoadDone() 结束加载中状态
+          if (api.connectionType == 'none') {
+            api.refreshHeaderLoadDone();
+            api.toast({
+              msg: '未连接网络',
+              duration: 2000,
+              location: 'bottom'
+            });
+          } else {
+            api.refreshHeaderLoadDone();
+            app.getRankList(true)
+          }
+        });
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 5 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+        }, function (ret, err) {
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.getRankList(false)
+        });
+      }
+    },
+    methods: {
+      getRankList: function (No) {
+        if(No){
+          app.page = 1;
+        }
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token,
+          perPage: app.porPage,
+          page: app.page
+        }
+        sendAjax(this, post, '/Api/Ucenter/getRankList', function (res) {
+          api.hideProgress();
+          console.log(JSON.stringify(res));
+          if (No) {
+            app.mYlist = res.data.rankList;
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          } else {
+            app.mYlist = app.mYlist.concat(res.data.rankList);
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          }
+          if (res.data.rankList.length == 0) {
+            app.overlate = true;
+            app.rote = false;
+            app.load = false
+          }
+//          api.refreshHeaderLoadDone();
+        })
+      }
+    }
+  })
+</script>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" href="../../css/api.css"/>
+    <link rel="stylesheet" href="../../css/style.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <style>
+        html, body {
+            background: #F0F0F0;
+        }
+        .top-box{
+            width: 100%;
+            text-align: center;
+            padding:1.5rem 0 1.8rem;
+            margin-bottom:0.5rem;
+            background-color: white;
+        }
+        .text-box{
+            color:#000000;
+            font-size:0.9rem;
+            margin-top:0.5rem;
+        }
+        .message-box{
+            width: 100%;
+            padding:0;
+        }
+        .message-box li{
+            font-size:0.9rem;
+            display: flex;
+            background-color: white;
+            border-bottom: 1px solid #ccc;
+            padding:0.7rem 0.6rem;
+            align-items: center;
+            -webkit-align-items: center;
+            justify-content: space-between;
+            -webkit-justify-content:space-between;
+        }
+        .pay_title{
+            font-size:0.7rem;
+        }
+        .lefttext{
+            color:#686868;
+            font-size:0.7rem;
+        }
+        .btn-box{
+            margin-top:2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            -webkit-align-items: center;
+            justify-content: center;
+            -webkit-justify-content: center;
+        }
+        .btn-box div{
+            font-size:0.9rem;
+            width:95%;
+            text-align: center;
+            margin:0 auto;
+            padding:0.8rem 0;
+            border-radius: 5px;
+            background-color: pink;
+            color:white;
+        }
+        .btn-box div:first-child{
+            background-color: #d9b270;
+        }
+        .btn-box div:last-child{
+            background-color:#686868;
+        }
+        .bottom-box{
+            position: fixed;
+            bottom:1rem;
+            width: 100%;
+            text-align: center;
+            font-size:0.6rem;
+            color:#999;
+        }
+
+        .img-box-success{
+            margin:0 auto;
+            width:2rem;
+            height:2rem;
+        }
+        .img-box-success img{
+            width:100%;
+            height:100%;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="top-box">
+        <div class="img-box-success"><img width="2.5rem" src="../../image/zhifuchenggong.png" alt=""></div>
+        <div class="text-box">支付成功</div>
+    </div>
+    <ul class="message-box">
+        <li>
+            <div class="lefttext">课程名称</div>
+            <div class="pay_title">{{title}}</div>
+        </li>
+        <li >
+            <div class="lefttext">支付方式</div>
+            <div class="pay_title" v-show="paymethod == 0">支付宝支付</div>
+            <div class="pay_title" v-show="paymethod == 1">微信支付</div>
+            <div class="pay_title" v-show="paymethod == 2">行币支付</div>
+        </li>
+        <li>
+            <div class="lefttext">支付金额</div>
+            <div style="color:#d9b270;">{{price}}</div>
+        </li>
+    </ul>
+    <div class="btn-box">
+        <div @click="getClassInfo()">查看课程</div>
+        <div style="margin-top:0.75rem;" @click="closeToRoot()">看看其他</div>
+    </div>
+    <div class="bottom-box">
+        在「我的课程」中查看已购买的课程
+    </div>
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/islider.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      title:'课程名称',
+      paymethod:0,
+      price:100
+    },
+    created: function () {
+      apiready = function () {
+        app.id=api.pageParam.id,
+          app.title=api.pageParam.title,
+          app.price=api.pageParam.price,
+          app.paymethod = api.pageParam.paymethod;
+        api.sendEvent({
+          name: 'paySuccess'
+        });
+        api.execScript({name: 'classPay_win', script: "app.closeWindow();"});
+      };
+    },
+    methods: {
+//      查看课程详情
+      getClassInfo:function () {
+        api.openWin({
+          name: 'professionDetail2',
+          url: '../fm/professionDetail3.html',
+          pageParam: {
+            des: app.id,
+            price: app.price,
+            buyed: 1,
+            title: app.title
+          }
+        });
+      },
+      closeToRoot:function () {
+        api.closeToWin({
+          name: 'root'
+        });
+      }
+    }
+  })
+</script>

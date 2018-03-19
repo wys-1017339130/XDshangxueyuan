@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>排行榜弹窗</title>
+  <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+</head>
+<link rel="stylesheet" href="../../css/api.css"/>
+<link rel="stylesheet" href="../../css/style.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+<style>
+  html, body {
+    background-color: transparent;
+  }
+  .Explain {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 150;
+    top: 0px;
+    display: -webkit-box;
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+    z-index: 1000;
+  }
+
+  .Explain > div {
+    width: 70%;
+    background-color: #ffffff;
+    padding: 1.5rem 1.5rem;
+    border-radius: 5px;
+    position: relative;
+  }
+
+  .Explain > div > div {
+    width: 15rem;
+    background-color: #ffffff;
+    width: 100%;
+    color: #252525;
+    font-weight: bold;
+  }
+
+  .Explain > div > p {
+    font-size: 0.7rem;
+    height: 2rem;
+    /*text-indent: 1rem;*/
+    line-height: 2rem;
+  }
+
+  .XXX {
+    position: absolute;
+    right: -20px;
+    top: -20px;
+    color: #c9c9c9;
+    font-size: 0.6rem;
+  }
+</style>
+<body>
+<div class="Explain" id="desr">
+  <div>
+    <div style="text-align: center;font-size: 0.8rem;height: 1.5rem;line-height: 1.5rem;">等级说明</div>
+    <p><img width="30" align="center" src="../../image/huangguan02.png" alt="">月度第1名，获得“皇冠”称号</p>
+    <p><img width="30" align="center" src="../../image/zuanshi0.png" alt="">月度第2-20名，获得“钻石”称号</p>
+    <p><img width="30" align="center" src="../../image/huangjin02.png" alt="">月度第21-100名，获得“黄金”称号</p>
+    <p><img width="30" align="center" src="../../image/baiyin02.png" alt="">月度第101-500名，获得“白银”称号</p>
+    <p><img width="30" align="center" src="../../image/qingtong02.png" alt="">月度第500名以后，获得“青铜”称号</p>
+    <p style="font-size: 0.6rem;font-weight: 500;line-height: 1rem;color: #ff8358;">
+      所有称号有效期为1个月，每月1号0:00重新评比，所有称号将展示在个人主页。</p>
+    <span class="XXX" @click="Explain02"><img width="40" src="../../image/close_icon.png" alt=""></span>
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#desr',
+    data: {},
+    created: function() {},
+    methods: {
+      Explain02:function() {
+        api.closeFrame()
+      }
+    }
+  })
+</script>
+</html>

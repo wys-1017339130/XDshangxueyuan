@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>互动</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body class="z-fff">
+	<ul id="list" class="chat-list"></ul>
+	<div id="last" style="height: 80px"></div>
+</body>
+<script id="other_list_Tpl" type="text/template">
+	{{#data}}
+	<li class="chat-left clear">
+		<img width="50" height="50" src="{{face}}" style="border-radius:3px;" class="fl" onerror="this.src='../../image/chat_user_default.png'">
+		<div class="chat-left-box">
+			<div class="chat-left-name">{{nickname}}</div>
+			<div class="chat-left-text">
+				<div class="chat-text-triangle"></div>
+				{{#if pic}}<img onclick="showChatImg(this)" width="100%" src="{{pic}}" alt="">{{else}}{{text}}{{/if}}
+			</div>
+		</div>
+	</li>
+	{{/data}}
+</script>
+<script id="my_list_Tpl" type="text/template">
+	{{#data}}
+	<li class="chat-right clear">
+		<img width="50" height="50" src="{{face}}" class="fr chat-avatar" onerror="this.src='../../image/chat_user_default.png'">
+		<div class="chat-right-box">
+			<div class="chat-right-name">{{nickname}}</div>
+			<div class="chat-right-text">
+				<div class="chat-text-right-triangle"></div>
+				{{#if pic}}<img onclick="showChatImg(this)" width="100%" src="{{pic}}" alt="">{{else}}{{text}}{{/if}}
+			</div>
+		</div>
+	</li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script src="../../script/socket.io.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var type = 0;
+	var HeadBar = $api.byId('HeadBar');
+	var playID = 0;
+	var isplay = false;
+	var fs,db,UIActionProgress,dialogBox,UIChatBox;
+	var messageArray = [];
+	var pattern1 = /[\u4e00-\u9fa5]+/g;
+	var userID;
+	var user;
+	var lastid = 0;
+	var preid = 0;
+	var lasttime = 0;
+	var face = 'http://online.xdjy100.com/image/chat_user_default.jpg';
+	var socket;
+	var LoadDone = false;
+	var ChatS = [];
+
+	apiready = function(){
+		fs = api.require('fs');
+		db = api.require("db");
+		wx = api.require("wx");
+		dialogBox = api.require('dialogBox');
+		UIChatBox = api.require('UIChatBox');
+		userID = $api.getStorage('user_id');
+
+		if(!App.State()){
+			document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">未连接网络</div></li>';
+		}
+
+		api.getPrefs({
+		    key: 'face'
+		}, function(ret, err){
+		    if( ret ){
+		    	if(ret.value.length>5){
+						face = ret.value;
+					}
+		    }
+		});
+
+		api.setCustomRefreshHeaderInfo({
+		    bgColor: '#efefef',
+		    image: {
+		        pull: 'widget://res/refresh/pull_image.png',
+		        transform: [
+		            'widget://res/refresh/refreshing_image_frame_01.png',
+		            'widget://res/refresh/refreshing_image_frame_02.png',
+		            'widget://res/refresh/refreshing_image_frame_03.png',
+		            'widget://res/refresh/refreshing_image_frame_04.png',
+		            'widget://res/refresh/refreshing_image_frame_05.png',
+		            'widget://res/refresh/refreshing_image_frame_06.png',
+		            'widget://res/refresh/refreshing_image_frame_07.png',
+		            'widget://res/refresh/refreshing_image_frame_08.png',
+		            'widget://res/refresh/refreshing_image_frame_09.png',
+		            'widget://res/refresh/refreshing_image_frame_10.png',
+		            'widget://res/refresh/refreshing_image_frame_11.png',
+		            'widget://res/refresh/refreshing_image_frame_12.png'
+		        ],
+		        load: [
+							'widget://res/refresh/refreshing_image_frame_01.png',
+							'widget://res/refresh/refreshing_image_frame_02.png',
+							'widget://res/refresh/refreshing_image_frame_03.png',
+							'widget://res/refresh/refreshing_image_frame_04.png',
+							'widget://res/refresh/refreshing_image_frame_05.png',
+							'widget://res/refresh/refreshing_image_frame_06.png',
+							'widget://res/refresh/refreshing_image_frame_07.png',
+							'widget://res/refresh/refreshing_image_frame_08.png',
+							'widget://res/refresh/refreshing_image_frame_09.png',
+							'widget://res/refresh/refreshing_image_frame_10.png',
+							'widget://res/refresh/refreshing_image_frame_11.png',
+							'widget://res/refresh/refreshing_image_frame_12.png'
+		        ]
+		    }
+		}, function() {
+		    //下拉刷新被触发，使用 api.refreshHeaderLoadDone() 结束加载中状态
+				if(App.State()){
+					LoadDone = true;
+					socket.emit('last', {token:$api.getStorage('token'),lastid:preid}, function(data){});
+				}else{
+					api.refreshHeaderLoadDone();
+				}
+		});
+		start();
+		App.init();
+	};
+
+	var link = false;
+	function start(){
+		try{
+      socket = io('http://101.132.76.100:2120');
+      window.socket = socket;
+      socket.on('connect',function(){});
+			socket.on('check', function(msg){
+				console.log(lastid + '===> ' + msg);
+				if((parseInt(msg) == 0) || (lastid<parseInt(msg))){
+					socket.emit('last', {token:$api.getStorage('token'),lastid:lastid}, function(data){});
+				}
+			});
+
+			socket.on('out', function(msg){
+			});
+
+			socket.on('close', function(msg){
+			});
+
+			socket.on('hide', function(msg){
+				api.refreshHeaderLoadDone();
+			});
+
+			socket.on('msg', function(data){
+				var Ty = '';
+				console.log(JSON.stringify(data));
+				if(typeof data == 'string'){
+					var data = App.JSON(data);
+				}
+
+				/*
+				if(data.length == 1){
+					if(data[0].uid == userID){
+						if(data[0].id >= lastid){
+							return;
+						}
+					}
+				}
+				*/
+
+				console.log(JSON.stringify(data));
+
+				var datas = [];
+				for(var j in data){
+					var pattern1 = /[\u4e00-\u9fa5]+/g;
+					str = data[j].content.match(pattern1);
+					var strs = data[j].content;
+					if(str && str.length>0){
+						for(var i =0; i<str.length;i++){
+							var newstr = App.face(str[i]);
+							data[j].content = data[j].content.replace('['+ str[i] +']',newstr);
+						}
+					}
+
+					//console.log(data[j].uid + ',' + userID);
+
+					if(typeof ChatS[data[j].id] != 'string'){
+						ChatS[data[j].id] = 'ok';
+						var tp = {
+							id:data[j].id,
+							face: data[j].face,
+							nickname:data[j].nickname,
+							text:data[j].content,
+							vtime:data[j].vtime,
+							me:((data[j].uid == userID)?1:0),
+							pic:''
+						}
+						if(preid == 0){
+							preid = data[j].id;
+						}else if(preid > data[j].id){
+							preid = data[j].id;
+							Ty = 'old';
+						}
+						lastid = data[j].id;
+						if(!data[j].type){
+							datas.push(tp);
+						}
+					}
+				}
+				console.log(lastid);
+				if(datas.length>0){
+					upview(datas,Ty);
+				}
+			});
+
+			socket.emit('login', $api.getStorage('token'), function(msg){
+				if(msg != $api.getStorage('user_id')){
+					api.closeWin();
+					return;
+				}
+			});
+
+    }catch(e){
+      console.log('close');
+    }
+	}
+
+	function chat(msg){
+		console.log(msg);
+		if(msg.length>100){
+//			alert('内容太长啦,建议100字以内!');
+			return;
+		}
+		lastid = lastid + 1;
+		msg = encodeURIComponent(msg);
+		socket.emit('msg', {token:$api.getStorage('token'),msg:msg}, function(msg){});
+	}
+
+	function upfail(msg){
+		api.toast({
+		    msg: msg,
+		    duration: 2000,
+		    location: 'middle'
+		});
+	}
+
+	function CloseChat(){
+		UIChatBox.closeKeyboard();
+		UIChatBox.closeBoard();
+		UIChatBox.close();
+	}
+
+	function showChatImg(dom){
+		CloseChat();
+		api.execScript({name: 'chat',script: "showChatImg('"+ dom.getAttribute('src') +"');"});
+	}
+
+	function upview(data,Type){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		if(LoadDone){
+			LoadDone = false;
+			api.refreshHeaderLoadDone();
+		}
+		if(data.length > 0){
+			if((parseInt(data[0].vtime) - parseInt(lasttime))>(60 * 5)){
+				lasttime = parseInt(data[0].vtime);
+				document.getElementById('list').innerHTML += '<li class="chat-time"><span>'+App.dateStr(data[0].vtime)+'</span></li>';
+			}
+			loaddata(data,Type);
+		}
+		api.hideProgress();
+	}
+
+	function loaddata(data,type){
+		var slen = data.length;
+		data.forEach(function(arg,dex,arr){
+			if(arg.text){
+				var msg = arg.text;
+				var str = msg.match(pattern1);
+
+				if(str && str.length>0){
+					for(var i =0; i<str.length;i++){
+						var newstr = App.face(str[i]);
+						msg = msg.replace('['+ str[i] +']',newstr);
+					}
+					arg.text = msg;
+				}
+			}
+
+			if(!arg.face){
+				arg.face = 'http://online.xdjy100.com/image/chat_user_default.jpg';
+			}
+			var _file = App.file(arg.face);
+			fs.exist({
+					path: (api.fsDir + '/file/' +_file.full)
+			}, function(ret, err) {
+					if (ret.exist) {
+						arg.face = (api.fsDir + '/file/' +_file.full);
+						if(arg.pic){
+							cachepic(arg,dex,arr,type,slen);
+						}else{
+							temp(arg,type,dex,arr,slen);
+						}
+					}else{
+						if(arg.face.indexOf('/') == 0){
+						var dpic = App.url + arg.face;
+					}else{
+						var dpic = arg.face;
+					}
+						api.download({
+								url: dpic,
+								savePath: ('fs://file/' +_file.full),
+								cache: true,
+								allowResume: true
+						}, function(ret, err) {
+							arg.face = (api.fsDir + '/file/' +_file.full);
+							if(arg.pic){
+									cachepic(arg,dex,arr,type,slen);
+								}else{
+									temp(arg,type,dex,arr,slen);
+								}
+						});
+					}
+			});
+		});
+	}
+
+	function fail(msg){
+		document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">当前暂无留言</div></li>';
+		api.hideProgress();
+	}
+
+	function cachepic(data,dex,arr,type,slen){
+    if(data.pic){
+      var _file = App.file(data.pic);
+      fs.exist({
+          path: (api.fsDir + '/file/' +_file.full)
+      }, function(ret, err) {
+          if (ret.exist) {
+              data.pic = (api.fsDir + '/file/' +_file.full);
+              temp(data,type,dex,arr,slen);
+          }else{
+            if(data.pic.indexOf('/') == 0){
+                var dpath = App.url + data.pic;
+            }else{
+                var dpath = data.pic;
+            }
+            api.download({
+                url: dpath,
+                savePath: ('fs://file/' +_file.full),
+                cache: true,
+                allowResume: true
+            }, function(ret, err) {
+                if(ret.state == 1){
+                  data.pic = (api.fsDir + '/file/' +_file.full);
+                  temp(data,type,dex,arr,slen);
+                }
+            });
+          }
+      	});
+    	}
+    }
+
+    function temp(data,type,dex,arr,len){
+
+    	//超过10分钟多一个时间
+			if((dex>1)&&(Math.abs(data.vtime - arr[dex-1].vtime) > 600)){
+				if(type == 'old'){
+					document.getElementById('list').innerHTML = '<li class="chat-time"><span>'+App.dateStr(arr[dex-1].vtime)+'</span></li>' + document.getElementById('list').innerHTML;
+				}else{
+					document.getElementById('list').innerHTML += '<li class="chat-time"><span>'+App.dateStr(data.vtime)+'</span></li>';
+				}
+			}
+
+    	if(data.me == 0){
+    		var TM = new T7({tm: document.getElementById('other_list_Tpl')});
+				var html = TM.Tpl(data);
+				if(type == 'old'){
+	    			document.getElementById('list').innerHTML = html + document.getElementById('list').innerHTML;
+	    		}else{
+						$("#list").append(html);
+	    			//document.getElementById('list').innerHTML = document.getElementById('list').innerHTML + html;
+						if(dex>=(len - 1)){
+							$('html, body').animate({
+								scrollTop: $("#last").offset().top
+							}, 0);
+						}
+	    		}
+    	}else{
+    		var TM = new T7({tm: document.getElementById('my_list_Tpl')});
+    		var html = TM.Tpl(data);
+    		if(type == 'old'){
+    			document.getElementById('list').innerHTML = html + document.getElementById('list').innerHTML;
+    		}else{
+					$("#list").append(html);
+    			//document.getElementById('list').innerHTML = document.getElementById('list').innerHTML + html;
+					if(dex>=(len - 1)){
+						$('html, body').animate({
+							scrollTop: $("#last").offset().top
+						}, 0);
+					}
+    		}
+    	}
+    }
+
+	function comment(){
+		UIChatBox.open({
+		    placeholder: '',
+		    maxRows: 4,
+		    emotionPath: 'widget://res/chatbox/emotion',
+		    texts: {
+		        sendBtn:{
+		            title:'发送'
+		        }
+		    },
+		    styles: {
+		        inputBar: {
+		            borderColor: '#d9d9d9',
+		            bgColor: '#f2f2f2'
+		        },
+		        inputBox: {
+		            borderColor: '#B3B3B3',
+		            bgColor: '#FFFFFF'
+		        },
+		        emotionBtn: {
+		            normalImg: 'widget://res/chatbox/face1.png'
+		        },
+						keyboardBtn: {
+		            normalImg: 'widget://res/chatbox/key3.png'
+		        },
+		        indicator: {
+		            target: 'both',
+		            color: '#c4c4c4',
+		            activeColor: '#9e9e9e'
+		        },
+		        sendBtn: {
+		            titleColor: '#fff',
+		            bg: '#5099FB' ,
+		            activeBg: '#2e73d0',
+		            titleSize: 12
+		        }
+		    },
+				extras: {}
+		}, function(ret, err){
+		    if( ret ){
+		    		if(ret.eventType=='send'){
+		    			var msg = ret.msg;
+		    			if(msg.length<1){
+//		    				alert('不能发送空内容!');
+		    				return;
+		    			}
+
+							chat(msg);
+
+							/*
+		    			var pattern1 = /[\u4e00-\u9fa5]+/g;
+		    			str = msg.match(pattern1);
+		    			var strs = msg;
+		    			if(str && str.length>0){
+		    				for(var i =0; i<str.length;i++){
+		    					var newstr = App.face(str[i]);
+		    					msg = msg.replace('['+ str[i] +']',newstr);
+		    				}
+		    			}
+
+							var ts = Math.round(new Date().getTime()/1000).toString();
+							var data = [{
+								id:0,
+								face: face,
+								nickname:'我',
+								text:msg,
+								vtime:ts,
+								me:1,
+								pic:''
+							}];
+
+							upview(data,'');
+						  */
+
+							UIChatBox.closeKeyboard();
+							UIChatBox.closeBoard();
+						}
+		    }
+		});
+
+		UIChatBox.addEventListener({
+		    target: 'inputBar',
+		    name: 'move'
+		}, function(ret, err) {
+		    if (ret) {
+					if(typeof ret.panelHeight != 'undefined'){
+						var sHeight = parseInt(ret.inputBarHeight) + parseInt(ret.panelHeight);
+						document.getElementById('last').style.height = sHeight + 'px';
+						$('html, body').animate({
+							scrollTop: $("#last").offset().top
+						}, 500);
+					}
+		    }
+		});
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

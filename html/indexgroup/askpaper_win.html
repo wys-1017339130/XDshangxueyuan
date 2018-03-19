@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>调查问卷</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+		<link rel="stylesheet" href="../../iconfont/iconfont.css">
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		.bg_color{
+			/*background:-webkit-linear-gradient(to bottom left, #d9b270, #e8d2a1);*/
+			/*background:webkit-linear-gradient(to bottom left, orange, green);*/
+			background: linear-gradient(to right, #e4c99b 30%, #ead3ab 60%, #e8d2a1 70%);
+			background: -webkit-linear-gradient(to right, #e4c99b 30%, #ead3ab 60%, #e8d2a1 70%);
+		}
+		#HeadBar {
+			background: linear-gradient(to right, #e4c99b 30%, #ead3ab 60%, #e8d2a1 70%);
+			background: -webkit-linear-gradient(to right, #e4c99b 30%, #ead3ab 60%, #e8d2a1 70%);
+		}
+	</style>
+</head>
+<body style="position: relative;">
+<div id="app">
+	<header id="HeadBar">
+		<div class="z-head bg_color">
+			<a @click="colsethiswin" style="color: black" class="z-head-left icon iconfont icon-fanhui"></a>
+			<div class="z-ellipsis z-head-text" style="color: black">问卷调查</div>
+		</div>
+	</header>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      pagerid:'',
+      },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        app.pagerid = api.pageParam.pagerid;
+        var posY = $api.offset($api.dom("header")).h;
+        api.openFrame({
+          name: 'askpaper',
+          url: './askpaper.html',
+          rect: {
+            x: 0,
+            y: posY,
+            width:'auto',
+            h:api.winHeight - posY
+          },
+					pageParam:{
+            pagerid:app.pagerid
+					},
+          bounces:false,
+          hScrollBarEnabled: false,
+          vScrollBarEnabled: false
+        });
+      };
+    },
+    filters:{
+    },
+    mounted:function(){
+		},
+    methods: {
+      //      关闭当前窗口
+      colsethiswin: function () {
+        api.closeWin()
+      },
+    }
+  });
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+</html>

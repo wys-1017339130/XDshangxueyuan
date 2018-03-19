@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+</head>
+<link rel="stylesheet" href="../../css/api.css"/>
+<link rel="stylesheet" href="../../css/style.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+<style>
+    #header {
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        height: 2.2rem;
+        background-color: #d2b379;
+        border-bottom-color: #d2b379;
+        line-height: 2.2rem;
+        color: #ffffff;
+    }
+
+    .left-box {
+        font-size: 1rem;
+        margin-left: 0.5rem;
+    }
+
+    .right-box {
+        position: absolute;
+        font-size: 0.75rem;
+        right: 10px;
+    }
+
+    .myTop {
+        height: 7rem;
+        width: 100%;
+        position: relative;
+        background-color: #d2b379;
+        z-index: 20;
+    }
+
+    .myTop > p {
+        position: absolute;
+        right: 0px;
+        top: 2.2rem;
+        font-size: 0.7rem;
+        background-color: #fff;
+        padding-left: 0.5rem;
+        padding-right: 0.75rem;
+        height: 1.25rem;
+        line-height: 1.25rem;
+        border-radius: 12px 0px 0px 12px;
+        border-top: 2px solid;
+        border-bottom: 2px solid;
+        border-left: 2px solid;
+        border-color: rgba(228, 209, 175, 0.3);
+        color: #bc9967;
+        z-index: 20;
+    }
+
+    .img {
+        padding-top: 1rem;
+        display: -webkit-box;
+        font-weight: bold;
+        color: #fff;
+        font-size: 0.8rem;
+        -webkit-box-align: center;
+    }
+
+    .img > img {
+        margin-left: 1rem;
+        margin-right: 0.5rem;
+    }
+
+    .navList {
+        position: relative;
+        display: -webkit-box;
+        -webkit-box-pack: center;
+        -webkit-box-align: center;
+        z-index: 100;
+        height: 2.2rem;
+        border-bottom: 10px solid #f2f2f2;
+    }
+
+    .navList > div {
+        -webkit-box-flex: 1;
+        font-size: 0.7rem;
+        text-align: center;
+        background-color: white;
+        color: #000;
+    }
+
+    .navList > div > p:last-child {
+        color: #a9a9a9;
+    }
+
+    .navList > div > p:first-child {
+        font-weight: bold;
+    }
+
+    .navList > p {
+        height: 1.5rem;
+        width: 2px;
+        background-color: #eaeaea;
+    }
+
+    .ranking {
+        position: absolute;
+        width: 100%;
+        top: 0px;
+        height: 100%;
+    }
+
+    .Explain {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index: 150;
+        top: 0px;
+        display: -webkit-box;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+        z-index: 1000;
+    }
+
+    .Explain > div {
+        width: 70%;
+        background-color: #ffffff;
+        padding: 1.5rem 1.5rem;
+        border-radius: 5px;
+        position: relative;
+    }
+
+    .Explain > div > div {
+        width: 15rem;
+        background-color: #ffffff;
+        width: 100%;
+        color: #252525;
+        font-weight: bold;
+    }
+
+    .Explain > div > p {
+        font-size: 0.7rem;
+        height: 2rem;
+        /*text-indent: 1rem;*/
+        line-height: 2rem;
+    }
+
+    .XXX {
+        position: absolute;
+        right: -20px;
+        top: -20px;
+        color: #c9c9c9;
+        font-size: 0.6rem;
+    }
+
+    .images > img {
+        height: 1.7rem;
+        margin-top: 0.15rem;
+    }
+</style>
+<body style="background-color: #f2f2f2">
+<div id="app">
+    <header class="aui-bar aui-bar-nav" id="header">
+        <a class="left-box iconfont icon-jiantou z-fanhui" @click="closeWindow()"></a>
+        <span class="aui-title">学霸排行榜</span>
+    </header>
+    <div style="background-color: white" id="nav">
+        <div class="myTop">
+            <p @click="Explain01()">等级说明</p>
+            <div class="img">
+                <img style="width: 3.5rem;height:3.5rem;border-radius: 100%;border: 2px solid rgba(255,255,255,0.7);"
+                     :src="formatImg(userlist.face)">
+                <p>{{userlist.nickname}}</p></div>
+            <img src="../../image/bolang.png" style="width: 100%;position: absolute;bottom: -1px;" alt="">
+        </div>
+        <div class="navList">
+            <div>
+                <p>{{userlist.index}}</p>
+                <p>我的排名</p>
+            </div>
+            <p></p>
+            <div>
+                <p>{{userlist.learn_len}}</p>
+                <p>当前学习(分钟)</p>
+            </div>
+            <p></p>
+            <div>
+                <p v-show="userlist.index == 1"><img width="25" align="center" src="../../image/huangguan02.png" alt="">皇冠
+                </p>
+                <p v-show="2 <= userlist.index && userlist.index <= 20"><img width="25" align="center"
+                                                                             src="../../image/zuanshi0.png" alt="">钻石
+                </p>
+                <p v-show=" 21 <= userlist.index && userlist.index <= 100"><img width="25" align="center"
+                                                                                src="../../image/huangjin02.png" alt="">黄金
+                </p>
+                <p v-show="100 <= userlist.index && userlist.index <= 500"><img width="25" align="center"
+                                                                                src="../../image/baiyin02.png" alt="">白银
+                </p>
+                <p v-show="500 < userlist.index"><img width="25" align="center" src="../../image/qingtong02.png" alt="">青铜
+                </p>
+                <p v-show="0 == userlist.index"><img width="25" align="center" src="../../image/qingtong02.png" alt="">青铜
+                </p>
+                <p>当前等级</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      userlist: {}
+    },
+    created: function () {
+      var _this = this
+      var hei = document.getElementById('nav').offsetHeight
+      var h = $api.offset($api.dom('header')).h + hei + 25
+      _this.getRankList()
+      apiready = function () {
+        _this.getRankList()
+        $api.fixStatusBar($api.dom('header'));
+        api.openFrame({
+          name: 'rinking_List',
+          url: './rinking_List.html',
+          rect: {
+            x: 0,
+            y: h,
+            w: 'auto'
+          },
+          bgColor: 'rgba(0,0,0,0)',
+          pageParam: {}
+        })
+      }
+    },
+    methods: {
+      getRankList: function () {
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token
+        };
+        sendAjax(this, post, '/Api/Ucenter/getRankList', function (res) {
+          app.userlist = res.data.user
+        })
+      },
+      Explain01: function () {
+        api.openFrame({
+          name: 'Ranking_alert',
+          url: './Ranking_alert.html',
+          rect: {
+            x: 0,
+            y: 0,
+            w: 'auto',
+            h: 'auto'
+          },
+          bgColor: 'rgba(0,0,0,0)',
+          pageParam: {}
+        })
+      },
+      closeWindow: function () {
+        api.closeWin()
+      }
+    }
+  })
+</script>
+</html>

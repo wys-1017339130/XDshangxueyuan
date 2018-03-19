@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>评论详情</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+		<link rel="stylesheet" href="../../iconfont/iconfont.css">
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		#footer{
+			position: fixed;
+			bottom: 0;
+			left:0;
+			width: 100%;
+			height: 55px;
+			display: flex;
+			background: #f5f5f5;
+		}
+		#otextarea{
+			background: white;
+			height: 35px;
+			margin: auto;
+			line-height: 35px;
+			width: 95%;
+			color: #999999;
+			font-size: 16px;
+			padding-left: 10px;
+			box-sizing: border-box;
+		}
+	</style>
+</head>
+<body style="position: relative;">
+<div id="app">
+	<header id="HeadBar" style="background: white;border-bottom: 1px solid #efefef">
+		<div class="z-head" style="padding: 0 10px;background: white;text-align: center">
+			<!--<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>-->
+			<!--<i style="color: #00ffff;" class="iconfont icon-lab_a-comm"></i>-->
+			<div style="width: 15%;text-align: left;float: left" @click="fanhui">
+				<i style="color: #b5b5b5;font-size: 20px;" class="iconfont icon-fanhui"></i>
+		</div>
+				<span>评论详情</span>
+			<div style="width: 15%;height: 100%;text-align: right;float: right;font-size: 13px;color: #676767"></div>
+		</div>
+	</header>
+
+	<footer id="footer">
+		<div id="otextarea" @click="openthistext">{{messagevalue}}</div>
+	</footer>
+
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      lon:'',
+			lat:'',
+      messagevalue:'请输入你想说的话',
+			reid:"",
+      usermessage:'',
+      ifshowjp:false
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        app.lon = api.pageParam.lon;
+        app.lat = api.pageParam.lat;
+        app.reid = api.pageParam.reid;
+        UIChatBox = api.require('UIChatBox');
+        app.usermessage = api.pageParam.usermessage;
+        var posY = $api.offset($api.dom("header")).h;
+        api.openFrame({
+          name: 'tokenmessage_frame',
+          url: './tokenmessage_frame.html',
+          rect: {
+            x: 0,
+            y: posY,
+            width:'auto',
+            h:api.winHeight - posY-55
+          },
+          bounces:true,
+          hScrollBarEnabled: false,
+          vScrollBarEnabled: false,
+          pageParam: {
+            lon: app.lon,
+						lat: app.lat,
+            reid:app.reid,
+            usermessage:app.usermessage
+          }
+        });
+        //同步 内容
+        api.addEventListener({
+          name: 'refreshvalue'
+        }, function(ret, err) {
+          app.messagevalue = ret.value.messagevalue
+        });
+        //发送成功清空
+        api.addEventListener({
+          name: 'newmessagelist'
+        }, function(ret, err) {
+          app.messagevalue = '请输入你想说的话'
+        });
+        //        关闭键盘
+        api.addEventListener({
+          name: 'closethisjp'
+        }, function(ret, err) {
+          UIChatBox.close();
+          UIChatBox.closeBoard();
+          UIChatBox.closeKeyboard();
+          UIChatBox.hide();
+        });
+      };
+    },
+    filters:{
+    },
+    mounted:function(){
+		},
+    methods: {
+      //前往写评论页
+      openthistext:function() {
+        api.sendEvent({
+          name: 'jpevent',
+          extra: {
+            ifshowjp:true
+          }
+        });
+        UIChatBox.open({
+          placeholder: '请输入您想回复的内容',
+          maxRows: 4,
+          autoFocus: true,
+          emotionPath: 'widget://res/chatbox/emotion',
+          texts: {
+            recordBtn: {
+              normalTitle: '按住说话',
+              activeTitle: '松开结束'
+            },
+            sendBtn: {
+              title: '发送'
+            }
+          },
+          styles: {
+            inputBar: {
+              borderColor: '#d9d9d9',
+              bgColor: '#f2f2f2'
+            },
+            inputBox: {
+              borderColor: '#B3B3B3',
+              bgColor: '#FFFFFF'
+            },
+            emotionBtn: {
+              normalImg: 'widget://res/chatbox/face1.png'
+            },
+            keyboardBtn: {
+              normalImg: 'widget://res/chatbox/key3.png'
+            },
+            indicator: {
+              target: 'both',
+              color: '#c4c4c4',
+              activeColor: '#9e9e9e'
+            },
+            sendBtn: {
+              titleColor: '#fff',
+              bg: '#5099FB',
+              activeBg: '#2e73d0',
+              titleSize: 12
+            }
+          },
+          extras: {
+            titleSize: 12,
+            titleColor: '#a3a3a3',
+            btns: []
+          }
+        }, function (ret, err) {
+          if (ret) {
+            if (ret.eventType == 'clickExtras') {
+            } else if (ret.eventTyp == 'show') {
+              UIChatBox.close();
+              UIChatBox.closeBoard();
+              UIChatBox.closeKeyboard();
+              UIChatBox.hide();
+            } else if (ret.eventType == 'send') {
+              api.sendEvent({
+                name: 'tokenistoken',
+                extra:{
+                  messagevalue:ret.msg
+                }
+              });
+              UIChatBox.close();
+              UIChatBox.closeBoard();
+              UIChatBox.closeKeyboard();
+              UIChatBox.hide();
+            }
+          } else {
+            //alert( JSON.stringify( err ) );
+          }
+        });
+      },
+			//关闭页面
+      fanhui:function() {
+        api.closeWin()
+      }
+    }
+  });
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+</html>

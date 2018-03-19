@@ -1,0 +1,2717 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>播放</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <style>
+        #Header {
+            text-align: center;
+            color: #50606e !important;
+            width: 100%;
+            height: 44px;
+            line-height: 44px;
+            position: fixed;
+            z-index: 100;
+        }
+
+        #Header h1 {
+            font-weight: normal;
+            font-size: 0.9503rem;
+            text-indent: -45px;
+        }
+
+        #Header.bg-tran-color.on {
+            background-color: rgba(0, 0, 0, .3) !important;
+        }
+
+        #Header.bg-tran-color i.mooc.icon-fl {
+            width: 50px;
+            float: left;
+            color: #fff;
+        }
+
+        #Header.main h1 {
+            font-weight: normal;
+            font-size: 0.9503rem;
+            text-indent: 50px;
+        }
+
+        #Header.def-color {
+            background-color: #2e73d0;
+            color: #fff;
+        }
+
+        #Header .fl {
+            float: left;
+            width: 50px;
+        }
+
+        #Header .fr {
+            float: right;
+            width: 50px;
+            font-size: 0.7826rem;
+        }
+
+        #Header.has-scroll.z-audio-white .z-head {
+            color: #999 !important;
+        }
+
+        #Header.has-scroll.z-audio-white .z-head .z-head-left, #Header.has-scroll.z-audio-white .z-head .z-head-right {
+            color: #999 !important;
+        }
+
+        .play_btn_box {
+            color: white;
+            width: 1.1rem;
+            height: 1.1rem;
+            font-size: 1.1rem;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+
+        #progress_total_text {
+            padding-right: 0.5rem;
+        }
+
+        /*简介改进*/
+        .paly_box {
+            padding-left: 0.6rem;
+            height: 2.95rem;
+            font-size: 0.7rem;
+            color: #666666;
+        }
+
+        .paly_box .dianzan_box {
+            padding-top: 0.5rem;
+            text-align: center;
+        }
+
+        .paly_box li[data-ilike='1'] {
+            color: #D9B270;
+        }
+
+        .paly_box li[data-download='1'] {
+            color: #D9B270;
+        }
+
+        .change_big_box {
+            padding: 0 0.5rem 0.75rem 0.5rem;
+            border-bottom: 1px solid #f3f3f3;
+        }
+
+        .title_box {
+            height: 50px;
+            position: relative;
+            line-height: 51px;
+            font-size: 0.9rem;
+            color: #000;
+        }
+
+        .right_box {
+            border-radius: 5px;
+            background-color: #D9B270;
+            position: absolute;
+            top: 15px;
+            right: 0.6rem;
+            font-size: 0.6rem;
+            color: #fff;
+            height: 1.2rem;
+            line-height: 1.2rem;
+            padding: 0 0.75rem;
+        }
+
+        .message_name_box {
+            font-size: 0.75rem;
+            padding-top: 0.2rem;
+        }
+
+        .TX_box {
+            width: 1.3rem;
+            height: 1.3rem;
+            border-radius: 100%;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .contact_box li:last-child {
+            border: none;
+            padding-bottom: 1rem;
+        }
+
+        .rating {
+            unicode-bidi: bidi-override;
+            direction: rtl;
+            text-align: center;
+        }
+
+        .rating > span {
+            display: inline-block;
+            position: relative;
+            width: 0.8rem;
+            font-size: 0.7rem;
+            color: #D9B270;
+        }
+
+        .rating > span:before {
+            content: "\2605";
+            position: absolute;
+            left: 0;
+            right: 0;
+            color: #D9B270;
+        }
+
+        .z-audio-img-box * {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body style="background-color: #fff">
+<div id="main" class="z-audio-main">
+    <!--头部-->
+    <div id="Header" class=" z-audio-white" style="z-index: 200;">
+        <div class="z-head">
+            <a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+            <div class="z-ellipsis z-head-text" style="font-size: 0.8rem;">
+                正在播放
+                <!--<span-->
+                <!--id="audioIndex">1</span>/<span-->
+                <!--id="top_num">1</span>-->
+            </div>
+            <span tapmode="" class="z-head-right icon iconfont icon-fenxiang2"
+                  style="display:none;font-size: 1rem;"></span>
+        </div>
+    </div>
+
+    <div class="z-audio-img-box" style="height:12rem;overflow: hidden;position: relative">
+        <img id="audio_pic" style="width: 100%;position: absolute;top: 0;left: 0;z-index: 10"
+             src="../../image/audio_default.jpg"
+             onerror="this.src='../../image/audio_default.jpg'">
+        <div class="z-audio-con-3" style="text-align: left;">
+            <div class="z-audio-title"></div>
+            <div class="z-audio-tips"></div>
+        </div>
+        <div id="cover-box"
+             style="background-color: rgba(0,0,0,0.5);height:12rem;position: relative;z-index: 100;display: block">
+
+            <div id="play_btn" onclick="playAudio()" class="iconfont icon-bofang"
+                 style="font-size: 2.15rem; color:white;position: absolute;top:5.5rem;left:44%;"></div>
+            <!--加载转圈-->
+            <img id="loading" style="display: none" class="loading-gif" width="20" height="20"
+                 src="../../image/loading_more1.gif" alt="">
+            <div style="height:2.4rem;width: 100%;position: absolute;bottom: 0;left: 0;" class="flex-wrap">
+                <div style="height:100%;width:1.8rem;position: relative">
+                    <div id="play_btn1" onclick="playAudio()" class="iconfont icon-bofang play_btn_box"></div>
+                </div>
+                <span id="progress_now_text" class="z-audio-progress-duration">0:00</span>
+                <div id="big-box" class="flex-con" style="">
+                    <div id="progress_box" class="z-audio-progress-box clear">
+                        <div id="progress_down" class="z-audio-progress-down"></div>
+                        <div id="progress_up" class="z-audio-progress-up"></div>
+                        <div class="z-audio-progress-up1"></div>
+                        <span id="progress_now" class="z-audio-progress-now"></span>
+                        <!-- <span id="progress_now_text" class="z-audio-progress-duration">0:00</span>
+                            <span id="progress_total_text" data-duration="" class="z-audio-progress-duration fr">0:00</span> -->
+                    </div>
+                </div>
+                <span id="progress_total_text" data-duration="" class="z-audio-progress-duration fr">0:00</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="audio_nonetwork"></div>
+    <!--<div style="height: 10px;background-color: #f5f5f5"></div>-->
+    <ul class="z-audio-bottom flex-wrap" style="border-bottom: 1px solid #ddd">
+        <li id="con" onclick="openFrameGroup(this,0)" class="flex-con">
+            <div>简介</div>
+        </li>
+        <li id="con_new" onclick="openFrameGroup(this,2)" class="flex-con">
+            <div>改进</div>
+        </li>
+    </ul>
+    <div id="audio-main" data-rid="0"></div>
+    <!--PPT-->
+    <div id="audio-main1" data-rid="0" style="display:none;"></div>
+    <div id="audio_mask" style="display: none"></div>
+    <div id="audio-message-box" style="margin-top:0.5rem"></div>
+    <!--改进-->
+    <div id="app" class="changeUp_box" style="display: none">
+        <!--题目-->
+        <!--<div class="change_big_box">-->
+        <!--<div class="title_box">题目</div>-->
+        <!--<div style="color:#666;">请根据所学的内容,结合实际案例,谈谈如何找到用户的核心价值</div>-->
+        <!--</div>-->
+        <!--<div class="change_big_box">-->
+        <!--<div class="title_box">参考案例</div>-->
+        <!--<div style="color:#666;">请根据所学的内容,结合实际案例,谈谈如何找到用户的核心价值</div>-->
+        <!--</div>-->
+        <div style="height: 10px;background-color: #f5f5f5"></div>
+        <!--练习答题-->
+        <ul class="contact_box" style="padding: 0 12px;background: white">
+            <div class="title_box" style="border-bottom:1px solid #f3f3f3;">
+                <span style="padding-left:0.5rem;line-height: 51px;font-size:0.9rem;color: #000;">练习答题</span>
+                <span class="right_box" @click="Examination()">我要答题</span>
+            </div>
+            <li v-for="(item,index) in useraskdate"
+                style="padding:0.75rem 0;border-bottom: 1px solid #f3f3f3;background: white" class="flex-vertical">
+                <div class="flex-wrap flex-vertical"
+                     style="-webkit-box-flex: 7;-webkit-flex: 7;flex: 7;margin-bottom: 10px">
+                    <div class="flex-wrap" style="width: 100%">
+                        <div class="flex-wrap"
+                             style="-webkit-box-flex: 4;-webkit-flex: 4;flex: 4;padding-bottom: 0.75rem;">
+                            <div>
+                                <img :src="formatImg(item.face)" alt="" class="TX_box">
+                            </div>
+                            <div class="message_name_box" style="margin-left: 10px">
+                                {{item.nickname}}
+                                <img v-if="item.index == 1" src="../../image/haungguanpai.png"
+                                     style="width: 15px;height: 18px;margin-left: 3px;margin-right: 3px">
+                                <img v-if="item.index <= 20 && item.index>=2" src="../../image/zuanshipai.png"
+                                     style="width: 15px;height: 18px;margin-left: 3px;margin-right: 3px">
+                                <img v-if="item.index <= 100 && item.index>=21" src="../../image/haungjinpai.png"
+                                     style="width: 15px;height: 18px;margin-left: 3px;margin-right: 3px">
+                                <img v-if="item.index > 500" src="../../image/tongpai.png"
+                                     style="width: 15px;height: 18px;margin-left: 3px;margin-right: 3px">
+                                <img v-if="item.index <= 500 && item.index>=100" src="../../image/yinpai.png"
+                                     style="width: 15px;height: 18px;margin-left: 3px;margin-right: 3px">
+                                <span style="color:#d2b379;font-size: 0.6rem;">{{item.level}}</span></div>
+                            <!--<div class="message_name_box">{{item.value.nickname}}-->
+                            <!--<img v-if="item.value.level==5" src="../../image/haungguanpai.png" style="width: 15px;height: 15px;margin-left: 3px;margin-right: 3px">-->
+                            <!--<img v-if="item.value.level==3" src="../../image/haungjinpai.png" style="width: 15px;height: 15px;margin-left: 3px;margin-right: 3px">-->
+                            <!--<img v-if="item.value.level==4" src="../../image/zuanshipai.png" style="width: 15px;height: 15px;margin-left: 3px;margin-right: 3px">-->
+                            <!--<img v-if="item.value.level==1" src="../../image/tongpai.png" style="width: 15px;height: 15px;margin-left: 3px;margin-right: 3px">-->
+                            <!--<img v-if="item.value.level==2" src="../../image/yinpai.png" style="width: 15px;height: 15px;margin-left: 3px;margin-right: 3px">-->
+                            <!--<span style="color:#d2b379;font-size: 0.6rem;">{{item.value.levelText}}</span></div>-->
+                        </div>
+                        <div style="text-align: center;font-size:0.6rem;color:#999999;line-height: 25px;padding-right: 1rem;box-sizing: border-box">
+                            {{item.finish_time}}
+                        </div>
+                    </div>
+                    <div style="color:#666666;font-size: 0.7rem;padding-bottom: 0.5rem;margin-left: 28px">
+                        {{item.practice_content}}
+                    </div>
+                    <div class="flex-wrap"
+                         style="font-size: 0.6rem;color:#999999;align-items: center;margin-left: 28px">
+                        <div style="margin-right: 0.6rem;">
+                            <span class="iconfont icon-liuyan1"></span>
+                            <span @click="openthisl(index,0,1)">回复({{item.count_reply}})</span>
+                        </div>
+                        <div style="margin-right: 0.6rem;" @click="u_agreeAnswer(index)">
+                            <span class="iconfont icon-dianzan"></span>
+                            <!--<span style="color: #D9B270" class="iconfont icon-dianzan"></span>-->
+                            <span>点赞({{item.count_agree}})</span>
+                        </div>
+                        <div style="" class="flex-wrap">
+                            <span class=""><img src="../../image/lxpf.png" alt=""
+                                                style="display:block;width:0.7rem;margin-right: 0.25rem;"></span>
+                            <span style="margin-right: 0.25rem;">练习评分</span>
+                            <!--<span>测评中...</span>-->
+                            <span class="rating flex-wrap">
+                                <span v-for="startindex in Number(item.star)">☆</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <!--回复-->
+                <div style="padding:0.75rem 0;border-bottom: 1px solid #f3f3f3;background: #f5f5f5"
+                     v-for="(itom,laberindex) in item.replyAnswer">
+                    <div class="flex-wrap">
+                        <div v-if="itom.reply_face!=null">
+                            <img :src="formatImg(itom.reply_face)" alt="" class="TX_box" style="margin: 0.15rem"
+                                 align="center">
+                        </div>
+                        <div v-else>
+                            <img src="../../image/kong.png" alt="" class="TX_box" style="margin: 0.15rem"
+                                 align="center">
+                        </div>
+                        <div class="message_name_box flex-con">
+                            {{itom.reply_nickname}}
+                        </div>
+                        <div style="text-align: center;font-size:0.6rem;color:#999999;line-height: 25px;padding-right: 1rem;box-sizing: border-box">
+                            {{itom.add_time}}
+                        </div>
+                    </div>
+                    <div style="color:#666666;font-size: 0.7rem;padding-bottom: 0.5rem;">
+                        <span style="color: #d0b7a0;margin-left: 1.6rem">回复{{itom.reply_cover_nickname}}:</span>{{itom.content}}
+                    </div>
+                    <!--<div @click="openthisl(index, laberindex, 2)"-->
+                    <!--style="width: 100%;text-align: right;padding-right: 15px;box-sizing: border-box;color: #999;font-size: 0.6rem">-->
+                    <!--<span class="iconfont icon-liuyan1"></span>-->
+                    <!--回复-->
+                    <!--</div>-->
+                </div>
+
+            </li>
+        </ul>
+        <div v-if="ifshowmore" @click="checkmore"
+             style="width: 100%;height: 3rem;line-height: 3rem;text-align: center;font-size: 15px">{{checkmoretext}}
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/template" id="audioContent">
+    {{#data}}
+    <div style="" id="message">
+        <ul class="paly_box flex-wrap">
+            <li style="-webkit-box-flex: 4;-webkit-flex: 4;flex: 4;text-align: left;line-height:2.95rem;"
+                class="aui-ellipsis-1">
+                <span style="color:#F3CA7F;margin-right: 0.3rem;">正在播放</span> <span class="">{{title}}</span></li>
+            <li data-des="0" onclick="like()" data-ilike="0" class="flex-wrap  flex-vertical flex-con dianzan_box"
+                style="">
+                <span class="iconfont icon-dianzan" style="font-size: 1rem;"></span>
+                <span>赞一个</span>
+            </li>
+        </ul>
+        <div style="height: 10px;background-color: #f5f5f5"></div>
+        <div style="border-top: 1px solid #ddd;border-bottom:1px solid #ddd;padding:3% 3% 30px">
+            <div class="audio-l-t" style="padding: 3% 0 !important">简介</div>
+            <div class="audio-content-content" id="text">{{des}}</div>
+        </div>
+        <div style="height: 10px;background-color: #f5f5f5"></div>
+        <div style="background-color: #fff !important; border-bottom: none;font-size: 0.9rem"
+             class="z-column2 fm-title-box">
+            讲义
+        </div>
+    </div>
+    {{/data}}
+</script>
+
+<script type="text/template" id="audioTask">
+    <div class="audio-tip-2" style="padding-bottom:1rem;"></div>
+    <!--<div class="audio-tip-3"><span id="task_count">0</span>人参与</div>-->
+    <!--<div>-->
+    <!--<div id="message" class="z-column">-->
+    <!--<dl id="list" class="audio-message-box">-->
+    <!--<dt onclick="comment('','','改进不能少于30个字')" class="flex-wrap">-->
+    <!--<img id="face" style="border-radius: 100%" data-u='face' width="32" height="32"-->
+    <!--src="../../image/user_default.png" class="fl"-->
+    <!--onerror="this.src='../../image/user_default.png'">-->
+    <!--<div class="audio-message-dt-body flex-con">我要改进</div>-->
+    <!--</dt>-->
+    <!--</dl>-->
+    <!--</div>-->
+    <!--</div>-->
+</script>
+<!--<script type="text/template" id="audioMessage">-->
+<!--<div>-->
+<!--<div id="message" class="z-column">-->
+<!--<dl id="list" class="audio-message-box">-->
+<!--<dt onclick="comment('','','留言不能少于3个字')" class="flex-wrap">-->
+<!--<img id="face" style="border-radius: 100%" data-u='face' width="32" height="32"-->
+<!--src="../../image/user_default.png" class="fl"-->
+<!--onerror="this.src='../../image/user_default.png'">-->
+<!--<div class="audio-message-dt-body flex-con">-->
+<!--我也来留言-->
+<!--</div>-->
+<!--</dt>-->
+<!--</dl>-->
+<!--</div>-->
+<!--</div>-->
+<!--</script>-->
+<!--<script id="task_tip_Tpl" type="text/template">-->
+<!--<div class="audio-tip-2">请您根据本次课程所学的知识分析一个绩效的案例</div>-->
+<!--<div class="audio-tip-3">{{jion}}人参与</div>-->
+<!--</script>-->
+<!--<script id="message_list_Tpl" type="text/template">-->
+<!--{{#data}}-->
+<!--{{#if text}}-->
+<!--<dd data-del="{{id}}">-->
+<!--<img style="border-radius: 100%" width="32" height="32" src="{{face}}" class="fl"-->
+<!--onerror="this.src='../../image/user_default.png'">-->
+<!--<div class="audio-message-body">-->
+<!--<div class="audio-message-body-title">-->
+<!--<span>{{nickname}}</span>-->
+<!--{{#if stage}}<span class="audio-class">赢利模式{{stage}}班</span>{{/if}}-->
+<!--<span class="audio-date fr">{{date}}</span>-->
+<!--</div>-->
+<!--<div class="audio-message-body-text">{{text}}</div>-->
+<!--<div class="audio-bel">-->
+<!--<span onclick="comment('{{id}}',true,'回复不能少于3个字')" class="icon iconfont icon-liuyan1">回复</span><span-->
+<!--style="margin-right:10px;">{{chatnum}}</span><span onclick="likeMessage(this,{{id}})"-->
+<!--data-ilike="{{ilike}}" data-id="{{id}}"-->
+<!--class="flex-con icon iconfont icon-dianzan">点赞</span><span-->
+<!--data-num="{{id}}">{{likenum}}</span>{{#if delete}}<span onclick="DelMessage({{id}},{{rid}})"-->
+<!--class="icon iconfont icon-iconfont05 fr"></span>{{/if}}-->
+<!--</div>-->
+<!--</div>-->
+<!--{{#if hschat}}-->
+<!--<div data-chat="{{id}}" style="overflow: hidden;background-color: #f5f5f5;padding: 10px;margin-top: 10px;">-->
+<!--{{#each chat}}-->
+<!--<div style="border-bottom: 1px solid #eee;margin-top: 10px;">-->
+<!--<img data-chat='{{id}}' style="border-radius: 100%" width="32" height="32" src="{{face}}" class="fl"-->
+<!--onerror="this.src='../../image/user_default.png'">-->
+<!--<div class="audio-message-body">-->
+<!--<div class="audio-message-body-title">-->
+<!--<span>{{nickname}}</span>-->
+<!--{{#if stage}}<span class="audio-class">赢利模式{{stage}}班</span>{{/if}}-->
+<!--<span class="audio-date fr">{{date}}</span>-->
+<!--</div>-->
+<!--<div class="audio-message-body-text">回复<span style="color: #d2b379">{{name}}:</span>{{text}}</div>-->
+<!--<div class="audio-bel" style="overflow: hidden;margin-bottom: 5px;">-->
+<!--<span onclick="comment('{{id}}',true,'回复不能少于3个字')"-->
+<!--class="icon iconfont icon-liuyan1 fr">回复</span>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--{{/each}}-->
+<!--</div>-->
+<!--{{/if}}-->
+<!--</dd>-->
+<!--{{/if}}-->
+<!--{{/data}}-->
+<!--</script>-->
+<!--<script id="Task_list_Tpl" type="text/template">-->
+<!--{{#data}}-->
+<!--<dd data-del="{{id}}">-->
+<!--<img style="border-radius: 100%" width="32" height="32" src="{{face}}" class="fl"-->
+<!--onerror="this.src='../../image/user_default.png'">-->
+<!--<div class="audio-message-body">-->
+<!--<div class="audio-message-body-title">-->
+<!--<span>{{nickname}}</span>-->
+<!--{{#if stage}}<span class="audio-class">赢利模式{{stage}}班</span>{{/if}}-->
+<!--<span class="audio-date fr">{{date}}</span>-->
+<!--</div>-->
+<!--<div class="audio-message-body-text">{{text}}</div>-->
+<!--<div class="audio-bel">-->
+<!--<span onclick="comment('{{id}}',true,'回复不能少于3个字')" class="icon iconfont icon-liuyan1">回复</span><span-->
+<!--style="margin-right:10px;">{{chatnum}}</span><span onclick="likeMessage(this,{{id}})"-->
+<!--data-ilike="{{ilike}}" data-id="{{id}}"-->
+<!--class="flex-con icon iconfont icon-dianzan">点赞</span><span-->
+<!--data-num="{{id}}">{{likenum}}</span>{{#if delete}}<span onclick="DelMessage({{id}},{{rid}})"-->
+<!--class="icon iconfont icon-iconfont05 fr"></span>{{/if}}-->
+<!--</div>-->
+<!--</div>-->
+<!--{{#if hschat}}-->
+<!--<div data-chat="{{id}}" style="overflow: hidden;background-color: #f5f5f5;padding: 10px;margin-top: 10px;">-->
+<!--{{#each chat}}-->
+<!--<div style="border-bottom: 1px solid #eee;margin-top: 10px;">-->
+<!--<img data-chat='{{id}}' style="border-radius: 100%" width="32" height="32" src="{{face}}" class="fl"-->
+<!--onerror="this.src='../../image/user_default.png'">-->
+<!--<div class="audio-message-body">-->
+<!--<div class="audio-message-body-title">-->
+<!--<span>{{nickname}}</span>-->
+<!--{{#if stage}}<span class="audio-class">赢利模式{{stage}}班</span>{{/if}}-->
+<!--<span class="audio-date fr">{{date}}</span>-->
+<!--</div>-->
+<!--<div class="audio-message-body-text">回复<span style="color: #d2b379">{{name}}:</span>{{text}}</div>-->
+<!--<div class="audio-bel" style="overflow: hidden;margin-bottom: 5px;">-->
+<!--<span onclick="comment('{{id}}',true,'回复不能少于3个字')"-->
+<!--class="icon iconfont icon-liuyan1 fr">回复</span>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--{{/each}}-->
+<!--</div>-->
+<!--{{/if}}-->
+<!--</dd>-->
+<!--{{/data}}-->
+<!--</script>-->
+
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  var HeadBar = $api.byId('Header');
+  var isSetProgress;
+  //有个bug是因为数据没对上，点暂停却停不了，看后台
+  var d, playing;
+  var frist = true;//页面初始化是否完成参数，因为index一直触发setprogress函数，页面没初始化时报错
+  var HeadBar = $api.byId('Header');
+  var id = 0;
+  var pro_up, pro_down, pro_now, pro_now_text, pro_now_w, pro_box, pro_box_width, duration;//播放进度相关参数
+  var cur;//将current变成全局，共快进和快退使用，快进快退只要改了index的进度就好
+  var fs, type, tid, category, db;//type是获取数据方式，为0为读取缓存加载正在播放的音频，为1为根据传进来的id获取音频并播放,tid是音频所属课程，每周一课tid默认为0，category是用来区分是每周一课0还是商学院1的tid和category都要传到index去
+  var index = -1;
+  var userID = localStorage.getItem('userID');
+  var ShareUrl = App.url + '/r.php?a=player&i=' + userID + '&id=';
+  var ShareTitle = '行动在线商学院';
+  var ShareDes = '行动在线商学院';
+  var audioTitle = '';
+  var dialogBox;
+  var cacheaudio;
+  var hasOpenFrame = false;
+  var UIChatBox;
+  var pattern1 = /[\u4e00-\u9fa5]+/g;
+  var messageArray = [];
+  var rid = 0;
+  var bottomContentType = 0;
+  var isChat = false;
+  var blocks = [];
+  var bar_height;
+  var isList = false;
+  var tasknum = 0;
+  var messagenum = 0;
+  var messageData, taskData, audioData;
+  var cacheData = {c: '', m: '', p: '', t: ''};
+  var wx;
+  var AudioCate = '';
+  var progress = 0;
+  var pptNum = 0;
+  var ppt = '';
+  var Tabtype = 0;
+  var ktnowtime = '';
+  var zeroimg = '';
+
+  apiready = function () {
+    $api.fixStatusBar(HeadBar);
+    type = api.pageParam.type || 0;
+    id = api.pageParam.des || 0;//音频id
+    tid = api.pageParam.tid || 0;  //音频所属课程id
+    app.id = api.pageParam.des; //音频id
+    app.tid = api.pageParam.tid; // 音频所属课程id
+    app.rids = api.pageParam.rid; //练习ID
+    category = api.pageParam.category || 0;
+    progress = api.pageParam.pro || 0;
+    fs = api.require("fs");
+    db = api.require("db");
+    dialogBox = api.require("dialogBox");
+    UIChatBox = api.require('UIChatBox');
+    wx = api.require('wx');
+    document.querySelector(".z-head-text").style.color = "rgba(0,0,0,0)";
+    if (api.pageParam.news === 1) {
+      setTimeout(function () {
+        openFrameGroup(document.getElementById('con_new'), 2);
+      }, 300);
+    } else {
+      openFrameGroup(document.getElementById("con"), 0);
+    }
+    app.getRadioPic();
+    if (isNaN(progress)) {
+      progress = 0;
+    }
+
+    if (bottomContentType == 0) {
+      if (document.getElementById("audioMessage"))
+        document.getElementById("audioMessage").style.display = 'none';
+    }
+
+    api.addEventListener({
+      name: 'scrolltobottom',
+      extra: {
+        threshold: 0
+      }
+    }, function (ret, err) {
+      if (App.State()) {
+        if (bottomContentType == 0) {
+        } else if (bottomContentType == 2) {
+        }
+      }
+    });
+
+    api.addEventListener({
+      name: 'topause'
+    }, function (ret, err) {
+      pause();
+    });
+
+    api.addEventListener({
+      name: 'PlayStatus'
+    }, function (ret, err) {
+      play();
+    });
+
+    //MD Start
+    api.execScript({name: 'root', script: "ChatAna('Audio',{'Active':'加载'},'播放器');"});
+    //MD End
+
+    wx.isInstalled(function (ret, err) {
+      if (ret.installed) {
+        var isshare = $api.getStorage('share');
+        if (isshare && (isshare == '1')) {
+          document.querySelector('.icon-fenxiang2').style.display = 'block';
+        } else {
+          document.querySelector('.icon-fenxiang2').style.display = 'none';
+        }
+      }
+    });
+
+
+    bar_height = document.querySelector("#Header").offsetHeight;
+    document.querySelector("body").addEventListener('touchmove', function () {
+      var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+      var dom = document.querySelector("#Header");
+      var head = document.querySelector(".z-head-text");
+      dom.style.backgroundColor = "rgba(255,255,255," + (scrollTop / bar_height).toFixed(2) + ")"
+      head.style.color = "rgba(0,0,0," + (scrollTop / bar_height).toFixed(2) + ")"
+      dom.style.color = "black";
+      if (scrollTop >= bar_height) {
+        if (/has-scroll/.test(dom.className)) {
+          return;
+        } else {
+          dom.className += ' has-scroll';
+        }
+      } else {
+        if (/has-scroll/.test(dom.className)) {
+          dom.className = dom.className.replace(/ has-scroll/, '');
+        } else {
+          return;
+        }
+      }
+    });
+
+    window.onscroll = function () {
+      var scrollTop = document.documentElement.scrollTop || window.pageYOffset || document.body.scrollTop;
+      var dom = document.querySelector("#Header");
+      var head = document.querySelector(".z-head-text");
+      dom.style.backgroundColor = "rgba(255,255,255," + (scrollTop / bar_height).toFixed(2) + ")"
+      head.style.color = "rgba(0,0,0," + (scrollTop / bar_height).toFixed(2) + ")"
+      dom.style.color = "black";
+      if (scrollTop >= bar_height) {
+        if (/has-scroll/.test(dom.className)) {
+          return;
+        } else {
+          dom.className += ' has-scroll';
+        }
+      } else {
+        if (/has-scroll/.test(dom.className)) {
+          dom.className = dom.className.replace(/ has-scroll/, '');
+        } else {
+          return;
+        }
+      }
+    }
+
+    if (progress > 0) {
+
+      api.execScript({
+        name: 'root',
+        script: "JumpProgress(" + parseInt(progress) + "," + id + ");"
+      });
+      progress = 0;
+    }
+
+    if (api.pageParam.down) {
+      UnState();
+    } else {
+      if (App.State()) {
+        if (id == 0) {
+          db.selectSql({
+            name: 'main',
+            sql: 'select * from currentaudio'
+          }, function (ret, err) {
+            if (ret.status) {
+              if (ret.data.length > 0) {
+//                document.querySelector(".z-audio-title").innerHTML = ret.data[0].title;
+                document.querySelector(".z-head-text").innerHTML = '正在播放:' + ret.data[0].title;
+                app.texts = ret.data[0].title;
+//                document.querySelector(".z-audio-tips").innerHTML = ret.data[0].des;
+                cachepics(0, 1, ret.data[0], true);
+              }
+            }
+          });
+        } else {
+          var sql = 'select * from weekly where id=' + id;
+          db.selectSql({
+            name: 'main',
+            sql: sql
+          }, function (ret, err) {
+            if (ret.status) {
+              if (ret.data.length > 0) {
+//                document.querySelector(".z-audio-title").innerHTML = ret.data[0].title;
+                document.querySelector(".z-head-text").innerHTML = '正在播放:' + ret.data[0].title;
+                app.texts = ret.data[0].title;
+//                document.querySelector(".z-audio-tips").innerHTML = ret.data[0].des;
+                cachepics(0, 1, ret.data[0], true);
+              } else {
+                var sql = 'select * from coursecontent where id=' + id;
+                db.selectSql({
+                  name: 'main',
+                  sql: sql
+                }, function (ret, err) {
+                  if (ret.status) {
+                    if (ret.data.length > 0) {
+//                      document.querySelector(".z-audio-title").innerHTML = ret.data[0].title;
+                      document.querySelector(".z-head-text").innerHTML = '正在播放:' + ret.data[0].title;
+                      app.texts = ret.data[0].title;
+//                      document.querySelector(".z-audio-tips").innerHTML = ret.data[0].des;
+                      cachepics(0, 1, ret.data[0], true);
+                    }
+                  }
+                });
+              }
+            }
+          });
+        }
+
+        api.execScript({
+          name: 'root',
+          script: "isplaying(" + id + ");"
+        });
+
+      } else {
+        if (id == 0) {
+          db.selectSql({
+            name: 'main',
+            sql: 'select * from currentaudio'
+          }, function (ret, err) {
+            if (ret.status) {
+              if (ret.data.length > 0) {
+                id = ret.data[0].id;
+                UnState();
+              }
+            }
+          });
+        } else {
+          UnState();
+        }
+        document.getElementById('audio-main').innerHTML = '<div class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">未连接网络</div></div>';
+      }
+    }
+    init();
+  };
+
+
+  function resID(cid) {
+    var sql = 'select * from audioinfo where id=' + cid;
+    db.selectSql({
+      name: 'main',
+      sql: sql
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          audioData = ret.data[0];
+          audioData.message = App.JSON(ret.data[0].message);
+          audioData.blocks = App.JSON(ret.data[0].blocks);
+          audioData.task = App.JSON(ret.data[0].task);
+          if (typeof audioData.task.list != 'undefined') {
+            taskData = audioData.task.list;
+          }
+          d = audioData;
+          upContent();
+        }
+      }
+    });
+  }
+  //废弃
+  function closeList() {
+    document.getElementById("audio_mask").style.display = 'none';
+    api.closeFrame({
+      name: 'list'
+    })
+  }
+
+  function UnState() {
+    var sql = 'select * from weekly where id=' + id;
+    db.selectSql({
+      name: 'main',
+      sql: sql
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+//          document.querySelector(".z-audio-title").innerHTML = ret.data[0].title;
+          document.querySelector(".z-head-text").innerHTML = '正在播放:' + ret.data[0].title;
+          app.texts = ret.data[0].title;
+//          document.querySelector(".z-audio-tips").innerHTML = ret.data[0].des;
+          var dm = 0;
+          var ds = 0;
+
+          if (typeof ret.data[0].duration != 'undefined') {
+            dm = parseInt(parseInt(ret.data[0].duration) / 60);
+            dm = dm < 0 ? '0' + dm : dm;
+            ds = parseInt(parseInt(ret.data[0].duration) % 60);
+            ds = ds < 0 ? '0' + ds : ds;
+            var lt = dm + ':' + ds;
+            ret.data[0].ltime = ret.data[0].duration;
+          } else if (typeof ret.data[0].ltime != 'undefined') {
+            dm = parseInt(ret.data[0].ltime / 60);
+            dm = dm < 0 ? '0' + dm : dm;
+            ds = parseInt(ret.data[0].ltime % 60);
+            ds = ds < 0 ? '0' + ds : ds;
+            var lt = dm + ':' + ds;
+          } else {
+            var lt = '00:00';
+            ret.data[0].ltime = 0;
+          }
+
+          document.getElementById("progress_total_text").innerHTML = lt;
+          document.getElementById("progress_total_text").setAttribute("data-duration", ret.data[0].ltime);
+          cachepics(0, 1, ret.data[0], true);
+          islike(ret.data[0]);
+          api.execScript({
+            name: 'root',
+            script: "isplaying(" + id + ",0);"
+          });
+          if (App.State()) {
+            api.execScript({
+              name: 'root',
+              script: "XO.GetAudioInfo('" + $api.getStorage('token') + "','" + id + "','0','" + ret.data[0].tid + "',{name:'audio',fun:'islike'},{name:'audio',fun:'fail'});"
+            });
+          }
+        } else {
+          var sql = 'select * from coursecontent where id=' + id;
+          db.selectSql({
+            name: 'main',
+            sql: sql
+          }, function (ret, err) {
+            if (ret.status) {
+              if (ret.data.length > 0) {
+//                document.querySelector(".z-audio-title").innerHTML = ret.data[0].title;
+                document.querySelector(".z-head-text").innerHTML = '正在播放:' + ret.data[0].title;
+                app.texts = ret.data[0].title;
+//                document.querySelector(".z-audio-tips").innerHTML = ret.data[0].des;
+                var dm = 0;
+                var ds = 0;
+
+                if (typeof ret.data[0].duration != 'undefined') {
+                  dm = parseInt(parseInt(ret.data[0].duration) / 60);
+                  dm = dm < 0 ? '0' + dm : dm;
+                  ds = parseInt(parseInt(ret.data[0].duration) % 60);
+                  ds = ds < 0 ? '0' + ds : ds;
+                  var lt = dm + ':' + ds;
+                  ret.data[0].ltime = ret.data[0].duration;
+                } else if (typeof ret.data[0].ltime != 'undefined') {
+                  dm = parseInt(ret.data[0].ltime / 60);
+                  dm = dm < 0 ? '0' + dm : dm;
+                  ds = parseInt(ret.data[0].ltime % 60);
+                  ds = ds < 0 ? '0' + ds : ds;
+                  var lt = dm + ':' + ds;
+                } else {
+                  var lt = '00:00';
+                  ret.data[0].ltime = 0;
+                }
+
+                document.getElementById("progress_total_text").innerHTML = lt;
+                document.getElementById("progress_total_text").setAttribute("data-duration", ret.data[0].ltime);
+                cachepics(0, 1, ret.data[0], true);
+                islike(ret.data[0]);
+                api.execScript({
+                  name: 'root',
+                  script: "isplaying(" + id + ",1);"
+                });
+                if (App.State()) {
+                  api.execScript({
+                    name: 'root',
+                    script: "XO.GetAudioInfo('" + $api.getStorage('token') + "','" + id + "','1','" + ret.data[0].tid + "',{name:'audio',fun:'islike'},{name:'audio',fun:'fail'});"
+                  });
+                }
+              } else {
+                App.tips('当前无网络');
+                api.execScript({
+                  name: 'root',
+                  script: "audioPlayer.stop();"
+                });
+                  /*
+                   api.execScript({
+                   name: 'root',
+                   script: "if(App.iphone){audioCover.cancel();}"
+                   });
+                   */
+                api.execScript({
+                  name: 'root',
+                  script: "initPlay(1);"
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
+  function init() {
+    _now_rate = 0;
+    _now = 0;
+    pro_up = document.getElementById('progress_up');
+    pro_down = document.getElementById('progress_down').offsetWidth;
+    pro_now = document.getElementById('progress_now');
+    pro_now_text = document.getElementById('progress_now_text');
+    pro_now_w = pro_now.offsetWidth / 2;
+    pro_box = document.getElementById('big-box');
+    pro_box_width = pro_box.offsetWidth;
+    var setouch;
+    var limit = api.winWidth * 0.7;
+    pro_box.addEventListener('touchstart', function () {
+      duration = document.querySelector("[data-duration]").getAttribute("data-duration");
+      api.execScript({name: 'root', script: "dragToFalse();"});
+    });
+    pro_box.addEventListener('touchmove', function () {
+      var x = event.changedTouches[0].pageX - api.winWidth * 0.15;
+      if (x < 0) {
+        x = 0;
+      }
+      if (x > limit) {
+        x = limit;
+      }
+      _now_rate = parseInt(x / pro_box_width * 100);
+      _now = parseInt(x / pro_box_width * duration);
+      setProgress(_now, duration);
+      event.preventDefault();
+    });
+    pro_box.addEventListener('touchend', function () {
+      setProgress(_now, duration);
+      showLoad();
+      api.execScript({name: 'root', script: "(AudioPause=true);"});
+      clearInterval(setouch);
+      setouch = setInterval(function () {
+        clearInterval(setouch);
+        console.log('_now', _now);
+        api.execScript({name: 'root', script: "dragToTrue();"});
+        api.execScript({
+          name: 'root',
+          script: "setAudioProgress('" + _now + "');"
+        });
+      }, 800);
+    });
+
+    frist = false;
+  }
+
+  function AuTo(St) {
+    console.log(' St ==> ' + St);
+    if (api.pageParam.auto) {
+      api.pageParam.auto = false;
+      if (!St) {
+        playAudio();
+      }
+    }
+  }
+
+  function islike(data) {
+    console.log(data);
+    if (typeof data == 'string') {
+      data = App.JSON(data);
+    }
+    audioData = data;
+    app.rids = audioData.pid;  //音频练习ID
+    if (bottomContentType == 2) {
+      taskData = [];
+      tasknum = 0;
+      if (data.task) {
+        if ((typeof data.task == 'object') && (typeof data.task.list == 'object')) {
+          taskData = data.task.list;
+        }
+      }
+
+
+//      if ((typeof audioData.task == 'object') && (typeof audioData.task.count != 'undefined')) {
+//        document.getElementById("task_count").innerHTML = audioData.task.count;
+//      } else {
+//        document.getElementById("task_count").innerHTML = 0;
+//      }
+
+      if (taskData.length > 0) {
+        moreTask(taskData.slice(tasknum * 10, (tasknum + 1) * 10));
+      } else {
+        upTaskfail('无信息');
+      }
+      return;
+    }
+
+    if (typeof d != 'object') {
+      d = data;
+    } else {
+      d.ilike = data.ilike;
+    }
+
+    if (api.pageParam.auto) {
+      api.execScript({name: 'root', script: "getPlayId();"});
+    }
+    openFrameGroup(document.getElementById("con"), 0);
+    messageData = [];
+    taskData = [];
+
+    if (data.message) {
+
+      if ((typeof data.task == 'object') && (typeof data.task.list == 'object')) {
+        taskData = data.task.list;
+      }
+
+      var sql = 'select * from audioinfo where id=' + data.id;
+      db.selectSql({
+        name: 'main',
+        sql: sql
+      }, function (ret, err) {
+        if (ret.status) {
+          var __message = JSON.stringify(data.message).replace(/'/g, '').replace(/\n/g, '<br>');
+          var __task = JSON.stringify(data.task).replace(/'/g, '').replace(/\n/g, '<br>');
+
+          if (ret.data.length > 0) {
+            var sql1 = "update audioinfo set title='" + data.title + "',pic='" + data.pic + "',des='" + data.des + "',vtime='" + data.vtime + "',size='" + data.size + "',path='" + data.path + "',duration='" + data.duration + "',likenum='" + data.likenum + "',blocks='" + JSON.stringify(data.blocks) + "',ilike='" + data.ilike + "',type='" + data.type + "',tid='" + data.tid + "',columnTitle='" + data.columnTitle + "',hearnum='" + data.hearnum + "',lecturer='" + data.lecturer + "',message='" + __message + "',task='" + __task + "' where id=" + data.id;
+            db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+              //console.log(sql1);
+            });
+          } else {
+            var sql1 = "insert into audioinfo (id,title,pic,des,vtime,size,path,duration,likenum,blocks,ilike,type,tid,columnTitle,hearnum,lecturer,message,task) values ('" + data.id + "','" + data.title + "','" + data.pic + "','" + data.des + "','" + data.vtime + "','" + data.size + "','" + data.path + "','" + data.duration + "','" + data.likenum + "','" + JSON.stringify(data.blocks) + "','" + data.ilike + "','" + data.type + "','" + data.tid + "','" + data.columnTitle + "','" + data.hearnum + "','" + data.lecturer + "','" + __message + "','" + __task + "')";
+            db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+              //console.log(sql1);
+            });
+          }
+        }
+      });
+    }
+
+    setTimeout(function () {
+      if (document.querySelector("[data-ilike]")) {
+        document.querySelector("[data-ilike]").setAttribute("data-ilike", data.ilike);
+      }
+    }, 300);
+//    document.querySelector(".z-audio-title").innerHTML = d.title;
+    document.querySelector(".z-head-text").innerHTML = '正在播放:' + d.title;
+    app.texts = d.title;
+
+    if ((d.des != "undefined") && d.des) {
+//      document.querySelector(".z-audio-tips").innerHTML = d.des;
+    } else if ((d.note != "undefined") && d.note) {
+//      document.querySelector(".z-audio-tips").innerHTML = d.note;
+    }
+    var dm = 0;
+    var ds = 0;
+    dm = parseInt(d.duration / 60);
+    dm = dm < 10 ? '0' + dm : dm;
+    ds = parseInt(d.duration % 60);
+    ds = ds < 10 ? '0' + ds : ds;
+    d.dur = dm + ':' + ds;
+    document.getElementById("progress_total_text").innerHTML = d.dur;
+    document.getElementById("progress_total_text").setAttribute("data-duration", d.duration);
+    cachepics(0, 1, d, playing);
+    App.init();
+  }
+
+  function getData(data, length, isplay) {
+    api.showProgress({
+      style: 'default',
+      animationType: 'fade',
+      title: '加载中...',
+      modal: true
+    });
+    //点击播放后立马进来或获取不到数据
+    pptNum = 0;
+    ppt = '';
+    audioData = {};
+
+    if (data.length < 14) {
+      return;
+      api.execScript({
+        //从index获取播放状态，如果正在播放则什么都不做
+        name: 'root',
+        script: "isplaying(0);"
+        //触发主页获取播放列表函数
+      });
+      return;
+    }
+
+    if (typeof data == 'string') {
+      data = App.JSON(data);
+    }
+
+    api.execScript({
+      name: 'audio',
+      frameName: 'list',
+      script: "play('" + data.id + "');"
+    });
+
+    d = {};
+    d = data;
+    id = data.id;
+
+    ShareTitle = d.title;
+    audioTitle = d.title;
+    ShareDes = d.des;
+
+    api.sendEvent({
+      name: 'changeaudio',
+      extra: {
+        key1: id,
+        key2: data.type,
+        key3: data.tid
+      }
+    });
+
+    playing = isplay;
+    if (playing) {
+      play();
+    }
+
+//    document.getElementById("audioIndex").innerHTML = parseInt(data.index) + 1;
+//    document.getElementById('top_num').innerHTML = length;
+
+    var sql = 'select * from audioinfo where id=' + d.id;
+    db.selectSql({
+      name: 'main',
+      sql: sql
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          audioData = ret.data[0];
+          audioData.message = App.JSON(ret.data[0].message);
+          audioData.blocks = App.JSON(ret.data[0].blocks);
+          audioData.task = App.JSON(ret.data[0].task);
+          openFrameGroup(document.getElementById("con"), 0);
+        }
+      }
+    });
+    if (App.State()) {
+      api.execScript({
+        name: 'root',
+        script: "XO.GetAudioInfo('" + $api.getStorage('token') + "','" + d.id + "','" + d.type + "','" + d.tid + "',{name:'audio',fun:'islike'},{name:'audio',fun:'fail'});"
+      });
+    } else {
+      openFrameGroup(document.getElementById("con"), 0);
+    }
+  }
+
+  //特殊情形，当播放被暂停的歌曲时需要把进度也传回去，可以从缓存取
+  function playAudio(id, e) {
+    if (d && d.id && !isNaN(d.id)) {
+      id = d.id;
+    } else if (isNaN(id)) {
+      id = 0;
+    }
+
+    api.execScript({name: 'root', script: "((AudioPause=true) && (rebot=(rebot?false:true)));"});
+    api.execScript({
+      name: 'root',
+      script: "reayplay('" + id + "');"
+    });
+
+    if (document.getElementById('play_btn').className.indexOf('pause') > -1) {
+      document.getElementById('play_btn').className = document.getElementById('play_btn').className.replace(/pause/, 'bofang');
+      document.getElementById('play_btn1').className = document.getElementById('play_btn1').className.replace(/pause/, 'bofang');
+    } else {
+      document.getElementById('play_btn').className = document.getElementById('play_btn').className.replace(/bofang/, 'pause');
+      document.getElementById('play_btn1').className = document.getElementById('play_btn1').className.replace(/bofang/, 'pause');
+      setTimeout(function () {
+        $('#cover-box').fadeOut(1000, function () {
+        });
+      }, 3000)
+    }
+  }
+
+  function checkPlayCover() {
+    if (document.getElementById('play_btn').className = document.getElementById('play_btn').className.replace(/bofang/, 'pause')) {
+      $('#cover-box').fadeOut(1000, function () {
+      });
+    }
+  }
+
+  $('#audio_pic').click(function () {
+    $('#cover-box').fadeToggle(100, function () {
+    });
+  });
+
+  function setProgress(current, duration, dataone) {
+    if (frist) return;
+    if (duration == 0) {
+      pro_up.style.width = '0px';
+      pro_now.style.left = '8px';
+      pro_now_text.innerHTML = '00:00';
+      return;
+    }
+    cur = current;
+
+    //获取播放时间  （实时）
+    ktnowtime = current;
+    if (ktnowtime < Number(app.starttimeimg)) {
+      document.getElementById("audio_pic").src = zeroimg
+    } else {
+      for (var i = 0; i < app.audiotimelist.length; i++) {
+        if (Number(app.audiotimelist[i].time_point) < ktnowtime) {
+          document.getElementById("audio_pic").src = baseimageUrl + app.audiotimelist[i].pic
+        }
+      }
+    }
+
+    var now = current / duration * pro_down;
+    if (parseInt(now) < 8) {
+      now = 8;
+    } else if (parseInt(now) > (api.winWidth - 8)) {
+      now = api.winWidth - 8;
+    }
+    pro_up.style.width = now + 'px';
+    pro_now.style.left = (now - pro_now_w) + 'px';
+    var m = parseInt(current / 60);
+    if (m > 1000) {
+      return;
+    }
+    var s = parseInt(current % 60);
+    s = s < 10 ? '0' + s : s;
+    pro_now_text.innerHTML = m + ':' + s;
+  }
+
+  function upview(data) {
+
+  }
+
+  function fail(msg) {
+    api.hideProgress();
+  }
+  // 上一首
+  function prev() {
+    if (App.State()) {
+      api.execScript({
+        name: 'root',
+        script: "ChatAna('Prev',{'courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "'},'播放器-上一首');"
+      });
+      api.execScript({
+        name: 'root',
+        script: "playPrev();"
+      });
+    }
+  }
+  // 下一首
+  function next() {
+    if (App.State()) {
+      api.execScript({
+        name: 'root',
+        script: "ChatAna('Next',{'courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "'},'播放器-下一首');"
+      });
+      api.execScript({
+        name: 'root',
+        script: "playNext();"
+      });
+    }
+  }
+  // 弹窗
+  function toast(msg) {
+    api.toast({
+      msg: msg,
+      duration: 2000,
+      location: 'middle'
+    });
+  }
+
+  function cachepics(i, max, data, isplay) {
+    if (i < max) {
+      if (data.pic) {
+        var _file = App.file(data.pic);
+        fs.exist({
+          path: (api.fsDir + '/file/' + _file.full)
+        }, function (ret, err) {
+          if (ret.exist) {
+            data.pic = (api.fsDir + '/file/' + _file.full);
+            console.log(data.pic);
+            zeroimg = data.pic;
+            document.getElementById("audio_pic").src = data.pic;
+            cachepics(i + 1, max, data, isplay);
+          } else {
+            if (data.pic.indexOf('/') == 0) {
+              var dpic = App.url + data.pic;
+            } else {
+              var dpic = data.pic;
+            }
+            api.download({
+              url: dpic,
+              savePath: ('fs://file/' + _file.full),
+              cache: true,
+              allowResume: true
+            }, function (ret, err) {
+              data.pic = (api.fsDir + '/file/' + _file.full);
+              document.getElementById("audio_pic").src = data.pic;
+              cachepics(i + 1, max, data, isplay);
+            });
+          }
+        });
+      }
+      if (!data.pic) {
+        cachepics((i + 1), max, data, isplay);
+      }
+    } else {
+      App.init();
+    }
+  }
+  //  分享
+  var apiKey = 'wxcfe803c780dc2647';
+  document.querySelector('.icon-fenxiang2').onclick = function () {
+    share();
+  }
+  function share() {
+    if (d.pic == '') {
+      d.pic = 'widget://res/pro_banner3.png'
+    }
+    var musicDataUrl = '';
+    if (/^http/g.test(d.file)) {
+      musicDataUrl = d.file;
+    } else {
+      musicDataUrl = App.url + d.file;
+    }
+    dialogBox.actionMenu({
+      rect: {
+        h: 170
+      },
+      texts: {
+        cancel: '取消分享'
+      },
+      items: [
+        {
+          text: '微信好友',
+          icon: 'widget://res/icon/icon-wx.png'
+        },
+        {
+          text: '微信朋友圈',
+          icon: 'widget://res/icon/icon-pyq.png'
+        }
+      ],
+      styles: {
+        bg: '#FFF',
+        column: 2,
+        itemText: {
+          color: '#000',
+          size: 12,
+          marginT: 8
+        },
+        itemIcon: {
+          size: 60
+        },
+        cancel: {
+          bg: '#fff',
+          color: '#000',
+          h: 44,
+          size: 14
+        }
+      },
+      tapClose: true
+    }, function (ret) {
+      dialogBox.close({dialogName: 'actionMenu'});
+      if (ret.eventType == 'click') {
+        console.log(ShareUrl + d.id);
+        if (d.pic.length > 0) {
+          switch (ret.index) {
+            case 0:
+              console.log(ShareUrl + d.id);
+              //console.log(musicDataUrl);
+              wx.isInstalled(function (ret, err) {
+                if (ret.installed) {
+                  wx.shareWebpage({
+                    apiKey: apiKey,
+                    scene: 'session',
+                    title: ShareTitle,
+                    description: ShareDes,
+                    thumb: d.pic,
+                    contentUrl: ShareUrl + d.id
+                  }, function (ret, err) {
+                    if (ret.status) {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('shareCourse',{'courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "','sharingMethod':'session','is_success':true},'分享音频-分享成功');"
+                      });
+                      //MD End
+                      api.toast({
+                        msg: '分享成功',
+                        duration: 2000,
+                        location: 'bottom'
+                      });
+                    } else {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('shareCourse',{'courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "','sharingMethod':'session','is_success':false},'分享音频-取消分享');"
+                      });
+                    }
+                  });
+                    /*
+                     wx.shareMusic({
+                     apiKey: apiKey,
+                     scene: 'session',
+                     title: ShareTitle,
+                     description: ShareDes,
+                     thumb: d.pic,
+                     musicDataUrl:musicDataUrl,
+                     contentUrl:ShareUrl+d.id
+                     }, function(ret, err) {
+                     //alert(JSON.stingify(ret)+00+JSON.stingify(err));
+                     //MD Start
+                     api.execScript({name: 'root', script: "ChatAna('分享音频',false,{'行为':'分享成功'},'分享音频-分享成功');"});
+                     //MD End
+                     api.toast({
+                     msg: '分享成功',
+                     duration: 2000,
+                     location: 'bottom'
+                     });
+                     });
+                     */
+                }
+              });
+              break;
+            case 1:
+              console.log(musicDataUrl);
+              wx.isInstalled(function (ret, err) {
+                if (ret.installed) {
+                  wx.shareWebpage({
+                    apiKey: apiKey,
+                    scene: 'timeline',
+                    title: ShareTitle,
+                    description: ShareDes,
+                    thumb: d.pic,
+                    contentUrl: ShareUrl + d.id
+                  }, function (ret, err) {
+                    if (ret.status) {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('shareCourse',{'courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "','sharingMethod':'timeline','is_success':true},'分享音频-分享成功');"
+                      });
+                      //MD End
+                      api.toast({
+                        msg: '分享成功',
+                        duration: 2000,
+                        location: 'bottom'
+                      });
+                    } else {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('shareCourse',{'courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "','sharingMethod':'timeline','is_success':false},'分享音频-取消分享');"
+                      });
+                    }
+                  });
+
+                    /*
+                     wx.shareMusic({
+                     apiKey: apiKey,
+                     scene: 'timeline',
+                     title: ShareTitle,
+                     description: ShareDes,
+                     thumb: d.pic,
+                     musicDataUrl:musicDataUrl,
+                     contentUrl: ShareUrl+d.id
+                     }, function(ret, err) {
+                     //alert(JSON.stingify(ret)+00+JSON.stingify(err));
+                     //MD Start
+                     api.execScript({name: 'root', script: "ChatAna('分享音频',false,{'行为':'分享成功'},'分享音频-分享成功');"});
+                     //MD End
+                     api.toast({
+                     msg: '分享成功',
+                     duration: 2000,
+                     location: 'bottom'
+                     });
+                     });
+                     */
+                }
+              });
+              break;
+            default:
+          }
+        }
+      }
+    });
+  }
+  // 当前音频已失效
+  function nullplay() {
+    App.tips('当前音频已失效');
+    setTimeout(function () {
+      api.closeWin();
+    }, 1000);
+  }
+
+  function bgc(lv) {
+    document.querySelector('.z-audio-progress-up1').style.width = lv + "%";
+  }
+
+  function showLoad() {
+    document.getElementById("loading").style.display = "block";
+  }
+
+  function hideLoad() {
+    document.getElementById("loading").style.display = "none";
+  }
+
+  function openFrameGroup(dom, type) {
+    if (!App.State() && (type == 2)) {
+      api.hideProgress();
+      return;
+    }
+    api.showProgress({
+      style: 'default',
+      animationType: 'fade',
+      title: '加载中...',
+      modal: false
+    });
+    tasknum = 0;
+    messagenum = 0;
+    bottomContentType = type;
+    var _dom = document.querySelector("#Header");
+    _dom.style.backgroundColor = "rgba(255,255,255,0)"
+
+    if (/has-scroll/.test(_dom.className)) {
+      _dom.className = _dom.className.replace(/ has-scroll/, '');
+    }
+
+    var _c = dom.className;
+    console.log(_c);
+    if (/active/g.test(_c)) {
+      api.hideProgress();
+      var datarid = document.getElementById("audio-main").getAttribute('data-rid');
+      if (typeof d == 'object') {
+        if (parseInt(datarid) == parseInt(d.id)) {
+          return;
+        }
+      }
+    } else {
+      var _act = document.querySelector(".active");
+      if (_act) {
+        _act.className = "flex-con";
+      }
+      dom.className = _c + " active";
+    }
+
+    document.getElementById("audio-main").innerHTML = '';
+//    document.getElementById("audio-message-box").innerHTML = '';
+
+    UIChatBox.closeKeyboard();
+    UIChatBox.close();
+    isChat = false;
+    Tabtype = type;
+
+    if (type == 0) {
+//      显示ppt
+      document.getElementById("audio-main1").style.display = 'block';
+//      隐藏练习部分
+      $('.changeUp_box').css('display', 'none');
+      //MD Start
+      api.execScript({
+        name: 'root',
+        script: "ChatAna('AudioTab',{'tabs':'简介','courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "'},'播放器-简介');"
+      });
+      //MD End
+      upContent();
+//    } else if (type == 1) {
+      //MD Start
+      api.execScript({
+        name: 'root',
+        script: "ChatAna('AudioTab',{'tabs':'讲义','courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "'},'播放器-讲义');"
+      });
+      //MD End
+      if (pptNum == 0) {
+        api.hideProgress();
+        document.getElementById('audio-main1').innerHTML = '<div class="nomessage" style="padding-bottom:1rem;"><img src="../../image/nomessage.png" alt=""><div class="no-tips">内容加载中</div></div>';
+        db.selectSql({
+          name: 'main',
+          sql: ("select * from ppt where id=" + id)
+        }, function (ret, err) {
+          if (ret.status) {
+            if (ret.data.length > 0) {
+              pptNum++;
+              ppt = ret.data[0].ppt;
+              document.getElementById("audio-main1").innerHTML = ppt;
+              var img = document.getElementById("audio-main1").querySelectorAll('img');
+              if (img) {
+                for (i in img) {
+                  if (typeof img[i] == 'object') {
+                    img[i].style.width = '100%';
+                    img[i].style.marginBottom = '10px';
+                  }
+                }
+              }
+            } else {
+              if (typeof d == 'object') {
+                api.execScript({
+                  name: 'root',
+                  script: "XO.GetPPT('" + $api.getStorage('token') + "','" + id + "','" + d.type + "','" + d.tid + "',{name:'audio',fun:'upPPT'},{name:'audio',fun:'upPPTfail'});"
+                });
+              } else {
+                api.execScript({
+                  name: 'root',
+                  script: "XO.GetPPT('" + $api.getStorage('token') + "','" + id + "',0,0,{name:'audio',fun:'upPPT'},{name:'audio',fun:'upPPTfail'});"
+                });
+              }
+            }
+          }
+        });
+      } else {
+        if (ppt && !(/img/.test(ppt))) {
+          document.getElementById("audio-main1").innerHTML = '<dd class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">内容编辑中</div></dd>';
+        } else {
+          document.getElementById("audio-main1").innerHTML = ppt;
+          var img = document.getElementById("audio-main1").querySelectorAll('img');
+          if (img) {
+            for (i in img) {
+              if (typeof img[i] == 'object') {
+                img[i].style.width = '100%';
+                img[i].style.marginBottom = '10px';
+              }
+            }
+          }
+        }
+        api.hideProgress();
+      }
+    } else {
+      app.getaskpage(1);
+//      隐藏PPT
+      document.getElementById("audio-main1").style.display = 'none';
+      document.getElementById("audio-main").style.display = 'block';
+      //      显示练习部分
+      $('.changeUp_box').css('display', 'block');
+      //MD Start
+      api.execScript({
+        name: 'root',
+        script: "ChatAna('AudioTab',{'tabs':'练习','courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "'},'播放器-练习');"
+      });
+      //MD End
+      document.getElementById("audio-main").innerHTML = document.getElementById("audioTask").innerHTML;
+      document.getElementById("audio-main").style.paddingTop = '10px';
+//      setTimeout(function () {
+//        if (document.querySelectorAll("[data-u]").length > 0) {
+//          document.querySelector("[data-u]").src = localStorage.getItem('face');
+//        }
+//      }, 300);
+      api.hideProgress();
+//      练习题赋值部分
+      if (audioData) {
+        if ((typeof audioData.task == 'object') && (typeof audioData.task.title != 'undefined')) {
+          document.querySelector(".audio-tip-2").innerHTML = audioData.task.title;
+          app.titlesw = document.querySelector(".audio-tip-2").innerHTML
+        } else {
+          document.querySelector(".audio-tip-2").innerHTML = '';
+        }
+      }
+//      if ((typeof audioData.task == 'object') && (typeof audioData.task.count != 'undefined')) {
+//        document.getElementById("task_count").innerHTML = audioData.task.count;
+//      } else {
+//        document.getElementById("task_count").innerHTML = 0;
+//      }
+//      if (taskData.length > 0) {
+//        moreTask(taskData.slice(tasknum * 10, (tasknum + 1) * 10));
+//      } else {
+//        upTaskfail('无信息');
+//      }
+
+    }
+    //ajax填充内容页
+  }
+
+
+  function upPPT(data) {
+    console.log(data);
+    document.getElementById("audio-main1").style.display = 'block';
+    if (Tabtype != 0) {
+      return;
+    }
+    pptNum++;
+    ppt = data;
+    if (!(/img/.test(data))) {
+      document.getElementById("audio-main1").innerHTML = '<dd class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">内容编辑中</div></dd>';
+    } else {
+      document.getElementById("audio-main1").innerHTML = data;
+      var img = document.getElementById("audio-main1").querySelectorAll('img');
+      if (img) {
+        for (i in img) {
+          if (typeof img[i] == 'object') {
+            img[i].style.width = '100%';
+            img[i].style.marginBottom = '10px';
+          }
+        }
+      }
+      var sql1 = "delete from ppt where id=" + id;
+      db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+        //alert(JSON.stringify(ret)+'study'+JSON.stringify(err));
+      });
+
+      var sql2 = "insert into ppt (ppt,id,type,tid) values ('" + data + "','" + id + "','" + d.type + "','" + d.tid + "')";
+
+      db.executeSql({name: 'main', sql: sql2}, function (ret, err) {
+        //alert(JSON.stringify(ret)+'study'+JSON.stringify(err));
+      });
+    }
+    api.hideProgress();
+  }
+
+  function upContent() {
+    if (audioData) {
+      if (!audioData.dur) {
+        var m, s;
+        m = parseInt(audioData.duration / 60);
+        s = parseInt(audioData.duration % 60);
+        m = m > 9 ? m : '0' + m;
+        s = s > 9 ? s : '0' + s;
+        audioData.dur = m + ':' + s;
+      }
+
+      audioData.index = 0;
+      blocks = [];
+      blocks.push({id: audioData.id, blocks: audioData.blocks, type: audioData.type});
+      var TM = new T7({tm: document.getElementById("audioContent")});
+      var html = TM.Tpl(audioData);
+      document.getElementById("audio-main").innerHTML = html;
+      db.selectSql({
+        name: 'main',
+        sql: ('select * from downfile')
+      }, function (ret, err) {
+        if (ret.status) {
+          if (ret.data.length > 0) {
+            ret.data.forEach(function (arg) {
+              $api.rmStorage('isdown' + arg.id);
+              if (document.querySelector("[data-down-id='" + arg.id + "']")) {
+                $api.setStorage('isdown' + arg.id, 1);
+                document.querySelector("[data-down-id='" + arg.id + "']").setAttribute("data-download", 1)
+              }
+            });
+          }
+        }
+      });
+
+//    document.getElementById("audio-message-box").innerHTML = document.getElementById("audioMessage").innerHTML;
+//    document.querySelector(".audio-message-dt-body").innerHTML = "我要留言";
+//    setTimeout(function () {
+//      if (document.querySelectorAll("[data-u]").length > 0) {
+//        document.querySelector("[data-u]").src = localStorage.getItem('face');
+//      }
+//    }, 300);
+//      api.execScript({
+//        name: 'root',
+//        script: "XO.GetAudioMessage('" + $api.getStorage('token') + "','" + id + "',{name:'audio',fun:'upMessage'},{name:'audio',fun:'upMessagefail'});"
+//      });
+//    if (typeof audioData.message != 'undefined') {
+//      if (audioData.message.length > 0) {
+//        messageData = audioData.message;
+////        moreMessage(messageData.slice(messagenum * 10, (messagenum + 1) * 10));
+//      } else {
+//        upMessagefail('无信息');
+//      }
+//    } else {
+//      upMessagefail('无信息');
+//    }
+    }
+  }
+  //留言点赞
+  function likeMessage(dom, id) {
+    setTimeout(function () {
+      var boo = dom.getAttribute('data-ilike');
+    }, 300);
+    if (boo == 0) {
+      if (bottomContentType == 2) {
+        api.execScript({
+          name: 'root',
+          script: "XO.AddLikeTask('" + $api.getStorage('token') + "','" + id + "',{name:'audio',fun:'AddLikeTaskSuccess'},{name:'audio',fun:'AddLikeTaskfail'});"
+        });
+      } else {
+        api.execScript({
+          name: 'root',
+          script: "XO.AddLikeMessage('" + $api.getStorage('token') + "','" + id + "',{name:'audio',fun:'AddLikeMessageSuccess'},{name:'audio',fun:'AddLikeMessageFail'});"
+        });
+      }
+
+    } else {
+      if (bottomContentType == 2) {
+        api.execScript({
+          name: 'root',
+          script: "XO.DelLikeTask('" + $api.getStorage('token') + "','" + id + "',{name:'audio',fun:'DelLikeTaskSuccess'},{name:'audio',fun:'DelLikeTaskfail'});"
+        });
+      } else {
+        api.execScript({
+          name: 'root',
+          script: "XO.DelLikeMessage('" + $api.getStorage('token') + "','" + id + "',{name:'audio',fun:'DelLikeMessageSuccess'},{name:'audio',fun:'DelLikeMessageFail'});"
+        });
+      }
+    }
+  }
+  //点赞成功
+  function AddLikeTaskSuccess(data) {
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+    document.querySelector("[data-id='" + data.msg + "']").setAttribute("data-ilike", 1);
+    document.querySelector("[data-num='" + data.msg + "']").innerHTML = parseInt(document.querySelector("[data-num='" + data.msg + "']").innerHTML) + 1;
+    api.toast({
+      msg: '点赞成功',
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+  // 点赞失败
+  function AddLikeTaskfail(data) {
+    api.toast({
+      msg: '点赞失败',
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+
+  function DelLikeTaskSuccess(data) {
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+    document.querySelector("[data-id='" + data.msg + "']").setAttribute("data-ilike", 0);
+    var num = parseInt(document.querySelector("[data-num='" + data.msg + "']").innerHTML);
+    if (num > 0) {
+      document.querySelector("[data-num='" + data.msg + "']").innerHTML = num - 1;
+    }
+    api.toast({
+      msg: '取消成功',
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+
+  function AddLikeMessageSuccess(data) {
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+    document.querySelector("[data-id='" + data.msg + "']").setAttribute("data-ilike", 1);
+    document.querySelector("[data-num='" + data.msg + "']").innerHTML = parseInt(document.querySelector("[data-num='" + data.msg + "']").innerHTML) + 1;
+    api.toast({
+      msg: '点赞成功',
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+
+  function AddLikeMessageFail(data) {
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+    api.toast({
+      msg: '操作失败',
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+
+  function DelLikeMessageSuccess(data) {
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+    document.querySelector("[data-id='" + data.msg + "']").setAttribute("data-ilike", 0);
+    if (document.querySelector("[data-num='" + data.msg + "']").innerHTML > 0) {
+      document.querySelector("[data-num='" + data.msg + "']").innerHTML = parseInt(document.querySelector("[data-num='" + data.msg + "']").innerHTML) - 1;
+    }
+    api.toast({
+      msg: '取消成功',
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+
+  function DelLikeMessageFail(data) {
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+    api.toast({
+      msg: '操作失败',
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+
+  function DelLikeTaskfail(data) {
+    api.toast({
+      msg: '操作失败',
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+
+  //  更多改进
+  function moreTask(data) {
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+    data.forEach(function (ar) {
+      ar.text = ar.content;
+      ar.date = App.dateFM(ar.vtime);
+      if (ar.uid == userID) {
+        ar.delete = true;
+      }
+      // if(!ar.stage){
+      // 	ar.stage = false;
+      // }
+      if (ar.text) {
+        var msg = ar.text;
+        var str = msg.match(pattern1);
+
+        if (str && str.length > 0) {
+          for (var i = 0; i < str.length; i++) {
+            var newstr = App.face(str[i]);
+            msg = msg.replace('[' + str[i] + ']', newstr);
+          }
+          ar.text = msg;
+        }
+      }
+      if (ar.chat && ar.chat.length > 0) {
+        var writer = ar.nickname;
+        var cid = ar.id;
+        ar.chat.forEach(function (arg) {
+          arg.text = arg.content;
+          arg.date = App.dateFM(arg.vtime);
+          var msg = arg.text;
+          var str = msg.match(pattern1);
+          writer = ar.nickname;
+          cid = ar.id;
+          if (!/http/.test(arg.face)) {
+            arg.face = App.url + arg.face;
+          }
+          if (str && str.length > 0) {
+            for (var i = 0; i < str.length; i++) {
+              var newstr = App.face(str[i]);
+              msg = msg.replace('[' + str[i] + ']', newstr);
+            }
+            arg.text = msg;
+          }
+        })
+      } else {
+        ar.chat == false;
+      }
+    });
+    // var TM = new T7({tm: document.getElementById("my_list_Tpl")});
+    // var html = TM.Tpl(data);
+    // document.getElementById('list').innerHTML = html;
+//    CACH(0, data.length, data, document.getElementById("Task_list_Tpl"), document.getElementById('list'), tasknum)
+    App.init();
+    api.hideProgress();
+  }
+
+  //  更多留言
+  function moreMessage(data) {
+    messageArray = [];
+    if (typeof data == 'string') {
+      var data = App.JSON(data);
+    }
+    data.forEach(function (ar) {
+      ar.text = ar.content;
+      ar.date = App.dateFM(ar.vtime);
+      if (ar.uid == userID) {
+        ar.delete = true;
+      }
+      // if(!ar.stage){
+      // 	ar.stage = false;
+      // }
+      if (ar.text) {
+        var msg = ar.text;
+        var str = msg.match(pattern1);
+
+        if (str && str.length > 0) {
+          for (var i = 0; i < str.length; i++) {
+            var newstr = App.face(str[i]);
+            msg = msg.replace('[' + str[i] + ']', newstr);
+          }
+          ar.text = msg;
+        }
+      }
+      if (ar.chat && ar.chat.length > 0) {
+        var writer = ar.nickname;
+        var cid = ar.id;
+        ar.chat.forEach(function (arg) {
+          arg.text = arg.content;
+          arg.date = App.dateFM(arg.vtime);
+          var msg = arg.text;
+          var str = msg.match(pattern1);
+          writer = ar.nickname;
+          cid = ar.id;
+          if (!/http/.test(arg.face)) {
+            arg.face = App.url + arg.face;
+          }
+          if (str && str.length > 0) {
+            for (var i = 0; i < str.length; i++) {
+              var newstr = App.face(str[i]);
+              msg = msg.replace('[' + str[i] + ']', newstr);
+            }
+            arg.text = msg;
+          }
+        })
+      } else {
+        ar.chat == false;
+      }
+    });
+
+    //console.log(JSON.stringify(data));
+
+    CACH(0, data.length, data, document.getElementById("message_list_Tpl"), document.getElementById('list'), messagenum)
+    //setTimeout(upChat(chatArray),1000);
+
+    api.hideProgress();
+  }
+
+  //  无留言
+  function upMessagefail(msg) {
+//    document.getElementById('list').innerHTML = document.getElementById('list').querySelector("dt").outerHTML + '<dd class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">当前暂无留言</div></dd>';
+    api.hideProgress();
+  }
+
+  //  无改进
+  function upTaskfail(msg) {
+//    document.getElementById('list').innerHTML = document.getElementById('list').querySelector("dt").outerHTML + '<dd class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">当前暂无改进</div></dd>';
+    api.hideProgress();
+  }
+
+  function upPPTfail(msg) {
+    document.getElementById('audio-main1').innerHTML = '<div class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">内容编辑中</div></div>';
+    api.hideProgress();
+  }
+
+  function play() {
+    document.getElementById('play_btn').className = document.getElementById('play_btn').className.replace(/bofang/, 'pause');
+    document.getElementById('play_btn1').className = document.getElementById('play_btn1').className.replace(/bofang/, 'pause');
+  }
+
+  function pause() {
+    document.getElementById('play_btn').className = document.getElementById('play_btn').className.replace(/pause/, 'bofang');
+    document.getElementById('play_btn1').className = document.getElementById('play_btn1').className.replace(/pause/, 'bofang');
+  }
+
+  function like() {
+    if (api.connectionType == 'none') {
+      api.toast({
+        msg: '未连接网络',
+        duration: 2000,
+        location: 'bottom'
+      });
+      return;
+    }
+    api.showProgress({
+      style: 'default',
+      animationType: 'fade',
+      title: '加载中...',
+      modal: false
+    });//数据加载中显示方块
+    var dom = document.querySelector("[data-ilike]");
+    if (dom.getAttribute('data-ilike') == 0) {
+      api.execScript({
+        name: 'root',
+        script: "ChatAna('ilike',{'ilike':true,'courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "'},'播放器-点赞');"
+      });
+      api.execScript({
+        name: 'root',
+        script: "XO.AddLike('" + $api.getStorage('token') + "','" + id + "',{name:'audio',fun:'add'},{name:'audio',fun:'fail'});"
+      });
+    } else {
+      api.execScript({
+        name: 'root',
+        script: "ChatAna('ilike',{'ilike':false,'courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "'},'播放器-取消点赞');"
+      });
+      api.execScript({
+        name: 'root',
+        script: "XO.DelLike('" + $api.getStorage('token') + "','" + id + "',{name:'audio',fun:'del'},{name:'audio',fun:'fail'});"
+      });
+    }
+  }
+
+  function add(data) {
+    document.querySelector("[data-ilike]").setAttribute('data-ilike', 1);
+    //var n = parseInt(document.getElementById("likenum").innerHTML);
+    //document.getElementById("likenum").innerHTML = n+1;
+    // api.execScript({
+    //     name: 'audio',
+    //     frameName: 'audioContent',
+    //     script: "addLikeSuccess();"
+    // });
+    api.hideProgress();
+    api.toast({
+      msg: '成功点赞',
+      duration: 2000,
+      location: 'bottom'
+    });
+
+  }
+
+  function del(data) {
+    document.querySelector("[data-ilike]").setAttribute('data-ilike', 0);
+    //var n = parseInt(document.getElementById("likenum").innerHTML);
+    //n = (n-1>=0)?(n-1):0;
+    //document.getElementById("likenum").innerHTML = n;
+    // api.execScript({
+    //     name: 'audio',
+    //     frameName: 'audioContent',
+    //     script: "DelLikeSuccess();"
+    // });
+    api.hideProgress();
+    api.toast({
+      msg: '取消点赞',
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+
+  function CACH(i, max, data, template, box, num) {
+    if (i < max) {
+      if (data[i].face) {
+
+        var _file = App.file(data[i].face);
+        fs.exist({
+          path: (api.fsDir + '/file/' + _file.full)
+        }, function (ret, err) {
+          if (ret.exist) {
+            data[i].face = (api.fsDir + '/file/' + _file.full);
+            CACH(i + 1, max, data, template, box, num);
+          } else {
+            if (data[i].face.indexOf('/') == 0) {
+              var dface = App.url + data[i].face;
+            } else {
+              var dface = data[i].face;
+            }
+            api.download({
+              url: dface,
+              savePath: ('fs://file/' + _file.full),
+              cache: true,
+              allowResume: true
+            }, function (ret, err) {
+              data[i].face = (api.fsDir + '/file/' + _file.full);
+              CACH(i + 1, max, data, template, box, num);
+            });
+          }
+        });
+      } else {
+        CACH((i + 1), max, data, template, box, num);
+      }
+    } else {
+      //结束
+      var TM = new T7({tm: template});
+      var html = TM.Tpl(data);
+      if (num == 0) {
+//        box.innerHTML = box.querySelector("dt").outerHTML + html;
+      } else {
+        box.innerHTML = box.innerHTML + html;
+      }
+      App.init();
+    }
+  }
+
+  //  发布留言和评论
+
+  function comment(cid, Replay, placeholder) {
+    if (isChat) {
+      UIChatBox.popupKeyboard();
+      return;
+    }
+    isChat = true;
+    UIChatBox.open({
+      placeholder: placeholder,
+      maxRows: 4,
+      autoFocus: true,
+      emotionPath: 'widget://res/chatbox/emotion',
+      texts: {
+        recordBtn: {
+          normalTitle: '按住说话',
+          activeTitle: '松开结束'
+        },
+        sendBtn: {
+          title: '发送'
+        }
+      },
+      styles: {
+        inputBar: {
+          borderColor: '#d9d9d9',
+          bgColor: '#f2f2f2'
+        },
+        inputBox: {
+          borderColor: '#B3B3B3',
+          bgColor: '#FFFFFF'
+        },
+        emotionBtn: {
+          normalImg: 'widget://res/chatbox/face1.png'
+        },
+        keyboardBtn: {
+          normalImg: 'widget://res/chatbox/key3.png'
+        },
+        indicator: {
+          target: 'both',
+          color: '#c4c4c4',
+          activeColor: '#9e9e9e'
+        },
+        sendBtn: {
+          titleColor: '#fff',
+          bg: '#5099FB',
+          activeBg: '#2e73d0',
+          titleSize: 12
+        }
+      },
+      extras: {
+        titleSize: 12,
+        titleColor: '#a3a3a3',
+        btns: []
+      }
+    }, function (ret, err) {
+      if (ret) {
+        if (ret.eventType == 'clickExtras') {
+        } else if (ret.eventTyp == 'show') {
+          UIChatBox.popupKeyboard();
+        } else if (ret.eventType == 'send') {
+          isChat = false;
+          var msg = ret.msg;
+          if (Replay) {
+            if (msg.length < 3) {
+              api.toast({
+                msg: '回复不能少于3个字!',
+                duration: 2000,
+                location: 'bottom'
+              })
+              return;
+            }
+          }
+          msg = msg.replace(/(\n)+|(\r\n)+/g, " ");
+          var token = $api.getStorage('token');
+          if (msg) {
+            //                简介
+            if (!Replay) {
+              if (msg.length < 3) {
+                api.toast({
+                  msg: '留言不能少于3个字!',
+                  duration: 2000,
+                  location: 'bottom'
+                })
+                return;
+              }
+            }
+            UIChatBox.closeKeyboard();
+            UIChatBox.close();
+            if (cid) {
+              var _data = {
+                values: {
+                  id: id,
+                  cid: cid,
+                  msg: msg
+                }
+              }
+            } else {
+//                发布留言
+              var _data = {
+                values: {
+                  id: id,
+                  cid: 0,
+                  msg: msg
+                }
+              }
+            }
+            api.ajax({
+              url: App.url + "?r=up&a=message&token=" + token,
+              method: 'post',
+              data: _data
+            }, function (ret, err) {
+              if (ret) {
+                UIChatBox.close();
+                if (ret.status == true || ret.status == 'true') {
+                  api.execScript({
+                    name: 'root',
+                    script: "XO.GetAudioInfo('" + $api.getStorage('token') + "','" + d.id + "','" + d.type + "','" + d.tid + "',{name:'audio',fun:'islike'},{name:'audio',fun:'fail'});"
+                  });
+                  api.toast({
+                    msg: '发布成功',
+                    duration: 2000,
+                    location: 'bottom'
+                  });
+                  var dom = document.querySelector("#Header");
+                  dom.style.backgroundColor = "rgba(255,255,255,0)"
+
+                  if (/has-scroll/.test(dom.className)) {
+                    dom.className = dom.className.replace(/ has-scroll/, '');
+                  }
+                  api.execScript({name: 'root', script: "ChatAna('Postcomment',{'is_success':true},'留言发布成功');"});
+                }
+              } else {
+                api.execScript({name: 'root', script: "ChatAna('Postcomment',{'is_success':false},'留言发布失败');"});
+                api.toast({
+                  msg: '发布失败',
+                  duration: 2000,
+                  location: 'bottom'
+                });
+              }
+            });
+          }
+        }
+      } else {
+        //alert( JSON.stringify( err ) );
+      }
+    });
+  }
+
+  //  改进成功
+  function postSuccess() {
+    UIChatBox.close();
+    api.toast({
+      msg: '发布成功',
+      duration: 2000,
+      location: 'bottom'
+    });
+    var dom = document.querySelector("#Header");
+    dom.style.backgroundColor = "rgba(255,255,255,0)"
+
+    if (/has-scroll/.test(dom.className)) {
+      dom.className = dom.className.replace(/ has-scroll/, '');
+    }
+
+    api.execScript({name: 'root', script: "ChatAna('PostTask',{'is_success':true},'改进提交成功');"});
+    api.execScript({
+      name: 'root',
+      script: "XO.GetAudioInfo('" + $api.getStorage('token') + "','" + d.id + "','" + d.type + "','" + d.tid + "',{name:'audio',fun:'islike'},{name:'audio',fun:'fail'});"
+    });
+  }
+
+  function postfail() {
+    api.toast({
+      msg: '发布失败',
+      duration: 2000,
+      location: 'bottom'
+    });
+    api.execScript({name: 'root', script: "ChatAna('PostTask',{'is_success':false},'改进提交失败');"});
+  }
+
+  //  删除留言
+  function DelMessage(id, radioid) {
+    rid = radioid;//分发事件用
+    api.execScript({
+      name: 'root',
+      script: "XO.DelMessage('" + $api.getStorage('token') + "','" + id + "',{name:'audio',fun:'DelSuccess'},{name:'audio',fun:'Delfail'});"
+    });
+  }
+
+  function DelTask(id) {
+    api.execScript({
+      name: 'root',
+      script: "XO.DelTask('" + $api.getStorage('token') + "','" + id + "',{name:'audio',fun:'DelSuccess'},{name:'audio',fun:'Delfail'});"
+    });
+  }
+
+  function DelSuccess(data) {
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+    document.querySelector("[data-del='" + data.msg + "']").parentNode.removeChild(document.querySelector("[data-del='" + data.msg + "']"));
+    // if(rid != 0){
+    // 	api.execScript({
+    // 	    name: 'root',
+    // 	    frameName: 'FM',
+    // 	    script: "changenum('com','del','"+rid+"');"
+    // 	});
+    // }
+    api.toast({
+      msg: '删除成功',
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+
+  function Delfail(data) {
+    api.toast({
+      msg: '删除失败',
+      duration: 2000,
+      location: 'bottom'
+    });
+  }
+
+  function changeDownloadState(id) {
+    if (document.querySelector("[data-down-id='" + id + "']")) {
+      document.querySelector("[data-down-id='" + id + "']").setAttribute("data-download", 1);
+    }
+
+  }
+
+  var CheckM = [];
+  function download(dom, index) {
+    CheckM = [];
+    var id = dom.getAttribute("data-down-id")
+    var boo = dom.getAttribute("data-download");
+    if (boo == 0) {
+      dom.setAttribute("data-download", 1);
+    }
+
+    api.execScript({name: 'root', script: "ChatAna('Download',{'courseID':" + id + ",'page':'audio'},'播放器-下载课程');"});
+
+    if ((typeof blocks[index] == 'object') && (blocks[index].blocks.length > 4)) {
+      var blocks_temp = blocks[index].blocks.split('|');
+      for (var i in blocks_temp) {
+        var tempi = blocks_temp[i].split(',');
+        CheckM.push({id: blocks[index].id, blocks: i, file: '', hash: tempi[1], type: blocks[index].type});
+      }
+
+      db.selectSql({
+        name: 'main',
+        sql: ("select * from downfile where `id`=" + blocks[index].id)
+      }, function (ret, err) {
+        if (ret.status) {
+          if (ret.data.length > 0) {
+            if ((ret.data.length != blocks_temp.length) && (blocks_temp.length > 0)) {
+              App.tips('已列入下载任务中!');
+              db.executeSql({
+                name: 'main',
+                sql: 'delete from downfile where id=' + blocks[index].id
+              }, function (ret, err) {
+                Upfile(CheckM, 0, CheckM.length);
+              });
+            } else {
+              App.tips('下载任务已存在!');
+            }
+          } else {
+            App.tips('已列入下载任务中!');
+            Upfile(CheckM, 0, CheckM.length);
+          }
+        }
+      });
+    }
+  }
+
+  function Upfile(CheckM, start, len) {
+    if (start < len) {
+      db.selectSql({
+        name: 'main',
+        sql: ('select * from downfile where id=' + CheckM[start].id + ' and blocks=' + CheckM[start].blocks)
+      }, function (ret, err) {
+        if (ret.status) {
+          var uptime = App.time();
+          if (ret.data.length > 0) {
+            var sql1 = "update downfile set file='" + CheckM[start].file + "',hash ='" + CheckM[start].hash + "',at=0,status=1,type=" + CheckM[start].type + " where id=" + CheckM[start].id + ' and blocks=' + CheckM[start].blocks;
+          } else {
+            var sql1 = "INSERT INTO downfile VALUES(" + CheckM[start].id + ",'" + CheckM[start].blocks + "','','" + CheckM[start].file + "','" + CheckM[start].hash + "',0,1," + CheckM[start].type + "," + uptime.stamp + ")";
+          }
+          console.log(sql1);
+          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+            Upfile(CheckM, (start + 1), len);
+          });
+        }
+      });
+    } else {
+      api.execScript({name: 'root', script: 'DownManage(0,\'doit\');'});
+    }
+  }
+  //打开播放列表
+  function openList() {
+    api.execScript({
+      name: 'root',
+      script: "ChatAna('OpenList',{'courseID':" + id + ",'courseTitle':'" + audioTitle + "','courseFirstCate':'" + AudioCate + "'},'播放器-播放列表');"
+    });
+    document.getElementById("audio_mask").style.display = 'block';
+    api.openFrame({
+      name: 'list',
+      url: '../../html/fm/list.html',
+      rect: {
+        x: 0,
+        y: api.winHeight / 2,
+        w: api.winWidth,
+        h: api.winHeight / 2
+      },
+      pageParam: {
+        name: 'list'
+      },
+      animation: {
+        type: "movein",
+        subType: "from_bottom",
+        duration: 300
+      }
+    });
+  }
+
+  //  监听并关闭播放列表
+  document.getElementById("main").onclick = function (ev) {
+    var oEvent = ev || event;
+    if (app.ifshowthistoken == true) {
+      UIChatBox.popupKeyboard();
+      UIChatBox.close();
+      app.ifshowthistoken = false
+    }
+    oEvent.cancelBubble = true;
+    oEvent.stopPropagation();
+  };
+  var app = new Vue({
+    el: "#app",
+    data: {
+      ad: '123',
+      rid: id,
+      page: 1,
+      useraskdate: '',
+      rote: false,
+      overlate: false,
+      load: false,
+      u_getReplyAnswerlist: [],
+      callbacklist: [
+        {
+          key: '',
+          value: []
+        }
+      ],
+      titlesw: '',
+      totlecallbacklist: {},
+      ifshowthistoken: false,
+      ifshowmore: false,
+      checkmoretext: '查看更多',
+      newimg: "../../image/alipay.png",
+      newtwoimg: "../../image/ask_bg.png",
+      audiotimelist: [],
+      starttimeimg: '',
+      id: '', //音频ID
+      tid: '', //课程id
+      rids: null, //练习答题ID
+      texts: '',
+      formatImg:formatImg
+    },
+    methods: {
+      //  输入框
+      openthisl: function (index, laberindex, laberl) {
+        UIChatBox.open({
+          placeholder: '请输入您想回复的内容',
+          maxRows: 4,
+          autoFocus: true,
+          emotionPath: 'widget://res/chatbox/emotion',
+          texts: {
+            recordBtn: {
+              normalTitle: '按住说话',
+              activeTitle: '松开结束'
+            },
+            sendBtn: {
+              title: '发送'
+            }
+          },
+          styles: {
+            inputBar: {
+              borderColor: '#d9d9d9',
+              bgColor: '#f2f2f2'
+            },
+            inputBox: {
+              borderColor: '#B3B3B3',
+              bgColor: '#FFFFFF'
+            },
+            emotionBtn: {
+              normalImg: 'widget://res/chatbox/face1.png'
+            },
+            keyboardBtn: {
+              normalImg: 'widget://res/chatbox/key3.png'
+            },
+            indicator: {
+              target: 'both',
+              color: '#c4c4c4',
+              activeColor: '#9e9e9e'
+            },
+            sendBtn: {
+              titleColor: '#fff',
+              bg: '#5099FB',
+              activeBg: '#2e73d0',
+              titleSize: 12
+            }
+          },
+          extras: {
+            titleSize: 12,
+            titleColor: '#a3a3a3',
+            btns: []
+          }
+        }, function (ret, err) {
+          if (ret) {
+            app.ifshowthistoken = true;
+            if (ret.eventType == 'clickExtras') {
+            } else if (ret.eventTyp == 'show') {
+              app.ifshowthistoken = false;
+              UIChatBox.popupKeyboard();
+              UIChatBox.close();
+            } else if (ret.eventType == 'send') {
+              app.ifshowthistoken = false;
+              if (laberl == 1) {
+                app.u_replySubmit(app.useraskdate[index].practice_user_id, ret.msg, app.useraskdate[index].uid);
+              } else {
+                app.u_replySubmit(app.useraskdate[index].practice_user_id, ret.msg, app.callbacklist[index].value[laberindex].reply_uid);
+              }
+            }
+          } else {
+            //alert( JSON.stringify( err ) );
+          }
+        });
+      },
+      //留言板块
+      getaskpage: function (ref) {
+        var post = {
+          hash: $api.getStorage('token'),
+          rid: api.pageParam.des,
+          perPage: 10,
+          page: app.page
+        };
+        sendAjax(this, post, '/Api/Ucenter/u_getImprovePracticeAnswer', function (res) {
+          for (var j = 0; j < res.data.answer.length; j++) {
+            res.data.answer[j].replyAnswer = [];
+          }
+          if (ref == 1) {
+            app.useraskdate = res.data.answer;
+
+            for (var i = 0; i < app.useraskdate.length; i++) {
+              app.u_getReplyAnswer(app.useraskdate[i].practice_user_id, app.useraskdate[i]);
+            }
+            if (app.useraskdate.length > 3) {
+              app.ifshowmore = true;
+            }
+          } else {
+            app.useraskdate = app.useraskdate.concat(res.data.answer);
+            for (var i = 0; i < app.useraskdate.length; i++) {
+              app.u_getReplyAnswer(app.useraskdate[i].practice_user_id, i)
+            }
+          }
+          if (res.data.answer.length == 0) {
+            app.checkmoretext = '已全部加载'
+          }
+        })
+      },
+      //回复列表
+      u_getReplyAnswer: function (practice_user_id, userask) {
+        var post = {
+          hash: $api.getStorage('token'),
+          practice_user_id: practice_user_id
+        };
+        sendAjax(this, post, '/Api/Ucenter/u_getReplyAnswer', function (res) {
+          userask.replyAnswer = res.data;
+        })
+      },
+      //提交回复内容
+      u_replySubmit: function (practice_user_id, callbackvalue, reply_cover_uid) {
+        var post = {
+          hash: $api.getStorage('token'),
+          practice_user_id: practice_user_id,
+          content: callbackvalue,
+          reply_cover_uid: reply_cover_uid
+        };
+        sendAjax(this, post, '/Api/Ucenter/u_replySubmit', function (res) {
+          toastMsg('回复成功');
+          app.getaskpage(1)
+          UIChatBox.close();
+          UIChatBox.popupKeyboard();
+        })
+      },
+      //点赞接口
+      u_agreeAnswer: function (index) {
+        var post = {
+          hash: $api.getStorage('token'),
+          practice_user_id: app.useraskdate[index].practice_user_id
+        };
+        sendAjax(this, post, '/Api/Ucenter/u_agreeAnswer', function (res) {
+          app.getaskpage(1)
+        })
+      },
+      //查看更多
+      checkmore: function () {
+        app.page++;
+        app.callbacklist = [];
+        app.getaskpage()
+      },
+      //获取音频时间 图片
+      getRadioPic: function () {
+        var post = {
+          rid: app.id
+        };
+        sendAjax(this, post, '/Api/Data/getRadioPic', function (res) {
+          if (res.data.length > 0) {
+            app.audiotimelist = res.data;
+            if (app.audiotimelist[0].time_point) {
+              app.starttimeimg = app.audiotimelist[0].time_point
+            }
+          }
+        })
+      },
+//      我要答题
+      Examination: function () {
+        if (app.rids == null || typeof app.rids == 'undefined') {
+          api.toast({
+            msg: '该课程暂无练习',
+            duration: 2000,
+            location: 'bottom'
+          })
+        } else {
+          api.openWin({
+            name: 'Completion_fm',
+            url: '../class/Completion_fm.html',
+            pageParam: {
+              nameText: app.texts,
+              texts: app.titlesw,
+              id: app.rids,   // 练习id
+              rid: app.id
+            }
+          })
+        }
+      }
+    }
+  })
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

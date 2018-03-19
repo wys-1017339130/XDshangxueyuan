@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>我的行币</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">我的行币</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div class="main-box">
+			<div class="z-home-banner-box">
+				<div style="top: 40px;z-index: 10;position: fixed;right: 0;" data-des="0" data-href="../../html/me/promoter.html" data-name="promoter" class="promoter">学习代言人</div>
+				<img class="z-home-bg" src="../../image/rank.png" alt="">
+			</div>
+			<div style="padding-top: 10%" class="up-box">
+				<div id="content" class="z-user-avatar-box">
+					<ul class="z-rank-user-info flex-wrap">
+						<li class="flex-con">
+							<div id="score" class="z-rank-user-text bold score-right">0</div>
+							<div class="z-rank-user-title score-right">我的行币</div>
+							<div data-des="0" data-href="../../html/me/help.html" data-name="help" class="score-a score-right">查看行币规则<span class="icon iconfont icon-ch2"></span></div>
+						</li>
+						<li data-des="0" data-href="../../html/me/rank.html" data-name="rank" class="flex-con">
+							<div id="index" class="z-rank-user-text bold score-left" style="text-indent: 1rem">0</div>
+							<div class="z-rank-user-title score-left">我的排名</div>
+							<div class="score-a score-left">查看学霸排行榜<span class="icon iconfont icon-ch2"></span></div>
+						</li>
+					</ul>
+				</div>
+				<div class="box">
+					<ul class="score-head z-border-bottom flex-wrap">
+						<li onclick="select(this,0)">行币明细</li>
+						<li onclick="select(this,1)">每周任务</li>
+						<li onclick="select(this,2)">学习挑战</li>
+					</ul>
+					<ul id="list" class="score-detail">
+					</ul>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+<script id="list1_Tpl" type="text/template">
+	{{#data}}
+	<li>
+		<div class="score-title">{{des}}</div>
+		<div class="score-date">{{vtime}}</div>
+		<span class="score-score">{{type}}{{score}}</span>
+	</li>
+	{{/data}}
+</script>
+<script id="list2_Tpl" type="text/template">
+	{{#data}}
+	<li data-href="{{href}}" data-name="{{name}}">
+		<span class="score-circle {{#if com}}score-complete{{/if}}">{{score}}<span class="score-add">+</span></span>
+		<span class="score-title">{{title}}</span>
+		{{#if com}}
+		<span class="fr score-li-right score-complete"><span class="icon iconfont icon-xuanzhong"></span>已完成</span>
+		{{else}}
+		<span class="fr score-li-right">前往<span class="icon iconfont icon-ch2"></span></span>
+		{{/if}}
+	</li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var PageNum = 0;
+	var HeadBar = $api.byId('HeadBar');
+	var length = 0;
+	var score_data,db;
+	var boo = [false,true];
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+		db = api.require('db');
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('ScorePage',{'Active':'加载'},'积分记录');"});
+		//MD End
+		App.openWWW(api.winName);
+		db.selectSql({
+		    name: 'main',
+		    sql: ('select * from user')
+		}, function(ret, err) {
+		    if (ret.status) {
+		       if(ret.data.length>0){
+							document.getElementById("index").innerHTML = ret.data[0].dex;
+							document.getElementById("score").innerHTML = ret.data[0].score;
+		      }
+		    }
+		    if(api.connectionType != 'none'){
+				Refresh();
+			}else{
+				document.getElementById("list").innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">无记录</div></li>';
+			}
+		});
+	};
+
+	function Refresh(){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});//数据加载中显示方块
+		api.execScript({name: 'root',script: "XO.GetScore('"+ $api.getStorage('token') +"',{name:'score',fun:'upview'},{name:'score',fun:'fail'});"});
+	}
+
+	function upscore(data){
+		console.log(data);
+		document.getElementById("score").innerHTML = data;
+		var sql = "update user set score='"+ data + "'";
+		db.executeSql({
+		    name: 'main',
+		    sql: sql
+		}, function(ret, err) {
+		});
+	}
+
+	function upview(data){
+
+		api.execScript({name: 'root',script: "XO.SCore('"+ $api.getStorage('token') +"',{name:'score',fun:'upscore'},{name:'score',fun:'fail'});"});
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+
+		data.detail.forEach(function(arg){
+			arg.vtime = App.dateStr(arg.vtime);
+			arg.type = (arg.type==0) ? '-' : '+';
+		})
+		data.week.forEach(function(arg){
+			arg.com = boo[arg.isComplete];
+		})
+		data.challenge.forEach(function(arg){
+			arg.com = boo[arg.isComplete];
+		})
+		score_data = data;
+		select(document.querySelectorAll(".score-head li")[0],0);
+		App.init();
+		api.hideProgress();
+	}
+
+	function select(dom,type){
+		if(/active/g.test(dom.className)){
+			return;
+		}
+		if(document.querySelector(".active")){
+			document.querySelector(".active").className = '';
+		}
+		dom.className = 'active';
+		switch (type){
+			case 0:
+				api.execScript({name: 'root', script: "ChatAna('score',{'name':'积分明细'},'积分记录－积分明细');"});
+				if(score_data && (typeof score_data.detail == 'object')){
+					if(score_data.detail.length>0){
+						var TM = new T7({tm: document.getElementById("list1_Tpl")});
+						var html = TM.Tpl(score_data.detail);
+						document.getElementById("list").innerHTML = html;
+					}else{
+						document.getElementById("list").innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">无记录</div></li>';
+					}
+					App.init();
+				}
+				break;
+			case 1:
+				api.execScript({name: 'root', script: "ChatAna('score',{'name':'每周任务'},'积分记录－每周任务');"});
+				if(score_data && (typeof score_data.week == 'object')){
+					if(score_data.week.length>0){
+						var TM = new T7({tm: document.getElementById("list2_Tpl")});
+						var html = TM.Tpl(score_data.week);
+						document.getElementById("list").innerHTML = html;
+					}else{
+						document.getElementById("list").innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">无记录</div></li>';
+					}
+					App.init();
+				}
+				break;
+			case 2:
+			api.execScript({name: 'root', script: "ChatAna('score',{'name':'挑战任务'},'积分记录－挑战任务');"});
+				if(score_data && (typeof score_data.week == 'object')){
+					if(score_data.challenge.length>0){
+						var TM = new T7({tm: document.getElementById("list2_Tpl")});
+						var html = TM.Tpl(score_data.challenge);
+						document.getElementById("list").innerHTML = html;
+					}else{
+						document.getElementById("list").innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">无记录</div></li>';
+					}
+					App.init();
+				}
+				break;
+			default:
+				document.getElementById("list").innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">无记录</div></li>';
+				break;
+		}
+	}
+
+
+	function fail(msg){
+		document.getElementById("list").innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">无记录</div></li>';
+		api.hideProgress();
+		App.tips(msg);
+	}
+
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

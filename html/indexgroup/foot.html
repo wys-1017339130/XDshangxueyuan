@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>商学院</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+    <style>
+	    html,body{
+	    	background-color: transparent !important;
+	    }
+	    body{
+	    	height: auto;
+	    }
+    	ul li{
+    		height: 50px;
+    		text-align: center;
+    		padding-top: 6px;
+    		box-sizing: border-box;
+    		-webkit-box-sizing: border-box;
+    	}
+    	.foot-text{
+    		font-size: 12px;
+    	}
+    	.foot-li .icon{
+    		font-size: 18px;
+    	}
+    	.foot-li{
+    		color: #666;
+    	}
+    	.foot-li.active{
+			color: #2f63a8;
+    	}
+    	.ceng{
+    		position: absolute;
+    		top: 0;
+    		bottom: 0;
+    		left: 0;
+    		right: 0;
+    		background-color: rgba(255,255,255,0.2);
+    		color: #fff;
+    		font-size: 18px;
+    	}
+    	.ceng .icon{
+    		line-height: 60px;
+    		text-align: center;
+    	}
+    </style>
+</head>
+<body>
+	<ul class="flex-wrap" style="margin-top: 30px">
+		<li id="ifoot" tapmode='' onclick="select(0,this)" class="flex-con foot-li active">
+			<span class="icon iconfont icon-xueyuan2"></span>
+			<div class="foot-text">商学院</div>
+		</li>
+		<li tapmode='' onclick="select(1,this)" class="flex-con foot-li">
+			<div style="height: 50px;">
+				<div style="width: 60px;height: 60px;border-radius: 100%;overflow: hidden;margin: auto;border: 6px solid #f3f3f3;margin-top: -30px;position: relative;">
+					<div style="display: block;" class="ceng">
+						<span class="icon iconfont icon-bofang2"></span>
+					</div>
+					<img id="play_pic" wifth="60" height="60" src="../../image/user_default.png" alt="">
+				</div>
+			</div>
+		</li>
+		<li tapmode='' onclick="select(2,this)" class="flex-con foot-li">
+			<span class="icon iconfont icon-wode1"></span>
+			<div class="foot-text">我的</div>
+		</li>
+	</ul>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+	var fs,db;
+	var getpicInt;
+	apiready = function(){
+		fs = api.require("fs");
+		db = api.require("db");
+		type = api.pageParam.type || 0;
+				//设置底部默认图
+		var sql = 'select * from currentaudio';
+		var d = document.getElementById('play_pic');
+		db.selectSql({
+		    name: 'main',
+		    sql: sql
+		}, function(ret, err) {
+			if(ret.status){
+			    if(ret.data.length>0){
+					setpic(ret.data[0].pic);
+			    }else{
+			    	getpicInt = setInterval(function(){
+			    		api.execScript({
+						    name: 'root',
+						    frameName: 'FM',
+						    script: "getpic();"
+						});
+			    	},200);
+			    }
+			}
+		});
+
+		api.execScript({name: 'root',script: "ToFront();"});
+
+		var ceng = document.querySelector(".ceng");
+		api.addEventListener({
+		    name: 'topause'
+		}, function(ret, err) {
+			ceng.style.display = "block";
+		});
+
+		api.addEventListener({
+		    name: 'PlayStatus'
+		}, function(ret, err) {
+			var ceng = document.querySelector(".ceng");
+			ceng.style.display = "none";
+		});
+
+	};
+
+	/*
+	function PlayStatus(data){
+		var ceng = document.querySelector(".ceng");
+		ceng.style.display = "none";
+	}
+	*/
+
+	function Refresh(){
+
+	}
+
+	function upview(data){
+
+	}
+
+	function setpic(pic){
+		if(getpicInt){
+			clearInterval(getpicInt);
+		}
+		if(pic&&(pic!="undefined")&&(pic!="null")){
+			var _file = App.file(pic);
+			fs.exist({
+			    path: (api.fsDir + '/file/' +_file.full)
+			}, function(ret, err) {
+			    if (ret.exist) {
+			    		pic = (api.fsDir + '/file/' +_file.full);
+			    		document.getElementById("play_pic").src = pic;
+			    }else{
+			    	if(pic.indexOf('/') == 0){
+						var dface = App.url + pic;
+
+					}else{
+						var dface = pic;
+					}
+			    	api.download({
+					    url: dface,
+					    savePath: ('fs://file/' +_file.full),
+					    cache: true,
+					    allowResume: true
+					}, function(ret, err) {
+						pic = (api.fsDir + '/file/' +_file.full);
+						document.getElementById("play_pic").src = pic;
+					});
+			    }
+			});
+		}
+	}
+
+	function playAudio(path,id){
+		api.execScript({
+		    name: 'root',
+		    script: "newPlayAudio('"+path+"','"+id+"');"
+		});
+	}
+
+	function select(type,dom){
+
+		if(/active/.test(dom.className)){
+			return;
+		}
+
+		if(type != 1){
+			var active = document.querySelector(".active");
+			if(active){
+				var str = active.className;
+				str = str.replace(/active/,'');
+				str = str.replace(/^\s\s*/,'').replace(/\s\s*$/,'');//去首尾空格最快方法
+				active.className = str.replace(/\s\s\s*/,' ');//将双空格换成单空格
+				dom.className = dom.className + ' active';
+			}else{
+				dom.className = dom.className + ' active';
+			}
+		}
+
+		api.execScript({
+		    name: 'root',
+		    script: "MenuClick('"+type+"');"
+		});
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

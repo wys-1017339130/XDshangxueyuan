@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html style="height: auto">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title>主页</title>
+	<link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/static.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+	<style>
+		.num_box{
+			float: right;
+			margin-right:0.5rem;
+		}
+	</style>
+</head>
+<body style="position: relative;padding-bottom: 1rem;">
+<div style="text-align: center;" class="home-img-box new-bg">
+	<img data-des="0" data-href="../../html/me/edit.html" data-name="edit" data-u='face' width="50" height="50" src="../../image/new-user.png" class="home-avatar-1" onerror="this.src='../../image/new-user.png'">
+	<div id="z-home-name" data-des="0" data-href="../../html/me/edit.html" data-name="edit" style="color: #473920;font-size: 1.1rem;line-height: 1.4;font-weight: 300;margin: 8px 0;">欢迎来到行动商学院</div>
+	<div id="z-home-login" data-des="0" data-href="../../html/me/login.html" data-name="login" class="new-login-btn">请先注册&nbsp;/&nbsp;登录</div>
+	<div id="user_info" style="display:none;">
+		<div id="bianhao" style="color: #999;font-size: 0.7rem;line-height: 1.6">学号：0</div>
+		<div data-des="0" data-href="../../html/me/edit.html" data-name="edit" style="color: #999;font-size: 0.7rem;line-height: 1.6">查看或编辑个人资料</div>
+	</div>
+	<div data-des="0" data-href="../../html/me/promoter.html" data-name="promoter" style="position: absolute;right: 0;top: 0;height: 100px;width: 120px;z-index:999" >
+		<div class="promoter new-promoter"><img src="../../image/dyr.png" class="new-promoter-img">学习代言人</div>
+	</div>
+</div>
+<div style="border-bottom: 1px solid #efefef" class="flex-wrap new-data">
+	<div data-touch data-des="0" data-href="../../html/me/rank.html" data-name="rank" class="flex-con z-ellipsis new-border new-border-1">
+		<img src="../../image/jp.png">学霸排行 第<span id="rank">?</span>名
+	</div>
+	<div data-touch class="flex-con z-ellipsis">
+		<img src="../../image/yq.png">已邀人数 <span id="invitation">0</span>人
+	</div>
+</div>
+<div class="flex-wrap new-data">
+	<div data-touch style="line-height: 1.6;padding: 10px 0" class="flex-con z-ellipsis new-border new-border-2">
+		<span id="z-home-second">0分</span><br><span class="new-little-title">本周学习</span>
+	</div>
+	<div data-touch style="line-height: 1.6;padding: 10px 0" class="flex-con z-ellipsis new-border new-border-2">
+		<span id="z-home-colume">0课</span><br><span class="new-little-title">学习课程</span>
+	</div>
+	<div data-touch style="line-height: 1.6;padding: 10px 0" class="flex-con z-ellipsis new-ch2">
+		<span id="z-home-day">0天</span><br><span class="new-little-title">连续天数</span>
+		<span class="icon iconfont icon-ch2" style="display:none;"></span>
+	</div>
+</div>
+<div class="up-box">
+	<div class="home-2">
+		<!--studylist-->
+		<div data-touch class="z-home-menu new-home-menu" data-des="0" data-href="../../html/class/myclass_win.html" data-name="studylist">
+			<img src="../../image/fmicon2.png" alt="">我的课程<span class="icon iconfont icon-ch2 fr"></span>
+		</div>
+		<div data-touch class="z-home-menu new-home-menu" data-des="0" data-href="../../html/me/studylist.html" data-name="studylist">
+			<img src="../../image/kc.png" alt="">学习记录<span class="icon iconfont icon-ch2 fr"></span>
+		</div>
+		<div data-touch class="z-home-menu new-home-menu" data-des="0" data-href="../../html/me/message.html" data-name="message">
+			<img src="../../image/xg.png" alt="">改进练习<span class="icon iconfont icon-ch2 fr"></span>
+		</div>
+		<div style="display:none;" data-touch class="z-home-menu new-home-menu">
+			<img src="../../image/zs.png" alt="">我的证书<span class="icon iconfont icon-ch2 fr"></span>
+		</div>
+		<div data-touch class="z-home-menu new-home-menu" data-des="0" data-href="../../html/me/score.html" data-name="score">
+			<img src="../../image/kb.png" alt="">我的行币<span class="icon iconfont icon-ch2 fr"></span>
+			<!--<span class="num_box">998</span>-->
+		</div>
+		<div data-touch class="z-home-menu new-home-menu" data-des="0" data-href="../../html/me/set.html" data-name="set">
+			<img src="../../image/sz.png" alt="">我的设置<span class="icon iconfont icon-ch2 fr"></span>
+		</div>
+		<div style="border-bottom: none;" data-touch class="z-home-menu new-home-menu" data-des="0" data-href="../../html/me/about.html" data-name="about">
+			<img src="../../image/kf.png" alt="">关于我们<span class="icon iconfont icon-ch2 fr"></span>
+		</div>
+	</div>
+</div>
+<div id="hsminiplay" style="height: 20px;background-color: #f5f5f5"></div>
+</body>
+<script id="home_Tpl" type="text/template"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+  var tou = document.querySelectorAll('[data-touch]');
+  for(var i in tou){
+    if(typeof tou[i] == 'object'){
+      tou[i].addEventListener('touchstart',function(){
+        this.style.backgroundColor = '#f5f5f5';
+      });
+      tou[i].addEventListener('touchend',function(){
+        this.style.backgroundColor = '#fff';
+      });
+    }
+  }
+
+  var fs,wx;
+  var offlineDataHome;
+  var db,userID,userData;
+
+  apiready = function(){
+    //MD Start
+    api.execScript({name: 'root', script: "ChatAna('TabPage3',{'Active':'加载'},'我的');"});
+    //MD End
+
+    id = api.pageParam.des || 0;//api.pageParam是获取到所有data传参的集合对象
+    fs = api.require("fs");
+    db = api.require('db');
+    wx = api.require("wx");
+
+    api.addEventListener({
+      name: 'keyback'
+    }, function(ret, err) {
+      if(Will == 0){
+        Will = Will+1;
+        api.toast({
+          msg: '再次返回将退出应用',
+          duration: 2000,
+          location: 'bottom'
+        });
+      }else{
+        api.execScript({name: 'root',script: "XO.CWidget()"});
+      }
+    });
+
+    if(App.iphone){
+      var sy = 0,my = 0;
+      var isTouch = true;
+      var s_scrollY = 0;
+      var m_mcrollY = 0;
+      document.querySelector('body').addEventListener('touchstart',function(){
+        isTouch = true;
+        sy = event.changedTouches[0].pageY;
+        s_scrollY = window.scrollY;
+      });
+
+      document.querySelector('body').addEventListener('touchend',function(){
+        if(!isTouch){
+          return;
+        }
+
+        my = event.changedTouches[0].pageY;
+        if(my<sy){
+          api.execScript({name: 'root', script: "Swipeup();"});
+        }else if(my>sy){
+          api.execScript({name: 'root', script: "Swipedown();"});
+        }
+
+        isTouch = false;
+      });
+    }else{
+      api.addEventListener({
+        name:'swipedown'
+      }, function(ret, err){
+        api.execScript({name: 'root', script: "Swipedown();"});
+      });
+
+      api.addEventListener({
+        name:'swipeup'
+      }, function(ret, err){
+        api.execScript({name: 'root', script: "Swipeup();"});
+      });
+    }
+
+    var token = $api.getStorage('token');
+
+    if(token && (token == App.guest)){
+      document.querySelector('#z-home-name').innerHTML = '欢迎来的行动商学院';
+      document.querySelector('#user_info').style.display = 'none';
+      document.querySelector('#z-home-login').style.display = 'block';
+    }else if(token){
+      document.querySelector('#z-home-name').innerHTML = '欢迎来的行动商学院';
+      document.querySelector('#user_info').style.display = 'block';
+      document.querySelector('#z-home-login').style.display = 'none';
+    }
+
+    userID = localStorage.getItem('userID');
+    db.selectSql({
+      name: 'main',
+      sql: ("select * from user where id='"+userID+"'")
+    }, function(ret, err) {
+      //alert(JSON.stringify(ret)+'000'+JSON.stringify(err))
+      if (ret.status) {
+        if(ret.data.length>0){
+          userData = ret.data[0];
+          userData.index = ret.data[0].dex;
+          userData.info = App.JSON(ret.data[0].info);
+          userData.record = App.JSON(ret.data[0].record);
+          upview(userData);
+        }
+      }
+      if(api.connectionType != 'none'){
+        Refresh();
+      }
+    });
+  };
+
+  function Refresh(){
+    api.execScript({name: 'root',script: "XO.GetUser('"+ $api.getStorage('token') +"',{name:'home',fun:'upview'},{name:'home',fun:'fail'});"});
+  }
+
+  function gguest(){
+    var token = $api.getStorage('token');
+    console.log(token);
+    if(token && (token == App.guest)){
+      document.querySelector('#z-home-name').innerHTML = '欢迎来的行动商学院';
+      document.querySelector('#user_info').style.display = 'none';
+      document.querySelector('#z-home-login').style.display = 'block';
+    }else if(token){
+      document.querySelector('#z-home-name').innerHTML = '欢迎来的行动商学院';
+      document.querySelector('#user_info').style.display = 'block';
+      document.querySelector('#z-home-login').style.display = 'none';
+    }
+  }
+
+  function upview(data){//这个函数在refresh中触发了，是获取数据的函数
+	console.log('用户信息'+data);
+    if(typeof data == 'string'){
+      var data = JSON.parse(data);
+    }
+    localStorage.setItem('userID',data.id);
+    if(!data.nickname){
+      if($api.getStorage('nickname')){
+        data.nickname = $api.getStorage('nickname');
+      }
+    }
+    $api.setStorage('nickname',data.nickname);
+    $api.setStorage("industry",data.industry);
+    $api.setStorage("profession",data.profession);
+    $api.setStorage("company",data.company);
+    if(!data.nickname){
+      data.nickname = "学员"+data.id;
+    }
+
+    api.execScript({name: 'root', script: "saAPICloud.login({loginId: "+parseInt(data.id)+"});saAPICloud.flush();"});
+    setTimeout(function(){
+      api.execScript({name: 'root',script: "XO.Profile('"+ $api.getStorage('token') +"',{name:'home',fun:'pro'},{name:'home',fun:'pro'});"});
+    },8000);
+
+    if(!data.nickname || !data.industry || !data.profession || !data.company){
+      $api.setStorage("noIdentifyPlayNum",0);
+    }else{
+      $api.setStorage("noIdentifyPlayNum",2);
+    }
+    document.getElementById("bianhao").innerHTML = '学号：'+data.id;
+
+
+    api.execScript({name: 'root', script: "identify({uid:"+data.id+",userPro:{'姓名':'"+data.nickname+"','性别':'"+data.sex+"','行业':'"+data.industry+"','职位':'"+data.profession+"'}});"});
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from user where id=' + data.id)
+    }, function(ret, err) {
+      if (ret.status) {
+//        if(data.face && (data.face.indexOf('/file/')>0)){
+        if(data.face){
+          $api.setStorage('face', data.face);
+          api.setPrefs({
+            key: 'face',
+            value: data.face
+          });
+        }
+        if(ret.data.length>0){
+          var sql1 = "update user set nickname='"+data.nickname+"',face='"+data.face+"',level='"+data.level+"',dex='"+data.index+"',score='"+data.score+"',duration='"+data.duration+"',sex='"+data.sex+"',birthday='"+data.birthday+"',industry='"+data.industry+"',company='"+data.company+"',stage='"+data.stage+"',profession='"+data.profession+"',address='"+data.address+"',info='"+JSON.stringify(data.info)+"',record='"+JSON.stringify(data.record)+"' where id=" + data.id;
+          db.executeSql({name: 'main',sql: sql1},function(ret, err){
+          });
+        }else{
+          var sql1 = "INSERT INTO user (id,nickname,face,level,dex,score,duration,sex,birthday,industry,company,stage,profession,address,info,record) VALUES ('"+data.id+"','"+data.nickname+"','"+data.face+"','"+data.level+"','"+data.index+"','"+data.score+"','"+data.duration+"','"+data.sex+"','"+data.birthday+"','"+data.industry+"','"+data.company+"','"+data.stage+"','"+data.profession+"','"+data.address+"','"+JSON.stringify(data.info)+"','"+JSON.stringify(data.record)+"')";
+          db.executeSql({name: 'main',sql: sql1},function(ret, err){
+          });
+        }
+      }
+    });
+
+    data.record.time = parseInt(data.record.time / 60);
+    if(data.face&&(data.face!="undefined")&&(data.face!="null")){
+      var _file = App.file(data.face);
+      fs.exist({
+        path: (api.fsDir + '/file/' +_file.full)
+      }, function(ret, err) {
+        if (ret.exist) {
+          data.face = (api.fsDir + '/file/' +_file.full);
+          $api.setStorage('face',data.face);
+          document.querySelector("[data-u]").src = data.face;
+          var sql1 = "update user set face='"+data.face+"' where id="+data.id;
+          db.executeSql({name: 'main',sql: sql1},function(ret, err){
+          });
+        }else{
+          if(data.face.indexOf('/') == 0){
+            var dface = App.url + data.face;
+          }else{
+            var dface = data.face;
+          }
+          console.log('头像'+dface);
+          api.download({
+            url: dface,
+            savePath: ('fs://file/' +_file.full),
+            cache: true,
+            allowResume: true
+          }, function(ret, err) {
+            data.face = (api.fsDir + '/file/' +_file.full);
+            $api.setStorage('face',data.face);
+            document.querySelector("[data-u]").src = data.face;
+            var sql1 = "update user set face='"+data.face+"' where id="+data.id;
+            db.executeSql({name: 'main',sql: sql1},function(ret, err){
+            });
+          });
+        }
+      });
+    }else{
+      $api.setStorage('face',data.face);
+    }
+    var token = $api.getStorage('token');
+    if(token && (token != App.guest)){
+      document.querySelector('#bianhao').style.display = 'block';
+      document.querySelector('#z-home-login').style.display = 'none';
+      document.querySelector('#user_info').style.display = 'block';
+      document.getElementById('z-home-name').innerHTML = data.nickname;
+      document.getElementById('z-home-second').innerHTML = data.record.time + '分';
+      document.getElementById('z-home-colume').innerHTML = data.record.knowledge + '课';
+      document.getElementById('z-home-day').innerHTML = data.record.day + '天';
+      if(!data.record.index){data.record.index = 0;}
+      if(!data.record.invitation){data.record.invitation = 0;}
+      document.getElementById('rank').innerHTML = data.record.index;
+      document.getElementById('invitation').innerHTML = data.record.invitation;
+    }
+    //scroll(document.querySelector('.up-box'));//isScroll底部有bug还是自己写好了
+    App.init();//动态生产html后腰重新绑定事件
+  }
+  function upface(){
+    console.log(123);
+    var pic = $api.getStorage('face');
+    document.querySelector("[data-u]").src = pic;
+  }
+  function pro(){}
+  function fail(msg){
+    App.tips(msg);
+  }
+  function red(Ty){
+    if(Ty){
+      //document.querySelector('.tips_red').style.display = 'inline-block';
+    }else{
+      //document.querySelector('.tips_red').style.display = 'none';
+    }
+  }
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

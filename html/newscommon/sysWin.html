@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>课程消息</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        .news_list {
+            padding: 1rem 0.6rem 0 0.6rem;
+        }
+
+        .time_box {
+            width: 100%;
+            height: 1rem;
+            line-height: 1rem;
+            text-align: center;
+            font-size: 0.6rem;
+            color: white;
+            margin-top: 1rem;
+        }
+
+        .time_box span {
+            background-color: #ABABAB;
+            border-radius: 1rem;
+            padding: 0 0.2rem;
+        }
+
+        .news_message_bigbox {
+            background-color: white;
+            /*background-color: red;*/
+            margin-top: 0.75rem;
+            border-radius: 5px;
+        }
+
+        .news_message_tx {
+            float: left;
+            width: 2.3rem;
+            height: 2rem;
+            border-radius: 100%;
+            background-image: url("../../image/logo.png");
+            background-repeat: no-repeat;
+            background-size: cover;
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
+
+        .message_name_box {
+            padding-top: 0.6rem;
+            padding-bottom: 0.3rem;
+        }
+
+        .news_message_box {
+            padding-top: 0.6rem;
+        }
+
+        .message_content_box {
+            color: #343434;
+            font-size: 0.725rem;
+        }
+
+        .botton_btn_box {
+            font-size: 0.7rem;
+            height: 1.5rem;
+            line-height: 1.5rem;
+            text-align: center;
+            background-color: #ebebf0;
+            color: #000000;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            box-shadow: 0 2px 0 rgb(227, 227, 227);
+        }
+
+        .friend-box {
+            background-color: white;
+            padding: 1rem 1rem 0.5rem 1rem;
+            margin-top: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /*优惠课程*/
+        .class_cover {
+            width: 100%;
+            height: auto;
+            /*height: 6rem;*/
+            /*background-repeat: no-repeat;*/
+            /*background-size: cover;*/
+        }
+
+        .class_cover * {
+            max-width: 100%;
+        }
+
+        /*底部上拉加载更多样式*/
+        .bottomdiv {
+            margin-top: 1rem;
+            clear: both;
+            width: 100%;
+            height: 2rem;
+            text-align: center;
+            line-height: 2rem;
+            color: black;
+        }
+
+        .uptext {
+            color: #bfbfbf;
+            font-size: 13px;
+        }
+
+        .publicfont {
+            width: 1rem;
+            height: 1rem;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<div id='app'>
+    <div id="HeadBar">
+        <div class="z-head">
+            <a class="z-head-left icon iconfont icon-fanhui" @click="closeWindow()"></a>
+            <div class="z-ellipsis z-head-text">系统消息</div>
+        </div>
+    </div>
+    <div v-show="main">
+        <div id="fixStatus"></div>
+        <ul id="list" class="tidings-wraper"></ul>
+        <div id="isnull" class="nomessage">
+            <img src="../../image/nomessage.png" alt="">
+            <div class="no-tips">暂无消息</div>
+        </div>
+    </div>
+    <div v-show="!main">
+        <div id="fixStatus"></div>
+        <ul v-for="(item,index) in proList">
+            <!--系统更新-->
+            <li class="news_list" v-if="item.subtype == 1">
+                <div class="time_box"><span>{{item.addtime}}</span></div>
+                <div class="news_message_bigbox">
+                    <!--信息-->
+                    <div class="news_message_box flex-wrap">
+                        <div class="news_message_tx"></div>
+                        <div style="width:90%;margin-right: 0.5rem;">
+                            <div class="message_name_box">管理员</div>
+                            <div class="message_content_box" style="padding-bottom: 0.6rem;color:#999">
+                                系统发布了新版本{{item.value.version}};更新描述:{{item.value.content}}
+                            </div>
+                        </div>
+                    </div>
+                    <!--查看详情-->
+                    <div class="botton_btn_box" style="" @click="checkUpdate()">
+                        <div>{{upTitle}}</div>
+                    </div>
+                </div>
+            </li>
+            <!--优惠课程-->
+            <li class="news_list" v-if="item.subtype == 2">
+                <div class="time_box"><span>{{item.addtime}}</span></div>
+                <div class="news_message_bigbox">
+                    <!--信息-->
+                    <div class="news_message_box flex-wrap flex-vertical">
+                        <div class="message_content_box" style="padding:0rem 0.5rem 0.6rem 0.5rem;color:#999"><span
+                                style="margin-bottom: 0.5rem;">{{item.value.title}}</span>
+                            <div class="class_cover"><img class="" :src="formatImg(item.value.pic)"></div>
+                        </div>
+                    </div>
+                    <!--查看详情-->
+                    <div class="botton_btn_box" style="" @click="openClass_win(item)">
+                        <div>点击查看详情</div>
+                    </div>
+                </div>
+            </li>
+            <!--文字通知-->
+            <li class="news_list" v-if="item.subtype == 3">
+                <div class="time_box"><span>{{item.addtime}}</span></div>
+                <div class="friend-box">
+                    <div>{{item.value}}</div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="bottomdiv">
+        <span v-if="rote" class="uptext">---查看更多---</span>
+        <img v-if="load" class="publicfont" src="../../image/timg.gif">
+        <span v-if="overlate" class="uptext">没有更多了</span>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: {
+      page: 1,
+      perPage: 10,
+      formatImg: formatImg,
+      proList: [],
+      homeData: {},
+      main: false,
+      rote: false,
+      load: false,
+      overlate: false,
+      upTitle: '检测APP版本',
+      UIActionProgress: ''
+    },
+    filters: {
+      jitianqian: function (diff) {
+        if (diff > 31536000) {
+          return parseInt(diff / 31536000) + '年前';
+        } else if (diff > 2592000) {
+          return parseInt(diff / 2592000) + '月前';
+        } else if (diff > 86400) {
+          return parseInt(diff / 86400) + '天前';
+        } else if (diff > 3600) {
+          return parseInt(diff / 3600) + '小时前';
+        } else if (diff > 60) {
+          return parseInt(diff / 60) + '分钟前';
+        } else {
+          return diff + '秒前';
+        }
+      }
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.byId('HeadBar'));
+        app.UIActionProgress = api.require('UIActionProgress');
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 5 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+        }, function (ret, err) {
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.getMessageList(false);
+        });
+        app.getMessageList(true);
+        app.setTypeMessageRead();
+      }
+    },
+    methods: {
+      //APP更新
+      checkUpdate: function () {
+        var mam = api.require('mam');
+        mam.checkUpdate(function (ret, err) {
+          if (ret.result) {
+            var result = ret.result;
+            if (result.update == true && result.closed == false) {
+              var str = '系统发布了新版本:' + result.version + ';更新描述:' + result.updateTip;
+              api.execScript({
+                name: 'root',
+                frameName: 'FM',
+                script: " app.addVersionMessage(' " + result.version + ',' + str + "');"
+              });
+              dialogBox.alert({
+                texts: {
+                  title: '发现新版本',
+                  content: str,
+                  leftBtnTitle: '取消',
+                  rightBtnTitle: '立即升级'
+                },
+                styles: {
+                  bg: '#fff',
+                  w: 300,
+                  corner: 4,
+                  title: {
+                    marginT: 30,
+                    bold: true,
+                    titleSize: 20,
+                    titleColor: '#252525'
+                  },
+                  content: {
+                    marginT: 20,
+                    marginB: 20,
+                    color: '#252525',
+                    size: 16
+                  },
+                  left: {
+                    marginB: 7,
+                    marginL: 20,
+                    w: 130,
+                    h: 35,
+                    corner: 2,
+                    bg: '#fff',
+                    size: 18
+                  },
+                  right: {
+                    marginB: 7,
+                    marginL: 10,
+                    w: 130,
+                    h: 35,
+                    corner: 2,
+                    bg: '#fff',
+                    size: 18
+                  }
+                }
+              }, function (ret) {
+                if (ret.eventType == 'left') {
+                  var dialogBox = api.require('dialogBox');
+                  dialogBox.close({
+                    dialogName: 'alert'
+                  });
+                } else {
+                  var dialogBox = api.require('dialogBox');
+                  dialogBox.close({
+                    dialogName: 'alert'
+                  });
+                  if (api.systemType == "android") {
+                    app.UIActionProgress.open({
+                      maskBg: 'rgba(0,0,0,0.5)',
+                      styles: {
+                        h: 108,
+                        bg: '#fff',
+                        title: {
+                          size: 20,
+                          color: '#000',
+                          marginT: 10
+                        },
+                        msg: {
+                          size: 14,
+                          color: '#000',
+                          marginT: 5
+                        },
+                        lable: {
+                          size: 14,
+                          color: '#696969',
+                          marginB: 5
+                        },
+                        progressBar: {
+                          size: 2,
+                          normal: '#000',
+                          active: '#4876FF',
+                          marginB: 35,
+                          margin: 5
+                        }
+                      },
+                      data: {
+                        title: '正在更新',
+                        msg: '更新至 v' + result.version + ' ' + result.updateTip,
+                        value: 0
+                      }
+                    }, function (ret) {
+                      api.download({
+                        url: result.source,
+                        report: true,
+                        cache: false,
+                        allowResume: true
+                      }, function (ret, err) {
+                        if (ret && 0 == ret.state) {
+                          app.Popinstall(ret.percent);
+                        } else if (ret && 1 == ret.state) {
+                          app.UIActionProgress.close();
+                          var savePath = ret.savePath;
+                          api.installApp({
+                            appUri: savePath
+                          });
+                        }
+                      });
+                    });
+                  }
+                  if (api.systemType == "ios") {
+                    api.installApp({
+                      appUri: result.source
+                    });
+                  }
+                }
+              });
+            } else {
+              app.upTitle = '已是最新版本'
+            }
+          }
+        });
+      },
+      Popinstall: function (rate) {
+        app.UIActionProgress.setData({
+          data: {
+            title: '正在更新',
+            msg: '正在更新至最新版本',
+            value: parseInt(rate)
+          }
+        });
+      },
+      closeWindow: function () {
+        closeWindow();
+      },
+      openClass_win: function (item) {
+//        console.log('---------------' + JSON.stringify(item));
+        var post = {
+          hash: $api.getStorage('token'),
+          id: item.value.cid
+        };
+        sendAjax(this, post, '/Api/Data/getCourse', function (res) {
+          app.homeData = res.data;
+          console.log(JSON.stringify(app.homeData))
+          //        买过或者价格为零
+//          if (app.homeData.buyed == 1 || app.homeData.price == '0.00') {
+            api.openWin({
+              name: 'professionDetail2',
+              url: '../fm/professionDetail3.html',
+              pageParam: {
+                des: app.homeData.id,
+                price: app.homeData.price,
+                buyed: app.homeData.buyed,
+                title: app.homeData.title
+              }
+            });
+//没买过
+//          } else {
+//            课程详情
+//            api.openWin({
+//              name: 'courseInfo_win',
+//              url: '../fm/courseInfo_win.html',
+//              pageParam: {
+//                des: app.homeData.id,
+//                title: app.homeData.title
+//              }
+//            });
+//          }
+        })
+      },
+//        获取课程消息列表
+      getMessageList: function (ref) {
+        var post = {
+          hash: $api.getStorage('token'),
+          type: 4,
+          page: app.page,
+          perPage: app.perPage
+        };
+        sendAjax(this, post, '/Api/Message/getMessageList', function (res) {
+          if (ref) {
+            app.proList = res.data.proList;
+            if (app.proList.length == 0) {
+              app.main = true;
+            }
+            if (app.proList.length >= 4) {
+              document.body.style.height = 'auto';
+              app.overlate = false;
+              app.rote = true;
+              app.load = false
+            }
+          } else {
+            app.proList = app.proList.concat(res.data.proList);
+            app.overlate = false;
+            app.rote = true;
+            app.load = false;
+            if (res.data.proList.length == 0) {
+              app.overlate = true;
+              app.rote = false;
+              app.load = false
+            }
+          }
+        })
+      },
+      //      将消息置为已读
+      setTypeMessageRead: function () {
+        var post = {
+          hash: $api.getStorage('token'),
+          type: 4
+        };
+        sendAjax(this, post, '/Api/Message/setTypeMessageRead', function (res) {
+          api.sendEvent({
+            name: 'newsUp',
+          });
+          api.execScript({name: 'root', frameName: 'FM', script: "app.getUnreadCount();"});
+          api.execScript({name: 'root', frameName: 'group', script: "app.getUnreadCount();"});
+        })
+      }
+    }
+  })
+</script>
+</html>

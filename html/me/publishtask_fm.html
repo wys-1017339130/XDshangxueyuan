@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>发布任务</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .publictitle {
+            width: 100%;
+            font-size: 15px;
+            background: white;
+            padding: 0.75rem 0 0.75rem 0;
+            box-sizing: border-box;
+            border-bottom: 1px solid #f4f4f4;
+            text-align: justify;
+            align-items: center;
+            -webkit-align-items: center;
+            display: flex;
+        }
+
+        .publictitle input {
+            text-align: right;
+        }
+
+        .changeclass {
+            width: 100%;
+            background: white;
+            padding-left: 12px;
+            padding-right: 12px;
+            box-sizing: border-box;
+        }
+
+        .leftspadn {
+            text-align: left;
+            width: 30%;
+            font-size: 15px;
+        }
+
+        .rightspdan {
+            text-align: right;
+            width: 70%;
+            font-size: 14px;
+        }
+
+        .otherstyle {
+            width:100%;
+            color: #999;
+            text-align: right;
+            float: right;
+            padding-right: 0.35rem;
+        }
+
+        input[type="date"]:before {
+            content: attr(placeholder);
+            color: #aaa;
+        }
+
+        .bottombutbox {
+            width: 100%;
+            margin-top: 1.5rem;
+            display: flex;
+        }
+
+        .submitbutton {
+            width: 90%;
+            margin: auto;
+            height: 3rem;
+            font-size: 16px;
+            line-height: 3rem;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            background: #d9b270;
+        }
+    </style>
+</head>
+<body>
+<div id="app" style="padding-top: 10px">
+    <div class="changeclass">
+        <div class="publictitle" style="width: 100%">
+            <span class="leftspadn">选择课程</span>
+            <span class="rightspdan" @click="changeclass" style="color:#999;">{{coursetitle}}</span>
+            <i @click="changeclass" style="color: #b5b5b5;font-size: 20px;" class="iconfont icon-jiantou"></i>
+        </div>
+
+        <div class="publictitle" style="width: 100%">
+            <span class="leftspadn">任务名称</span>
+            <input type="text" placeholder="请填写任务名称" style="text-align: right" class="otherstyle"
+                   v-model="workname">
+        </div>
+
+        <div class="publictitle" style="width: 100%">
+            <span class="leftspadn">任务对象</span>
+            <span class="rightspdan otherstyle">所有成员({{allpeople}})人</span>
+            <i style="color: #b5b5b5;font-size: 20px;" class="iconfont icon-jiantou"></i>
+        </div>
+
+        <div class="publictitle" style="width: 100%">
+            <span class="leftspadn" style="line-height: 27px">任务开始日期</span>
+            <span class="rightspdan" style="position: relative;color:#999;" @click="openStar()"
+                  v-text="stardate"
+            >
+				<!--<input v-model="stardate" style="text-align: right;float: right;" type="date" name="star"-->
+                       <!--class="otherstyle" datatype="*" nullmsg="请选择开始日期" placeholder="请选择开始日期"-->
+                       <!--onfocus="this.removeAttribute('placeholder')">-->
+			</span>
+            <i style="color: #b5b5b5;font-size: 20px;line-height: 27px;" class="iconfont icon-jiantou"></i>
+        </div>
+
+        <div class="publictitle" style="width: 100%">
+            <span class="leftspadn" style="line-height: 27px">任务完成日期</span>
+            <span class="rightspdan" style="color:#999;" @click="openEnd()" v-text="enddate">
+				<!--<input v-model="enddate" style="text-align: right;float: right;" type="date" name="end"-->
+                       <!--class="otherstyle" datatype="*" nullmsg="请选择完成日期" placeholder="请选择完成日期"-->
+                       <!--onfocus="this.removeAttribute('placeholder')">-->
+			</span>
+            <i style="color: #b5b5b5;font-size: 20px;line-height: 27px;" class="iconfont icon-jiantou"></i>
+        </div>
+    </div>
+    <div class="bottombutbox">
+        <div class="submitbutton" @click="creatcrous">提交</div>
+    </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {
+  });
+  var app = new Vue({
+    el: '#app',
+    data: {
+      gid: '',
+      stardate: '请选择开始日期',
+      enddate: '请选择完成日期',
+      workname: '',
+      coursetitle: '请选择课程',
+      allpeople: ''
+    },
+    created: function () {
+      apiready = function () {
+        app.gid = api.pageParam.gid;
+        api.addEventListener({
+          name: 'changesure'
+        }, function (ret, err) {
+          app.coursetitle = ret.value.name;
+          app.workname = '完成 '+app.coursetitle +' 课程学习';
+          app.courseid = ret.value.courseid
+        });
+        app.getpeopel()
+      };
+    },
+    filters: {},
+    methods: {
+      openStar:function () {
+        api.openPicker({
+          type: 'date',
+          title: '选择开始时间'
+        }, function(ret, err) {
+          if (ret) {
+            app.stardate = ret.year +'-' + ret.month +'-' + ret.day;
+          } else {
+          }
+        });
+      },
+      openEnd:function () {
+        api.openPicker({
+          type: 'date',
+          title: '选择结束时间'
+        }, function(ret, err) {
+          if (ret) {
+            app.enddate = ret.year +'-' + ret.month +'-' + ret.day;
+          } else {
+          }
+        });
+      },
+      //前往选择课程
+      changeclass: function () {
+        api.openWin({
+          name: 'changeclass_win',
+          url: './changeclass_win.html'
+        });
+      },
+//			创建任务
+      //					cid:15,
+      creatcrous: function () {
+        if (app.coursetitle == '') {
+          toastMsg('请先选择课程')
+        } else if (app.workname == '') {
+          toastMsg('请填写任务名称')
+        } else if (app.stardate == '' || app.enddate == '') {
+          toastMsg('请选择日期')
+        } else {
+          var post = {
+            hash: $api.getStorage('token'),
+            gid: app.gid,
+            cid: app.courseid,
+            name: app.workname,
+            start_date: app.stardate,
+            end_date: app.enddate
+          };
+          sendAjax(this, post, '/Api/Group/addMission', function (res) {
+            if (res.code == 1) {
+              toastMsg('创建成功');
+              api.sendEvent({
+                name: 'revoreddate',
+              });
+              setTimeout(function () {
+                api.closeWin()
+              }, 1000)
+            }
+          })
+        }
+      },
+      //获取任务对象人数
+      getpeopel: function () {
+        var post = {
+          gid: app.gid
+        };
+        sendAjax(this, post, '/Api/Group/getMemberCount', function (res) {
+          app.allpeople = res.data
+        })
+      }
+    }
+  });
+
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+
+</html>

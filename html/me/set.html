@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>设置</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/jquery-weui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/weui.min.css"/>
+</head>
+<style>
+    .caree {
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        border-radius: 100%;
+        margin-top: auto;
+        margin-bottom: 9px;
+    }
+
+    .z-sets {
+        font-size: 0.8rem;
+        line-height: 54px;
+        height: 53px;
+        color: #333;
+    }
+
+    .weui-switc {
+        position: relative;
+        width: 2.1rem;
+        height: 1.05rem;
+        border: 1px solid #dfdfdf;
+        outline: 0;
+        border-radius: 20px;
+        box-sizing: border-box;
+        background-color: #dfdfdf;
+        -webkit-transition: background-color .1s, border .1s;
+        transition: background-color .1s, border .1s
+    }
+
+    .weui-switcs {
+        border-color: #04be02;
+        background-color: #04be02;
+    }
+
+    .rL_ck {
+        position: absolute;
+        top: -1px;
+        height: 1.05rem;
+        width: 1.05rem;
+        border-radius: 100%;
+        background-color: white;
+    }
+</style>
+<body>
+<div id="HeadBar">
+    <div class="z-head">
+        <a class="z-head-left icon iconfont icon-jiantou z-fanhui" onclick="closeWindow()"></a>
+        <div class="z-ellipsis z-head-text">我的设置</div>
+    </div>
+</div>
+<div id="main">
+    <div id="fixStatus"></div>
+    <div style="padding-top: 3%"></div>
+    <div style="background-color: #fff;margin-bottom: 20px">
+        <div data-des="0" data-href="../../html/class/data.html" data-name="edit"
+             class="z-column6 z-sets z-border-bottom"
+             tapmode style="margin-bottom: 1px;">
+            个人资料
+            <span class="fr icon iconfont icon-ch2"></span>
+            <sapn style="display: flex;" class="fr fonts">
+                <span class="caree" id="none" style="display: block;"></span>
+                <img width="30px" height="30px" id="data-u"
+                     style="border-radius: 100%;margin-top: 14px;margin-left: 10px;margin-right: 10px;"
+                     src="../../image/tx_icon.png"/>
+            </sapn>
+        </div>
+        <div data-des="0" class="z-column6 z-sets z-border-bottom" onclick="account_management_fmandwin()" tapmode
+             style="border-bottom: 5px solid #f2f2f2;display: none;">
+            账号管理
+            <span class="fr icon iconfont icon-ch2"></span>
+            <span class="" id="tle" style="float:right;color: #999;">15800773972</span>
+        </div>
+        <div class="weui-cell weui-cell_switch z-sets"
+             style="padding-top: 0px;padding-bottom: 0px; padding: 0 13px;border-bottom: 1px solid #dddddd;"
+             onclick="buttoms()">
+            <div class="weui-cell__bd" style="font-size: 15px; color: #333333;">消息通知</div>
+            <div class="weui-cell__ft">
+                <div class="weui-switc" id="slider">
+                    <div class="rL_ck" id="rL_ck" style="margin-left: 18px;"></div>
+                </div>
+            </div>
+        </div>
+        <div style="display: none" data-des="0" data-href="../../html/me/edit.html" data-name="edit"
+             class="z-column6 z-sets z-border-bottom" tapmode>
+            联系地址
+            <span class="fr icon iconfont icon-ch2"></span>
+        </div>
+
+        <div onclick="clearCache();" class="z-column6 z-sets z-border-bottom" style="margin-bottom: 1px;">
+            清除缓存
+            <span class="fr icon iconfont icon-ch2"></span>
+            <span class="size" style="float:right;color: #999;">0.00M</span>
+        </div>
+        <div class="z-column6 z-sets z-border-bottom" tapmode
+             style="margin-bottom: 1px;border-bottom: 5px solid #f2f2f2"
+             onclick="WeChat()">
+            绑定微信
+            <span class="fr icon iconfont icon-ch2"></span>
+            <span class="size" id="wX" style="float:right;color: #999;">未绑定</span>
+        </div>
+        <div tapmode id="daf" class="z-column6 z-sets z-border-bottom" style="margin-bottom: 1px;">
+            邀请人数
+            <span class="fr" style="float:right;color: #999;" id="invitation">0</span>
+        </div>
+        <div tapmode id="dafen" class="z-column6 z-sets z-border-bottom" tapmode style="margin-bottom: 1px;">
+            我要打分
+            <span class="fr icon iconfont icon-ch2"></span>
+        </div>
+        <div data-des="0" data-href="../../html/me/about.html" data-name="about" class="z-column6 z-sets" tapmode>
+            关于我们
+            <span class="fr icon iconfont icon-ch2"></span>
+        </div>
+    </div>
+    <div style="background-color: #ffcc66 !important;color: #fff;margin: 0 3% 3%;border-radius: 5px" id="loginOut"
+         class="z-out" tapmode>退出登录
+    </div>
+    <div id="version" class="z-version"></div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/swiper-3.4.2.min.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+  var HeadBar = $api.byId('HeadBar');
+  var dialogBox, ani, db, fs, push, wx;
+  var noIdentifyPlayNum;
+  var userID, id;
+  var BindWx;
+  apiready = function () {
+    $api.fixStatusBar($api.dom('header'));
+    $api.fixStatusBar(HeadBar);
+    //  判断是否是第一次启动APP
+    api.addEventListener({
+      name: 'redS'
+    }, function (ret, err) {
+      var ifs = $api.getStorage('images_html')
+      if (ifs == 1) {
+        document.getElementById('none').style.display = 'none'
+      }
+    })
+    var ifs = $api.getStorage('images_html')
+    if (ifs == 1) {
+      document.getElementById('none').style.display = 'none'
+    }
+    //  判断是否开启推送消息
+    var tuisong = $api.getStorage('tuisong')
+    if (tuisong == 1) {
+      document.getElementById('rL_ck').style.marginLeft = '0px'
+      document.getElementById('slider').className = 'weui-switc'
+    }
+    if (tuisong != 1) {
+      document.getElementById('rL_ck').style.marginLeft = '18px'
+      document.getElementById('slider').className = 'weui-switc weui-switcs'
+    }
+    // 引模块
+    push = api.require('push');
+    wx = api.require('wx');
+    db = api.require('db');
+    fs = api.require('fs');
+    dialogBox = api.require('dialogBox');
+    // 关闭更改电话号的关闭（窗口）
+    api.execScript({
+      name: 'account_management_fmandwin',
+      script: 'closeWindow()'
+    })
+    api.execScript({
+      name: 'new-account_management',
+      script: 'closeWindow()'
+    })
+    App.openWWW(api.winName);
+    var size = api.getCacheSize({sync: true});
+    if (size > 1) {
+      //     清除缓存
+      document.querySelector('.size').innerHTML = '当前缓存 ' + parseFloat(size / 1024 / 1024).toFixed(2) + 'MB';
+    }
+    var ua = navigator.userAgent.toLowerCase();
+    if (/android/.test(ua)) {
+      //  退出登录
+      document.getElementById("dafen").style.display = "none";
+    }
+    //MD Start
+    api.execScript({name: 'root', script: "ChatAna('Setting',{'Active':'加载'},'设置页面');"});
+    document.getElementById('version').innerHTML = '版本号: ' + api.appVersion;
+    document.getElementById('loginOut').onclick = function () {
+      var dialogBox = api.require('dialogBox');
+      dialogBox.evaluation({
+        styles: {
+          bg: '#fff',
+          w: 250,
+          buttons: [{
+            marginB: 0,
+            marginL: 0,
+            w: 250,
+            h: 50,
+            bg: '#f5f5f5',
+            color: '#007FFF',
+            size: 14
+          }, {
+            marginB: 0,
+            marginL: 0,
+            w: 250,
+            h: 50,
+            bg: '#fff',
+            color: '#007FFF',
+            size: 14
+          }]
+        },
+        texts: {
+          buttons: [{
+            text: '返回'
+          }, {
+            text: '退出登录'
+          }]
+        }
+      }, function (ret, err) {
+        if (ret) {
+          var dialogBox = api.require('dialogBox');
+          dialogBox.close({
+            dialogName: 'evaluation'
+          });
+          if (ret.index == 1) {
+
+            db.executeSql({name: 'main', sql: "delete from currentaudio"}, function (ret, err) {
+            });
+            db.executeSql({name: 'main', sql: "delete from user"}, function (ret, err) {
+            });
+            api.execScript({name: 'root', script: "EndPage();"});
+            noIdentifyPlayNum = parseInt($api.getStorage("noIdentifyPlayNum")) || 0;
+
+            api.showProgress({
+              style: 'default',
+              animationType: 'fade',
+              title: '退出中...',
+              modal: false
+            });
+
+            if (window.navigator.userAgent.indexOf('iPhone') > 0) {
+              setTimeout(function () {
+                api.hideProgress();
+                out();
+              }, 300);
+              //setTimeout(function(){api.hideProgress();api.execScript({name: 'root',script: "CWidget()"});},2000);
+            } else {
+              setTimeout(function () {
+                api.hideProgress();
+                out();
+                Loginpath = '../../';
+                api.closeWin();
+              }, 300);
+            }
+
+          }
+        } else {
+        }
+      });
+    }
+    api.execScript({
+      name: 'root',
+      script: "getPlayId();"
+    });
+    document.getElementById('tle').innerHTML = $api.getStorage('pholones')
+    getUserInfo()
+    userID = localStorage.getItem('userID');
+
+    db.selectSql({
+      name: 'main',
+      sql: ("select * from user where id='" + userID + "'")
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          userData = ret.data[0];
+          userData.index = ret.data[0].dex;
+          userData.info = App.JSON(ret.data[0].info);
+          userData.record = App.JSON(ret.data[0].record);
+          upview(userData);
+        }
+      }
+      if (api.connectionType != 'none') {
+        Refresh();
+      }
+    });
+  };
+  // ios我要打分
+  document.getElementById("dafen").onclick = function () {
+    api.installApp({
+      appUri: 'http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?id=1239657840&pageNumber=0&sortOrdering=2&type=Purple+Software&mt=8' //安装包对应plist地址
+    });
+  }
+  // 电话号
+  function getUserInfo() {
+    var token = $api.getStorage('token')
+    api.ajax({
+      url: App.url + 'api.php/Api/Ucenter/getUserInfo',
+      method: 'post',
+      data: {
+        values: {
+          hash: token
+        }
+      }
+    }, function (ret, err) {
+
+      if (ret) {
+        document.getElementById('tle').innerHTML = ret.data.tel
+        $api.setStorage('pholones', ret.data.tel)
+        var faceUrl = App.url + ret.data.face;
+        console.log(faceUrl)
+        document.getElementById('data-u').src = faceUrl;
+        imgfunction(faceUrl)
+      } else {
+      }
+    })
+  }
+  // 关闭这个窗口
+  function closeWindow() {
+    api.closeWin()
+  }
+  // 更换电话号页跳转
+  function account_management_fmandwin() {
+    api.openWin({
+      name: 'account_management_fmandwin',
+      url: '../class/account_management_fmandwin.html',
+      pageParam: {}
+    })
+  }
+  function Refresh() {
+    api.showProgress({
+      title: '努力加载中...',
+      modal: false
+    });
+    api.execScript({
+      name: 'root',
+      script: "XO.GetUser('" + $api.getStorage('token') + "',{name:'set',fun:'upview'},{name:'set',fun:'fail'});"
+    });
+  }
+  //  邀请人数 && 头像
+  function upview(data) {
+
+    api.hideProgress();
+    getSizepeople(data);
+
+    // 是否绑定微信
+    checkBindWx(data)
+    localStorage.setItem('userID', data.id);
+    if (!data.nickname) {
+      if ($api.getStorage('nickname')) {
+        data.nickname = $api.getStorage('nickname');
+      }
+    }
+    $api.setStorage('nickname', data.nickname);
+    if (data.face && (data.face != "undefined") && (data.face != "null")) {
+      var _file = App.file(data.face);
+      fs.exist({
+        path: (api.fsDir + '/file/' + _file.full)
+      }, function (ret, err) {
+        if (ret.exist) {
+          data.face = (api.fsDir + '/file/' + _file.full);
+          $api.setStorage('face', data.face);
+          document.getElementById('data-u').style.src = data.face;
+          var sql1 = "update user set face='" + data.face + "' where id=" + data.id;
+          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+
+          });
+        } else {
+          if (data.face.indexOf('/') == 0) {
+            var dface = App.url + data.face;
+
+          } else {
+            var dface = data.face;
+          }
+          api.download({
+            url: dface,
+            savePath: ('fs://file/' + _file.full),
+            cache: true,
+            allowResume: true
+          }, function (ret, err) {
+            data.face = (api.fsDir + '/file/' + _file.full);
+            $api.setStorage('face', data.face);
+            document.querySelector("[data-u]").src = data.face;
+            var sql1 = "update user set face='" + data.face + "' where id=" + data.id;
+            db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+            });
+          });
+        }
+      });
+    } else {
+      $api.setStorage('face', data.face);
+    }
+    App.init();//动态生产html后腰重新绑定事件
+  }
+  function getSizepeople(data) {
+    var dataSize = JSON.parse(data);
+    var token = $api.getStorage('token');
+    if (token && (token != App.guest)) {
+      if (dataSize.record) {
+        if (!dataSize.record.index) {
+          dataSize.record.index = 0;
+        }
+        if (!dataSize.record.invitation) {
+          dataSize.record.invitation = 0;
+        }
+        document.getElementById('invitation').innerHTML = dataSize.record.invitation;
+      }
+    }
+  }
+  // 缓存清理中
+  function clearCache() {
+    api.showProgress({
+      style: 'default',
+      animationType: 'fade',
+      title: '清理中...',
+      modal: false
+    });
+
+    //MD Start
+    api.execScript({name: 'root', script: "ChatAna('ClearCache',{'page':'setting'},'清除缓存');"});
+    //MD End
+
+    if (App.iphone) {
+      var audio = api.require('audio');
+      audio.expungeCache();
+    }
+
+    var audioPlayer = api.require('audioPlayer');
+    audioPlayer.clearCache();
+
+    var lens = '';
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from downfile')
+    }, function (ret, err) {
+      if (ret && ret.status) {
+        if (ret.data.length > 0) {
+          for (var i in ret.data) {
+            lens = lens + '|' + ret.data[i].hash + '.db';
+          }
+          fs.readDir({
+            path: 'fs://blocks/'
+          }, function (ret, err) {
+            console.log(JSON.stringify(ret));
+            if (ret.status) {
+              for (var i in ret.data) {
+                if (('|' + lens + '|').indexOf('|' + ret.data[i] + '|') < 0) {
+                  console.log('删除文件 ' + ret.data[i]);
+                  fs.removeSync({path: 'fs://blocks/' + ret.data[i]});
+                }
+              }
+            }
+          });
+        } else {
+          var ck_blocks = $api.getStorage('blocks');
+          if (ck_blocks) {
+            fs.readDir({
+              path: 'fs://blocks/'
+            }, function (ret, err) {
+              console.log(JSON.stringify(ret));
+              if (ret.status) {
+                for (var i in ret.data) {
+                  if (ck_blocks != ret.data[i]) {
+                    console.log('删除文件 ' + ret.data[i]);
+                    fs.removeSync({path: 'fs://blocks/' + ret.data[i]});
+                  }
+                }
+              }
+            });
+          } else {
+            fs.rmdir({path: 'fs://blocks/'}, function (ret, err) {
+              console.log(JSON.stringify(err));
+            });
+          }
+        }
+      }
+    });
+
+    if (localStorage.getItem('promoterPIC')) {
+      var promoter = localStorage.getItem('promoterPIC');
+      var _file = App.file(promoter);
+      fs.exist({
+        path: (api.fsDir + '/file/' + _file.full)
+      }, function (ret, err) {
+        if (ret.exist) {
+          data = (api.fsDir + '/file/' + _file.full);
+          fs.remove({
+            path: data
+          }, function (ret, err) {
+
+          });
+        }
+      });
+    }
+
+    noIdentifyPlayNum = parseInt($api.getStorage("noIdentifyPlayNum")) || 0;
+    api.clearCache(function () {
+      document.querySelector('.size').innerHTML = '0.00M ';
+      $api.setStorage("noIdentifyPlayNum", noIdentifyPlayNum);
+      api.hideProgress();
+      api.toast({
+        msg: '清除完成',
+        duration: 2000,
+        location: 'bottom'
+      });
+    });
+
+  }
+  // 消息通知按钮
+  function buttoms() {
+    var res = /px/
+    var r = document.getElementById('rL_ck').style.marginLeft.replace(res, '')
+    var vlass = document.getElementById('slider')
+    var y = r
+    var tuisong = $api.getStorage('tuisong')
+    if (tuisong == 1) {
+      $api.setStorage('tuisong', 0)
+      // 开启消息 （css）
+      kais = setTimeout(function () {
+        if (y = 18) {
+          document.getElementById('rL_ck').style.marginLeft = y + "px"
+          vlass.className += ' weui-switcs'
+          if (y = 0) {
+            clearTimeout(kais)
+          }
+        } else {
+          y += 1
+          document.getElementById('rL_ck').style.marginLeft = y + "px"
+        }
+      }, 200)
+      // 弹窗提示（开启）
+      api.toast({
+        msg: '通知已开启',
+        duration: 2000,
+        location: 'bottom'
+      })
+      // 开启推送消息 （后台）
+      push.bind({
+        userName: $api.getStorage('nickname'),
+        userId: localStorage.getItem('userID')
+      }, function (ret, err) {
+        if (ret) {
+        } else {
+        }
+      });
+    }
+    if (tuisong != 1) {
+      $api.setStorage('tuisong', 1)
+      //  关闭推送消息 css
+      kaishi = setTimeout(function () {
+        if (y = 1) {
+          y -= 1
+          document.getElementById('rL_ck').style.marginLeft = y + "px"
+          vlass.className = ' weui-switc'
+          if (y = 0) {
+            clearTimeout(kaishi)
+          }
+        } else {
+          y -= 1
+          document.getElementById('rL_ck').style.marginLeft = y + "px"
+        }
+      }, 200)
+      // 弹窗提示（关闭）
+      api.toast({
+        msg: '通知已关闭',
+        duration: 2000,
+        location: 'bottom'
+      })
+      //  关闭推送消息  （后台）
+      push.unbind({
+        userName: $api.getStorage('nickname'),
+        userId: localStorage.getItem('userID')
+      }, function (ret, err) {
+        if (ret) {
+        } else {
+        }
+      });
+    }
+  }
+  // 确定是否绑定微信
+  function checkBindWx(data) {
+    var wxID = JSON.parse(data).wx_openid;
+    var wxinnerHtml = document.getElementById('wX')
+    if (wxID && wxID != '') {
+      BindWx = 1;
+      wxinnerHtml.innerHTML = '已绑定'
+    } else {
+      wxinnerHtml.innerHTML = '未绑定'
+    }
+  }
+  //  绑定微信(弹窗)
+  function WeChat() {
+    if (BindWx != 1) {
+      api.confirm({
+        title: '绑定微信',
+        buttons: ['确定', '取消']
+      }, function (ret, err) {
+        var index = ret.buttonIndex;
+        if (index == '1') {
+          wxbinding()
+        }
+      })
+    } else {
+      toastMsg('您已成功绑定微信')
+    }
+  }
+  //  绑定微信
+  function wxbinding() {
+    api.execScript({name: 'root', script: "ChatAna('wxauth',{'Active':'微信授权'},'微信绑定-微信授权');"});
+    api.toast({
+      msg: '微信授权中',
+      duration: 2000,
+      location: 'bottom'
+    });
+
+    wx.auth(function (ret, err) {
+      if (ret.status) {
+        wx.getToken({
+          code: ret.code
+        }, function (ret, err) {
+          if (ret.status) {
+            wx.getUserInfo({
+              accessToken: ret.accessToken,
+              openId: ret.openId
+            }, function (ret, err) {
+              wx_openid = ret.openid;
+              api.execScript({name: 'root', script: "ChatAna('bindwx',{'is_success':true},'微信绑定-授权成功');"});
+              api.execScript({
+                name: 'root',
+                script: "XO.BindUser('" + $api.getStorage('token') + "',1,'" + ret.openid + "',0,0,0,'" + ret.unionid + "',{name:'set',fun:'checkBindWx'},{name:'set',fun:'fail'});"
+              });
+            });
+          } else {
+            api.execScript({name: 'root', script: "ChatAna('bindwx',{'is_success':false},'微信绑定-授权失败');"});
+            wx_openid = '';
+            api.toast({
+              msg: '授权失败',
+              duration: 2000,
+              location: 'bottom'
+            });
+          }
+        });
+      } else {
+        api.execScript({name: 'root', script: "ChatAna('bindwx',{'is_success':false},'微信绑定-授权失败');"});
+        api.toast({
+          msg: '授权失败',
+          duration: 2000,
+          location: 'bottom'
+        });
+      }
+    });
+  }
+  function fail() {
+    api.hideProgress();
+    toastMsg('获取失败')
+  }
+  // 图片缓存
+  function imgfunction(img_utl) {
+    api.imageCache({url: img_utl}, function (ret, err) {
+      if (ret.status) {
+        $api.setStorage('face', ret.url);
+      } else {
+        document.getElementById('data-u').src = App.imge_url
+      }
+    });
+  }
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

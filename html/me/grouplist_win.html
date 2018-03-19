@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>任务详情</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+		<link rel="stylesheet" href="../../iconfont/iconfont.css">
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		.serchfont{
+			width: 15%;
+			height: 100%;
+			float: right;
+			font-size: 13px;
+			color: #676767;
+			box-sizing: border-box;
+			display: flex;
+		}
+		.searchoimg{
+			width: 1.4rem;
+			height: 1.4rem;
+			margin: auto;
+		}
+	</style>
+</head>
+<body style="position: relative;">
+<div id="app">
+	<header id="HeadBar" style="background: #d2b379">
+		<div class="z-head" style="background: #d2b379;text-align: center">
+				<i @click="colsethiswin" style="float: left;color: white;margin-left: 10px;font-size: 20px" class="iconfont icon-fanhui"></i>
+				<span></span>
+			<div class="serchfont" @click="gotosearch">
+				<img class="searchoimg" src="../../image/searchimgwhite.png">
+			</div>
+		</div>
+	</header>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      gid:''
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        var posY = $api.offset($api.dom("header")).h;
+//        var newpost = $api.offset($api.dom(".headerboxtop")).h;
+        app.gid = api.pageParam.gid;
+        api.openFrame({
+          name: 'grouplist_fm',
+          url: './grouplist_fm.html',
+          rect: {
+            x: 0,
+            y: posY,
+            width:'auto',
+            h:api.winHeight - posY
+          },
+          pageParam: {
+            gid: app.gid
+          },
+          bounces:true,
+          hScrollBarEnabled: false,
+          vScrollBarEnabled: false
+        });
+      };
+    },
+    filters:{
+    },
+    mounted:function(){
+		},
+    methods: {
+      //前往搜索
+      gotosearch:function() {
+        api.openWin({
+          name: 'search_win',
+          url: './search_win.html'
+        });
+      },
+			//关闭当前页面
+      colsethiswin:function() {
+        api.closeWin()
+			}
+    }
+  });
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+</html>

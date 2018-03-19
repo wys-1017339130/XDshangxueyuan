@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+</head>
+<link rel="stylesheet" href="../../css/api.css"/>
+<link rel="stylesheet" href="../../css/style.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/static.css" />
+<style>
+  body {
+    background: #f2f2f2;
+  }
+
+  #header {
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    height: 2.2rem;
+    line-height: 2.2rem;
+  }
+
+  .left-box {
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+  }
+  .right-box{
+    position: absolute;
+    right:0.5rem;
+    font-size: 0.75rem;
+  }
+  .title{
+    height: 0.5rem;
+    background-color: transparent;
+    width:100%;
+  }
+  .nckiname{
+    display: -webkit-box;
+    -webkit-box-align: center;
+    padding: 0 0.5rem;
+    height: 3rem;
+    background-color: #ffffff;
+  }
+  .nckiname>div{
+    -webkit-box-flex: 1;
+    height: 3rem;
+  }
+
+  .nckiname>div>textarea{
+    width:100%;
+    height: 3rem;
+    resize: none;
+  }
+
+  .nckiname>p{
+    width:1.5rem;
+    height: 1.5rem;
+    line-height: 0.5rem;
+    text-align: center;
+    border-radius: 100%;
+    background: #f1f1f1;
+    font-size: 0.8rem;
+    color: #FFF;
+  }
+  .Identification{
+    display: -webkit-box;
+    -webkit-box-align: center;
+    padding-left: 1rem;
+    height: 2rem;
+    font-size: 0.6rem;
+    line-height: 2rem;
+  }
+  .Identification>p{
+    width:0.6rem;
+    height: 0.6rem;
+    border-radius: 100%;
+    color: #ffffff;
+    background-color: #ff3300;
+    text-align: center;
+    margin: 0.5rem;
+    line-height: 0.8rem;
+  }
+</style>
+<body>
+<div id='app'>
+  <header class="aui-bar aui-bar-nav" id="header">
+    <a class="left-box" @click="closeWindow()">取消</a>
+    <span class="aui-title">详细地址</span>
+    <span class="right-box" @click="complete()">完成</span>
+  </header>
+  <div class="title"></div>
+  <div class="nckiname"><div><textarea v-model="address"></textarea></div></div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      address: ''
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        app.address = $api.getStorage('myaddress')
+      }
+    },
+    methods: {
+      closeWindow: function () {
+        api.closeWin()
+      },
+      complete: function () {
+        $api.setStorage('myaddress', app.address)
+        api.sendEvent({
+          name: 'myAddress',
+        });
+        api.closeWin()
+      }
+    }
+  })
+</script>
+</html>

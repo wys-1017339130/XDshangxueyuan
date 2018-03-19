@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>获取位置</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+		<link rel="stylesheet" href="../../iconfont/iconfont.css">
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		.nowspanstyle{
+			margin-left: 10px;
+			margin-right: 10px;
+			color: #9a9a9a;
+			line-height: 30px;
+			padding: 0 10px;
+			box-sizing: border-box;
+		}
+
+	</style>
+</head>
+<body style="position: relative;">
+<div id="app">
+	<header id="HeadBar" style="background: white">
+		<div class="z-head" style="padding: 0 10px;background: white;text-align: center">
+			<!--<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>-->
+			<!--<i style="color: #00ffff;" class="iconfont icon-lab_a-comm"></i>-->
+			<div style="width: 15%;text-align: left;float: left" @click="closethiswin">
+				<i style="color: #b5b5b5;" class="iconfont icon-fanhui"></i>
+			</div>
+				<span>所在位置</span>
+			<div style="width: 15%;height: 100%;text-align: right;float: right;font-size: 13px;color: #676767"></div>
+		</div>
+	</header>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      lon:'',
+			lat:'',
+      nowaddress:''
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        app.lon = api.pageParam.lon;
+        app.lat = api.pageParam.lat;
+        app.address = api.pageParam.address;
+        var posY = $api.offset($api.dom("header")).h;
+        var aMap = api.require('aMap');
+        aMap.open({
+          rect: {
+            x: 0,
+            y: 0,
+            w: 0,
+            h: 0
+          },
+          showUserLocation: true
+        }, function(ret, err) {
+          if (ret.status) {
+            aMap.getLocation(function(ret, err) {
+              if (ret.status) {
+                app.lon = ret.lon;
+                app.lat = ret.lat;
+                aMap.getNameFromCoords({
+                  lon: app.lon,
+                  lat: app.lat
+                }, function (ret, err) {
+                  if (ret.status) {
+                    app.nowaddress = ret.state;
+                    api.openFrame({
+                      name: 'local_frame',
+                      url: './local_frame.html',
+                      rect: {
+                        x: 0,
+                        y: posY,
+                        width:'auto',
+                        h:api.winHeight - posY
+                      },
+                      bounces:true,
+                      hScrollBarEnabled: false,
+                      vScrollBarEnabled: false,
+                      pageParam: {
+                        nowaddress:app.nowaddress,
+                        lon: app.lon,
+                        lat: app.lat,
+												address:app.address
+                      }
+                    });
+                  } else {
+                    api.closeWin()
+                  }
+                });
+              } else {
+//                alert(JSON.stringify(err));
+              }
+            });
+          } else {
+//            alert(JSON.stringify(err));
+          }
+        });
+      };
+    },
+    filters:{
+    },
+    mounted:function(){
+		},
+    methods: {
+      closethiswin:function() {
+        api.closeWin()
+			}
+    }
+  });
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+</html>

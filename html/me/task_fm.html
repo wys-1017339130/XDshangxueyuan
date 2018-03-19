@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>小组学习情况</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .plantext {
+            width: 100%;
+            line-height: 25px;
+            background: #f2f2f2;
+            text-align: left;
+            padding-left: 10px;
+            color: #9fa09f;
+            box-sizing: border-box;
+        }
+
+        .rankinglist {
+            width: 100%;
+            padding: 15px 0;
+            height: auto;
+            background: white;
+        }
+
+        .rankinglist:last-child {
+            border-bottom: none;
+        }
+
+        .ranktitle {
+            width: 100%;
+            height: 2rem;
+            line-height: 2rem;
+            display: flex;
+        }
+
+        .ranktitle div {
+            text-align: center;
+            line-height: 2rem;
+            height: 2rem;
+            font-size: 15px;
+        }
+
+        .publictitle {
+            width: 100%;
+            font-size: 17px;
+            background: white;
+            padding: 0.75rem 0 0.75rem 12px;
+            box-sizing: border-box;
+            border-bottom: 1px solid #f4f4f4;
+        }
+
+        .rankminbox {
+            border-radius: 8px;
+            background: #fff8eb;
+            padding: 15px;
+        }
+
+        .rankp {
+            color: #252525;
+            font-size: 14px;
+            line-height: 1.3rem;
+        }
+
+        .ranktext {
+            padding: 15px;
+            background: white;
+        }
+
+        .ranktitledetails {
+            padding: 1rem 0;
+            border-bottom: 1px solid #f4f4f4;
+        }
+
+        .ranktitledetails:last-child {
+            border-bottom: none;
+        }
+
+        .paihangstyle {
+            font-size: 15px;
+            line-height: 1.5rem;
+            font-weight: bold
+        }
+
+        .nicknamestyle {
+            font-size: 13px;
+            width: 100%;
+            display: inline-block;
+            height: 100%;
+            /*background: green;*/
+        }
+
+        .nicknamestyletext {
+            font-size: 13px;
+            float: left;
+            margin-left: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 65%;
+        }
+
+        .exporedstyle {
+            color: #ff5317;
+            font-size: 13px;
+        }
+
+        .successstyle {
+            color: #72b236;
+            font-size: 13px;
+        }
+
+        .ballfont {
+            width: 0.9rem;
+            height: 0.9rem;
+            border-radius: 50%;
+            position: absolute;
+            right: 0px;
+            top: 50%;
+            margin-top: -0.45rem;
+        }
+    </style>
+</head>
+<body>
+<div id="app" style="padding-top: 10px">
+    <div class="publictitle">任务内容</div>
+    <div class="ranktext">
+        <div class="rankminbox">
+            <div style="color: #7a3c19;font-size: 16px;padding-bottom: 0.4rem;line-height: 1.2rem">
+                任务名称：{{detailslist.name}}
+            </div>
+            <p class="rankp">课程名称：{{detailslist.title}}</p>
+            <p class="rankp">对象：所有成员</p>
+            <p class="rankp">任务时间：{{detailslist.start_date}} ~ {{detailslist.end_date}}</p>
+        </div>
+    </div>
+    <div class="publictitle" style="margin-top: 10px">课程学习情况</div>
+    <div class="rankinglist">
+        <div class="ranktitle">
+            <div style="width: 15%">排序</div>
+            <div style="width: 30%">用户昵称</div>
+            <div style="width: 20%">完成情况</div>
+            <div style="width: 35%">完成时间</div>
+        </div>
+        <div class="ranktitle ranktitledetails" v-for="(item,index) in rankinglistcontent"
+             @click="gototaskdetails(index)">
+            <div style="width: 15%">
+                <img v-if="index==0" style="width: 1.5rem;height: 1.5rem;display: inline" src="../../image/gold.png">
+                <img v-if="index==1" style="width: 1.5rem;height: 1.5rem;display: inline" src="../../image/yin.png">
+                <img v-if="index==2" style="width: 1.5rem;height: 1.5rem;display: inline" src="../../image/tie.png">
+                <span class="paihangstyle" v-if="index>=3">{{index + 1}}</span>
+            </div>
+            <div style="width: 30%">
+                <img v-if="item.face == '' || item.face == null"
+                     style="width: 1.7rem;height: 1.7rem;border-radius: 50%;float: left"
+                     src="../../image/user_default.png">
+                <img v-else style="width: 1.7rem;height: 1.7rem;border-radius: 50%;float: left"
+                     :src="formatImg(item.face)">
+                <span class="nicknamestyletext">{{item.nickname}}</span>
+            </div>
+            <div style="width: 20%;position: relative">
+                <!--未购买-->
+                <span class="nicknamestyle" style="color: #9b9b9b"
+                      v-if="rankinglistcontent[index].buyed==0">未购买课程</span>
+                <!--过期 未完成-->
+                <span class="exporedstyle"
+                      v-if="rankinglistcontent[index].expired==1 && rankinglistcontent[index].buyed==1">{{item.count_complete}}/{{item.count_radio}}</span>
+                <img src="../../image/outtime.png"
+                     v-if="rankinglistcontent[index].expired==1 && rankinglistcontent[index].buyed==1" class="ballfont">
+                <!--已完成-->
+                <span class="successstyle" v-if="rankinglistcontent[index].complete==1">{{item.count_complete}}/{{item.count_radio}}</span>
+                <img src="../../image/finishsuccess.png" v-if="rankinglistcontent[index].complete==1" class="ballfont">
+                <!--未完成-->
+                <span class="nicknamestyle"
+                      v-if="rankinglistcontent[index].complete==0 && rankinglistcontent[index].buyed==1 && rankinglistcontent[index].expired==0">{{item.count_complete}}/{{item.count_radio}}</span>
+            </div>
+            <div style="width: 35%">
+                <!--未购买-->
+                <span class="nicknamestyle" style="color: #9b9b9b"
+                      v-if="rankinglistcontent[index].buyed==0">未购买课程</span>
+                <!--过期 未完成-->
+                <span class="exporedstyle" style="width: 100%"
+                      v-if="rankinglistcontent[index].expired==1 && rankinglistcontent[index].buyed==1" v-else
+                      style="width: 30%">{{'已过期'}}</span>
+                <!--已完成-->
+                <span class="successstyle" style="width: 100%" v-if="rankinglistcontent[index].complete==1">{{item.complete_time}}</span>
+                <!--没过期 未完成-->
+                <span class="nicknamestyle"
+                      v-if="rankinglistcontent[index].complete==0 && rankinglistcontent[index].buyed==1 && rankinglistcontent[index].expired==0">{{complete_time_format(item)}}</span>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {
+  });
+  var app = new Vue({
+    el: '#app',
+    data: {
+      rankinglistcontent: '',
+      mid: '',
+      detailslist: '',
+      formatImg:formatImg
+    },
+    created: function () {
+      apiready = function () {
+        app.mid = api.pageParam.mid;
+        //获取任务详情
+        app.getdetails()
+      };
+    },
+    filters: {},
+    methods: {
+      //前往个人学习记录
+      gototaskdetails: function (index) {
+        api.openWin({
+          name: 'personal_win',
+          url: './personal_win.html',
+          pageParam: {
+            uid: app.rankinglistcontent[index].uid,
+            mid: app.detailslist.id,
+            nickname: app.rankinglistcontent[index].nickname
+          }
+        })
+      },
+      //获取任务详情信息
+      getdetails: function () {
+        var post = {
+          mid: app.mid
+        };
+        sendAjax(this, post, '/Api/Group/getMissionDetail', function (res) {
+          app.detailslist = res.data.mission;
+          app.rankinglistcontent = res.data.ranklist;
+          for (var i = 0; i < app.rankinglistcontent.length; i++) {
+            app.rankinglistcontent[i].complete_time = app.rankinglistcontent[i].complete_time.split(' ')[0];
+          }
+        })
+      },
+      complete_time_format(item) {
+        if (item) {
+            if (item.count_complete == item.count_radio) {
+              return item.complete_time;
+            } else if (item.complete_time) {
+              return '---';
+            } else {
+              return '暂未开始';
+            }
+        } else {
+          return '';
+        }
+      }
+    }
+  });
+
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <style>
+        html, body {
+            background-color: white;
+            position: relative;
+            height: 98.5%;
+        }
+
+        .contenttitle {
+            width: 100%;
+            height: auto;
+            line-height: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .pubtitlelsit {
+            width: 50%;
+            float: left;
+            text-align: center;
+            background: white;
+        }
+
+        .pub_spanstyle {
+            font-size: 0.8rem;
+            border-bottom: 3px solid transparent;
+        }
+
+        .activestyle {
+            /*color:#66cc00;*/
+            /*border-bottom: 3px solid #66cc00;*/
+            color: #dfbd86;
+            border-bottom: 3px solid #d9b270;
+        }
+
+        /*重构*/
+        .list-item {
+            clear: both;
+            width: 100%;
+            padding: 0.5rem 0;
+            background-color: white;
+            border-top: 1px solid #eaeaea;
+        }
+
+        .left-box {
+            width: 25%;
+            float: left;
+        }
+
+        .img_box {
+            width: 4rem;
+            height: 4.8rem;
+            border-radius: 5px;
+            margin: 0 0.5rem;
+        }
+
+        .right_box {
+            float: left;
+            width: 70%;
+            margin-left: 0.5rem;
+        }
+
+        .title_box {
+            width: 100%;
+            padding-top: 0.2rem;
+            color: #434343;
+
+        }
+
+        .leftspan_box {
+            width: 70%;
+            float: left;
+            font-size: 0.9rem;
+        }
+
+        .rightspan_box {
+            width: 30%;
+            color: #868686;
+            font-size: 0.7rem;
+            text-align: right;
+        }
+
+        .small_title_box {
+            color: #999;
+            font-size: 0.7rem;
+            padding: 0.3rem 0 0.3rem 0;
+        }
+
+        .lastp {
+            width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .freeclass {
+            padding-top: 2.2rem;
+            width: 100%;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #727272;
+        }
+
+        .freeclass img {
+            width: 7.25rem;
+        }
+
+        .border_box {
+            border-top: 1px solid #eaeaea;
+            padding-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="contenttitle">
+        <div class="pubtitlelsit" v-for="(item,index) in itemlist">
+            <span class="pub_spanstyle" @click="changeclasskind(index)" :class="{activestyle: kindindex == index}">{{item}}</span>
+        </div>
+    </div>
+
+
+    <!--<div class="list-item">-->
+    <!--<div class="left-box">-->
+    <!--&lt;!&ndash;<img class="headerimg"  :src="formatImg(item.pic)">&ndash;&gt;-->
+    <!--<img class="img_box" src="../../image/audio.png">-->
+    <!--</div>-->
+    <!--<div class="right_box">-->
+    <!--<div class="title_box">-->
+    <!--<span class="leftspan_box aui-ellipsis-1">智能时代激活你得五项本能</span>-->
+    <!--<span class="rightspan_box">120分钟钱</span>-->
+    <!--</div>-->
+    <!--<span class="small_title_box aui-ellipsis-1">李建</span>-->
+    <!--<div class="new_class_box">-->
+    <!--<div class="aui-ellipsis-1"><span class="">上次收听:</span>跟李建学习自我调整巴拉巴拉跟李建学习自我调整巴拉巴拉</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+
+    <!--免费-->
+    <div v-show="kindindex ==0">
+        <div class="list-item" v-for="(itom,index) in courselist.free" v-show="courselist.free.length>0"
+             @click="jumphtml(index)">
+            <div class="left-box">
+                <img class="img_box" :src="formatImg(itom.pic)">
+            </div>
+            <div class="right_box">
+                <p class="title_box">
+                    <span class="leftspan_box aui-ellipsis-1">{{itom.title}}</span>
+                    <span class="rightspan_box">{{itom.jianTime | jitianqian}}</span>
+                </p>
+                <p class=" aui-ellipsis-1" style="padding-top:0.2rem; color: #999;font-size: 0.7rem;">{{itom.lecturer}}</p>
+                <p class="small_title_box aui-ellipsis-1">{{itom.canyuCount}}人参与</p>
+                <p class="lastp" style="font-size:0.8rem;color: #868686" v-html="itom.produce"></p>
+            </div>
+        </div>
+        <div v-show="courselist.free.length==0" class="freeclass">
+            <div class="border_box"></div>
+            <img src="../../image/nomessage.png">
+            <p style="font-size: 0.7rem;padding-top: 10px">暂无课程信息</p>
+        </div>
+    </div>
+
+    <!--收费-->
+    <div v-show="kindindex ==1">
+
+        <div class="list-item" v-for="(itom,index) in courselist.noFree" v-show="courselist.noFree.length>0"
+             @click="jumphtml(index)">
+            <div class="left-box">
+                <img class="img_box" :src="formatImg(itom.pic)">
+            </div>
+            <div class="right_box">
+                <p class="title_box">
+                    <span class="leftspan_box aui-ellipsis-1">{{itom.title}}</span>
+                    <span class="rightspan_box">{{itom.jianTime | jitianqian}}</span>
+                </p>
+                <p class=" aui-ellipsis-1" style="padding-top:0.2rem; color: #999;font-size: 0.7rem;">{{itom.lecturer}}</p>
+                <p class="small_title_box aui-ellipsis-1">{{itom.canyuCount}}人已购买</p>
+                <p class="lastp" style="font-size:0.8rem;color: #868686" v-html="itom.produce"></p>
+            </div>
+        </div>
+        <div v-show="courselist.noFree.length==0" class="freeclass" style="padding-top:3rem;">
+            <img src="../../image/nomessage.png">
+            <p style="font-size: 0.7rem;padding-top: 10px">暂无课程信息</p>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      aaa: '',
+      pay: '',
+      payNum: '',
+      kindindex: 0,  //课程类型
+      formatImg: formatImg,
+      itemlist: ['免费课程', '收费课程'],
+      courselist: {
+        free: [],
+        noFree: []
+      },
+      localPic: [],
+      labershow: 0,
+      userID: '', //用户ID
+      fs: '', //文件操作
+      db: ''  //本地数据库
+    },
+    created: function () {
+      apiready = function () {
+        app.db = api.require("db");
+        app.fs = api.require("fs");
+        app.userID = localStorage.getItem('userID');
+        app.classtypelist(1);
+        app.db.selectSql({
+          name: 'main',
+          sql: ('select * from studylist where uid=' + app.userID)
+        }, function (ret, err) {
+          if (ret.status) {
+            if (ret.data.length > 0) {
+              var study = JSON.parse(ret.data[0].list);
+//              alert('数据库' + JSON.stringify(study));
+              if (study.free) {
+                app.courselist.free = study.free;
+              }
+              if (study.noFree) {
+                app.courselist.noFree = study.noFree;
+              }
+            }
+          }
+        });
+      };
+    },
+    filters: {
+      jitianqian: function (diff) {
+        if (diff > 31536000) {
+          return parseInt(diff / 31536000) + '年前';
+        } else if (diff > 2592000) {
+          return parseInt(diff / 2592000) + '月前';
+        } else if (diff > 86400) {
+          return parseInt(diff / 86400) + '天前';
+        } else if (diff > 3600) {
+          return parseInt(diff / 3600) + '小时前';
+        } else if (diff > 60) {
+          return parseInt(diff / 60) + '分钟前';
+        } else {
+          return diff + '秒前';
+        }
+      }
+    },
+    methods: {
+      checkLocaled: function () {
+        var free = app.courselist.free;
+        var noFree = app.courselist.noFree;
+        var i;
+
+        for (i = 0; i < free.length; i++) {
+          if (free[i].pic.indexOf('/uploads/') != -1) {
+            return false;
+          }
+        }
+        if (app.kindindex == 1) {
+          for (i = 0; i < noFree.length; i++) {
+            if (noFree[i].pic.indexOf('/uploads/') != -1) {
+              return false;
+            }
+          }
+        }
+
+
+        return true;
+      },
+      //选择课程类型
+      changeclasskind: function (index) {
+        app.kindindex = index;
+        app.classtypelist(index + 1);
+      },
+      classtypelist: function (index) {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+//        api.refreshHeaderLoadDone();
+        app.labershow = 0;
+        var post = {
+          hash: $api.getStorage('token'),
+          type: index
+        };
+        sendAjax(app, post, '/Api/Pay/getMyCourses', function (res) {
+          api.hideProgress();
+          if (app.kindindex == 0) {
+            // 免费
+            app.courselist.free = res.data;
+            if (app.courselist.free) {
+              for (var i = 0; i < app.courselist.free.length; i++) {
+                app.courselist.free[i].produce = app.charToHtml(app.courselist.free[i].produce);
+              }
+              app.cachepics(0, app.courselist.free.length, app.courselist.free, 0, app.kindindex, function () {
+                if (app.checkLocaled()) {
+                  app.insertSql();
+                }
+              });
+            }
+          } else {
+            // 收费
+            app.courselist.noFree = res.data;
+            if (app.courselist.noFree) {
+              for (var j = 0; j < app.courselist.noFree.length; j++) {
+                app.courselist.noFree[j].produce = app.charToHtml(app.courselist.noFree[j].produce);
+              }
+              app.cachepics(0, app.courselist.noFree.length, app.courselist.noFree, 0, app.kindindex, function () {
+                if (app.checkLocaled()) {
+                  app.insertSql();
+                }
+              });
+            }
+          }
+          if (res.data == '') {
+            app.labershow = 1;
+          }
+        });
+      },
+      insertSql: function () {
+        var sql1 = "delete from studylist";
+        app.db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+        });
+//        alert('aaa---' + JSON.stringify(app.courselist));
+        var sql2 = "insert into studylist (uid,list) values ('" + app.userID + "','" + JSON.stringify(app.courselist) + "')";
+        app.db.executeSql({name: 'main', sql: sql2}, function (ret, err) {
+        });
+      },
+      cachepics: function (i, max, data, type, kindindex, ifLocaledCall) {
+        if (i < max) {
+          if (!data || !data[i]) {
+            return;
+          }
+          if (type == 1) {
+            var str = 'banner';
+          } else {
+            var str = 'pic';
+          }
+          if (data[i][str]) {
+            var _file = (data[i][str]).split('/')[2];
+            app.fs.exist({
+              path: (api.fsDir + '/file/' + _file)
+            }, function (ret, err) {
+              if (ret.exist) {
+                data[i][str] = (api.fsDir + '/file/' + _file);
+                if (kindindex == '0') {
+                  app.courselist.free[i].pic = data[i][str];
+                } else {
+                  app.courselist.noFree[i].pic = data[i][str];
+                }
+                if (ifLocaledCall) {
+                  ifLocaledCall();
+                }
+                app.cachepics(i + 1, max, data, type, kindindex, ifLocaledCall);
+              } else {
+                if (data[i][str].indexOf('/') == 0) {
+                  var dpic = App.url + data[i][str];
+                } else {
+                  var dpic = data[i][str];
+                }
+                api.download({
+                  url: dpic,
+                  savePath: ('fs://file/' + _file),
+                  cache: true,
+                  allowResume: true
+                }, function (ret, err) {
+                  data[i][str] = (api.fsDir + '/file/' + _file);
+                  if (kindindex == '0') {
+                    app.courselist.free[i].pic = data[i][str];
+                  } else {
+                    app.courselist.noFree[i].pic = data[i][str];
+                  }
+                  if (ifLocaledCall) {
+                    ifLocaledCall();
+                  }
+                  app.cachepics(i + 1, max, data, type, kindindex, ifLocaledCall);
+                });
+              }
+            });
+          } else {
+            app.cachepics(i + 1, max, data, type, kindindex, ifLocaledCall);
+          }
+        } else {
+          //结束
+          App.init();
+        }
+      },
+      charToHtml: function (str) {
+        if (str) {
+          str = str.replace(/&amp;/g, '&');
+          str = str.replace(/&lt;/g, '<');
+          str = str.replace(/&gt;/g, '>');
+          str = str.replace(/&quot;/g, '"');
+          str = str.replace(/&apos;/g, "'");
+          str = str.replace(/&nbsp;/g, ' ');
+          str = str.replace(/&#039;/g, ' ');
+        }
+        return str;
+      },
+      jumphtml: function (index) {
+//        免费
+        if (app.kindindex == '0') {
+          api.openWin({
+            name: 'professionDetail2',
+            url: '../fm/professionDetail3.html',
+            pageParam: {
+              des: app.courselist.free[index].id,
+              name: 'professionDetail2',
+              buyed: 1
+            }
+          });
+        } else {
+          api.openWin({
+            name: 'professionDetail2',
+            url: '../fm/professionDetail3.html',
+            pageParam: {
+              des: app.courselist.noFree[index].id,
+              name: 'professionDetail2',
+              buyed: 1
+            }
+          });
+        }
+
+      }
+    }
+  });
+
+
+</script>

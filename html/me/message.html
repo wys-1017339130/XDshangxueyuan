@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>所有留言</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body class="z-fff">
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">所有留言</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<ul class="z-index-head clear z-border-bottom">
+			<li class="z-sub fl"><span class="z-subfont z-dongtai z-active">留言</span></li>
+			<li class="z-sub fl"><span class="z-subfont z-xiaoyou">练习</span></li>
+			<li class="z-slider"></li>
+		</ul>
+		<ul id="list" class="box-wraper"></ul>
+	</div>
+</body>
+
+<script id="my_list_Tpl" type="text/template">
+	{{#data}}
+	<li class="box z-column clear">
+		<div onclick="toaudio({{id}},{{tid}},{{type}})" class="fl list-img-box">
+			<img width="60" height="60" src="{{pic}}" class="list-img-box-back">
+			<img width="42" height="42" src="../../image/play_btn.png" class="list-img-box-front">
+		</div>
+		<div class="list-font-box">
+			<div onclick="toaudio({{id}},{{tid}},{{type}})" class="list-title" data-title="{{id}}">{{title}}</div>
+			<div onclick="toaudio({{id}},{{tid}},{{type}})" class="list-text"><span class="tags">{{date}}</span><span class="tags">时长{{leng}}</span><span class="tags">{{#each classify}}#{{value}}{{/each}}</span></div>
+			<ul class="message-box">
+				{{#each message}}
+				<li data-message="{{id}}">
+					{{#if text}}
+					<div class="message-content">{{text}}</div>
+					{{else}}
+					<div class="radio-content">
+						<span onclick="playMessage('{{file}}','{{id}}')" class="message-chat-box">
+							<span class="z-bofangdonghua">
+								<img data-donghua="{{id}}" width="24" height="11" src="../../image/laba.png" alt="">
+							</span>
+						</span><span class="message-chat-box-triangle"></span>{{leng}}
+					</div>
+					{{/if}}
+					<div class="message-date">{{date}}<span onclick="DelMessage({{id}})" class="icon iconfont icon-iconfont05"></span></div>
+				</li>
+				{{/each}}
+			</ul>
+		</div>
+	</li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var PageNum = 0;
+	var type = 0;
+	var HeadBar = $api.byId('HeadBar');
+	var playID = 0;
+	var isplay = false;
+	var audio,fs,ani,laba;
+	var messageArray = [];
+	var pattern1 = /[\u4e00-\u9fa5]+/g;
+	var userID;
+	var MostPageNum = 0;
+	var user;
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+		id = api.pageParam.des || 0;
+		audio = api.require('audio');
+		fs = api.require('fs');
+		slider();
+
+		App.openWWW(api.winName);
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('CommentList',{'Active':'加载'},'所有留言');"});
+		//MD End
+
+		var menu1 = document.querySelector(".z-dongtai");
+		var menu2 = document.querySelector(".z-xiaoyou");
+		menu1.addEventListener('click',function(){
+			if(!App.State()){
+				document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">未连接网络</div></li>';
+				return;
+			}
+			var cl = menu1.className;
+			if(/z-active/.test(cl)){
+				return;
+			}else{
+				document.querySelector(".z-active").className = document.querySelector(".z-active").className.replace(/ z-active/,'');
+				menu1.className += ' z-active';
+				slider();
+				type = 0;
+				Refresh(type);
+			}
+		});
+		menu2.addEventListener('click',function(){
+			if(api.connectionType == 'none'){
+				document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">未连接网络</div></li>';
+				api.toast({
+				    msg: "未连接网络",
+				    duration: 2000,
+				    location: 'bottom'
+				});
+				return;
+			}
+			var cl = menu2.className;
+			if(/z-active/.test(cl)){
+				return;
+			}else{
+				document.querySelector(".z-active").className = document.querySelector(".z-active").className.replace(/ z-active/,'');
+				menu2.className += ' z-active';
+				slider();
+				type = 1;
+				Refresh(type);
+			}
+		});
+
+		if(api.connectionType == 'none'){
+			document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">未连接网络</div></li>';
+		}else{
+			Refresh(0);
+		}
+	};
+
+	function slider(){
+		var rect = document.querySelector(".z-active").getBoundingClientRect();
+		document.querySelector(".z-slider").style.width = rect.width + "px";
+		document.querySelector(".z-slider").style.left = rect.left + "px";
+	}
+
+	function Refresh(type){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});
+		if(type == 0){
+			api.execScript({name: 'root',script: "XO.GetMessage('"+ $api.getStorage('token') +"',0,'"+PageNum+"',{name:'message',fun:'upMyMessage'},{name:'message',fun:'fail'});"});
+		}else{
+			api.execScript({name: 'root',script: "XO.GetTask('"+ $api.getStorage('token') +"',0,'"+MostPageNum+"',{name:'message',fun:'upMyMessage'},{name:'message',fun:'fail'});"});
+		}
+	}
+
+	function upMyMessage(data){
+		if(type == 0 && PageNum == 0){
+			localStorage.setItem('message',data);
+		}
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		data.forEach(function(ar){
+			var _m = parseInt(ar.duration/60);
+			var _s = parseInt(ar.duration%60);
+			_s = _s < 10 ? '0'+ _s : _s;
+			ar.leng = _m + ':' + _s;
+			ar.date = App.dateStr(ar.vtime);
+			ar.message.forEach(function(arg){
+				if(arg.text){
+					var msg = arg.text;
+					var str = msg.match(pattern1);
+
+					if(str && str.length>0){
+						for(var i =0; i<str.length;i++){
+							var newstr = App.face(str[i]);
+							msg = msg.replace('['+ str[i] +']',newstr);
+						}
+						arg.text = msg;
+					}
+				}
+
+				arg.date = App.dateStr(arg.vtime);
+				if(arg.file){
+					var m = parseInt(arg.len/60);
+					var s = parseInt(arg.len%60);
+					s = s < 10 ? '0' + s : s;
+					arg.leng = m + '\'' + s +'\"';
+					messageArray[arg.id] = arg;
+				}
+			});
+		});
+
+		// var TM = new T7({tm: document.getElementById("my_list_Tpl")});
+		// var html = TM.Tpl(data);
+		// document.getElementById('list').innerHTML = html;
+		CACH(0,data.length,data,document.getElementById("my_list_Tpl"),document.getElementById('list'))
+		App.init();
+		api.hideProgress();
+	}
+
+	function upMostMessage(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+
+		// data.forEach(function(ar){
+		// 	ar.message.forEach(function(arg){
+		// 		if(arg.uid == userID){
+		// 			arg.delete = true;
+		// 		}
+		// 		if(arg.text){
+		// 			var msg = arg.text;
+		// 			var str = msg.match(pattern1);
+
+		// 			if(str && str.length>0){
+		// 				for(var i =0; i<str.length;i++){
+		// 					var newstr = App.face(str[i]);
+		// 					msg = msg.replace('['+ str[i] +']',newstr);
+		// 				}
+		// 				arg.text = msg;
+		// 			}
+		// 		}
+
+		// 		arg.date = App.dateStr(arg.vtime);
+		// 		if(arg.file){
+		// 			var m = parseInt(arg.len/60);
+		// 			var s = parseInt(arg.len%60);
+		// 			s = s < 10 ? '0' + s : s;
+		// 			arg.leng = m + '\'' + s +'\"';
+		// 			messageArray[arg.id] = arg;
+		// 		}
+		// 	});
+		// });
+		CACH(0,data.length,data,document.getElementById("most_list_Tpl"),document.getElementById('list'));
+		// var TM = new T7({tm: document.getElementById("most_list_Tpl")});
+		// var html = TM.Tpl(data);
+		// document.getElementById('list').innerHTML = html;
+		// api.execScript({
+  //           name: 'root',
+  //           script: "getPlayId();"
+  //       });
+		App.init();
+		api.hideProgress();
+	}
+
+	function CACH(i,max,data,template,box){
+		if(i<max){
+			if(data[i].pic){
+				var _file = App.file(data[i].pic);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i].pic = (api.fsDir + '/file/' +_file.full);
+				    		CACH(i+1,max,data,template,box);
+				    }else{
+				    	if(data[i].pic.indexOf('/') == 0){
+							var dpic = App.url + data[i].pic;
+						}else{
+							var dpic = data[i].pic;
+						}
+				    		api.download({
+						    url: dpic,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i].pic = (api.fsDir + '/file/' +_file.full);
+							CACH(i+1,max,data,template,box);
+						});
+				    }
+				});
+			}else{
+       			CACH((i + 1),max,data,template,box);
+       		}
+		}else{
+			//结束
+			var TM = new T7({tm: template});
+			var html = TM.Tpl(data);
+			box.innerHTML = html;
+			api.execScript({
+	            name: 'root',
+	            script: "getPlayId();"
+	        });
+
+			App.init();
+		}
+	}
+
+	// function up(){
+	// 	PageNum++;
+	// 	GetRank('token',PageNum,upview,fail);
+	// }
+
+	function fail(msg){
+		document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">当前暂无留言</div></li>';
+		api.hideProgress();
+	}
+
+
+	function playAudio(path,id){
+		api.execScript({
+		    name: 'root',
+		    script: "newPlayAudio('"+path+"','"+id+"');"
+		});
+	}
+
+	function playMessage(file,id){
+		if(playID == id && isplay == true){
+			api.stopPlay();
+			isplay = false;
+			api.execScript({
+			    name: 'root',
+			    script: "recordPlay();"
+			});
+			clearInterval(laba);
+			document.querySelector("[data-donghua='"+playID+"']").style.transform = "translateX(0)";
+			document.querySelector("[data-donghua='"+playID+"']").style.webkitTransform = "translateX(0)";
+		}else{
+			api.execScript({
+			    name: 'root',
+			    script: "recordPause();"
+			});
+
+			if(laba){
+				clearInterval(laba);
+			}//因为多次触发了播放，所以有多个定时器
+
+			playID = id;
+			if(playID != 0){
+				var n = 2;
+				document.querySelector("[data-donghua='"+playID+"']").style.transform = "translateX(-16px)";
+				document.querySelector("[data-donghua='"+playID+"']").style.webkitTransform = "translateX(-16px)";
+				laba = setInterval(function(){
+					if(n > 0){
+						n--;
+					}else{
+						n = 2;
+					}
+					document.querySelector("[data-donghua='"+playID+"']").style.transform = "translateX("+(-n*8) + "px)";
+					document.querySelector("[data-donghua='"+playID+"']").style.webkitTransform = "translateX("+(-n*8) + "px)";
+				},500);
+			}
+
+			isplay = true;
+			// audio.play({
+			// path: App.url+file
+			// },function(ret,err){
+			// 	if(ret){
+			// 		if(ret.complete){
+			// 			api.execScript({
+			// 			    name: 'root',
+			// 			    script: "recordPlay();"
+			// 			});
+			// 		}
+			// 	}
+			// })
+			cachepics(messageArray[id]);
+
+		}
+	}
+
+	function ayscPlayPath(file,id){
+		file = messageArray[id].storagePath ? messageArray[id].storagePath : file;
+		api.startPlay({
+			path: file
+		},function(ret,err){
+			if(ret){
+				api.execScript({
+				    name: 'root',
+				    script: "recordPlay();"
+				});
+				clearInterval(laba);
+				document.querySelector("[data-donghua='"+playID+"']").style.transform = "translateX(-53.33px)";
+				document.querySelector("[data-donghua='"+playID+"']").style.webkitTransform = "translateX(-53.33px)";
+			}
+		})
+	}
+
+	function cachepics(data){
+        if(data.file){
+            var _file = App.file(data.file);
+            fs.exist({
+                path: (api.fsDir + '/file/' +_file.full)//判断对应缓存路径下是否存在文件
+            }, function(ret, err) {
+                if (ret.exist) {
+                        data.storagePath = (api.fsDir + '/file/' +_file.full);//如果存在文件则对路径进行处理，音频为新增本地路径
+                        ayscPlayPath(data.storagePath,data.id);
+                }else{//本地无缓存文件时
+                	ayscPlayPath((App.url+data.file),data.id);
+                    if(data.file.indexOf('/') == 0){//判断服务器路径是否完整，不完整则补全
+                        var dpath = App.url + data.file;
+                    }else{
+                        var dpath = data.file;
+                    }
+                    api.download({//下载
+                        url: dpath,
+                        savePath: ('fs://file/' +_file.full),
+                        cache: true,
+                        allowResume: true
+                    }, function(ret, err) {
+                        if(ret.state == 1){
+                            data.storagePath = (api.fsDir + '/file/' +_file.full);
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    function play(id){
+
+		if(document.querySelector(".active")){
+			document.querySelector(".active").className = "list-title";
+		}
+		if(document.querySelector("[data-title='"+id+"']")){
+			document.querySelector("[data-title='"+id+"']").className = "list-title active";
+		}
+	}
+
+	function pause(id){
+		if(document.querySelector(".active")){
+			document.querySelector(".active").className = "list-title";
+		}
+	}
+
+	function DelMessage(id){
+		if(type == 0){
+			api.execScript({name: 'root',script: "XO.DelMessage('"+ $api.getStorage('token') +"','"+id+"',{name:'message',fun:'DelSuccess'},{name:'message',fun:'Delfail'});"});
+		}else{
+			api.execScript({name: 'root',script: "XO.DelTask('"+ $api.getStorage('token') +"','"+id+"',{name:'message',fun:'DelSuccess'},{name:'message',fun:'Delfail'});"});
+		}
+
+	}
+
+	function DelSuccess(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		var _ul = document.querySelector("[data-message='"+data.msg+"']").parentNode;
+		_ul.removeChild(document.querySelector("[data-message='"+data.msg+"']"));
+		if(_ul.children.length == 0){
+			document.getElementById("list").removeChild(_ul.parentNode.parentNode);
+		}
+		if(document.getElementById("list").children.length == 0){
+			document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">当前暂无留言</div></li>';
+		}
+		api.toast({
+		    msg: '删除成功',
+		    duration: 2000,
+		    location: 'bottom'
+		});
+	}
+
+	function Delfail(data){
+		api.toast({
+		    msg: '删除失败',
+		    duration: 2000,
+		    location: 'bottom'
+		});
+	}
+
+	function toaudio(id,tid,category){
+		var boo = /active/g.test(document.querySelector("[data-title='"+ id +"']").className);
+		var type = 1;
+		if(boo){
+			type = 2;
+		}
+		var link = '../../html/indexgroup/audio.html';
+	    var name = 'audio';
+		api.sendEvent({name: 'IndexEvent',extra: {page: name}});
+
+		api.execScript({
+            name: 'root',
+            script: "changePlayStatusToFalse();"
+        });//专栏分栏第二次进去时会触发pause，但业务是不要暂停的，所以改一下状态
+		var bounces = false;//新开窗口是否弹动
+		var reload = false;
+		var animation = {};
+		if(!App.iphone){
+			animation = {
+				type:"movein",
+			    subType:"from_bottom",
+			    duration:300
+			};
+			api.openWin({
+                name: name,
+                url: link,
+                slidBackEnabled:false,
+                pageParam:{
+            		name: name,
+            		des:id,
+            		type:type,
+            		tid:tid,
+            		category:category
+                },
+                reload:reload,
+                animation:animation,
+                bounces: bounces,
+                customRefreshHeader: 'UIPullRefresh',
+                rect: {
+                    x: 0,
+                    y: 0,
+                    w: 'auto',
+                    h: 'auto'
+                }
+    		});
+		}else{
+			api.openWin({
+			    name:name,
+			    url: link,
+			    reload:true,
+			    slidBackEnabled:false,
+			    pageParam:{
+            		name: name,
+            		des:id,
+            		type:type,
+            		tid:tid,
+            		category:category
+                },
+			});
+		}
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

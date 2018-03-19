@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>选择兴趣与时间</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">我的兴趣</div>
+			<a class="z-head-right z-head-right-animation">
+				<div class="z-animation">
+					<img id="z-animation-img" src="../../image/dong.png">
+				</div>
+			</a>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div class="z-change-box">
+			<div class="z-change-title">您感兴趣的话题</div>
+			<div class="z-change-title-below">行动在线商学院为你服务</div>
+			<div id="content" class="z-change-intreset-box">
+				<span data-int="3001" class="z-change-intreset">互联网</span>
+				<span data-int="3002" class="z-change-intreset">职场</span>
+				<span data-int="3003" class="z-change-intreset">绩效管理</span>
+				<span data-int="3004" class="z-change-intreset">研发</span>
+				<span data-int="3005" class="z-change-intreset">阅读</span>
+				<span data-int="3006" class="z-change-intreset">赢利模式</span>
+				<span data-int="3007" class="z-change-intreset">导购</span>
+				<span data-int="3008" class="z-change-intreset">心理学</span>
+				<span data-int="3009" class="z-change-intreset">书籍</span>
+				<span data-int="3010" class="z-change-intreset">FM音频</span>
+				<span data-int="3011" class="z-change-intreset">互联网</span>
+				<span data-int="3012" class="z-change-intreset">健康学</span>
+			</div>
+			<div class="z-column2 z-change-btn">
+				<div data-des="0" data-href="../../html/me/change.html" data-name="change" class="z-change-to-rank">设置兴趣与学习时间</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<span data-int="{{id}}" class="z-change-intreset">{{title}}</span>
+	{{/data}}
+</script>
+<script type="text/javascript">
+	var HeadBar = $api.byId('HeadBar');
+	var ani;
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('interest',{'Active':'加载'},'兴趣与时间');"});
+		//MD End
+
+		if(!App.State()){
+			setTimeout(function(){
+				api.closeWin();
+			},2000);
+		}else{
+			Refresh();
+		}
+
+		api.execScript({
+            name: 'root',
+            script: "getPlayId();"
+        });
+
+	};
+
+	function Refresh(){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});//数据加载中显示方块
+		api.execScript({name: 'root',script: "XO.GetTag('"+ $api.getStorage('token') +"',{name:'interest',fun:'uptag'},{name:'interest',fun:'fail'});"});
+	}
+
+	function uptag(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		var TM = new T7({tm: document.getElementById("list_Tpl")});
+		var html = TM.Tpl(data);
+		document.getElementById('content').innerHTML = html;
+		api.execScript({name: 'root',script: "XO.GetPlan('"+ $api.getStorage('token') +"',{name:'interest',fun:'upview'},{name:'interest',fun:'fail'});"});
+	}
+
+	function upview(data){
+		localStorage.setItem('change',JSON.stringify(data));
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		if(data.interest && data.interest.length > 0){
+			data.interest.forEach(function(arg){
+				document.querySelector("[data-int='"+ arg.id +"']").className = "z-change-intreset z-active";
+			})
+		}
+
+		App.init();
+		api.hideProgress();
+	}
+
+	function fail(msg){
+		api.hideProgress();
+		App.tips(msg);
+	}
+
+	function play(){
+		if(ani){
+			clearInterval(ani);
+		}//因为多次触发了播放，所以有多个定时器
+		var n = 0;
+		ani = setInterval(function(){
+			if(n < 3){
+				n++;
+			}else{
+				n = 1;
+			}
+			document.getElementById("z-animation-img").style.transform = "translateX("+(-n*15.5) + "px)";
+			document.getElementById("z-animation-img").style.webkitTransform = "translateX("+(-n*15.5) + "px)";
+		},300);
+	}
+
+	function pause(){
+		clearInterval(ani);
+		document.getElementById("z-animation-img").style.transform = "translateX(0)";
+		document.getElementById("z-animation-img").style.webkitTransform = "translateX(0)";
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

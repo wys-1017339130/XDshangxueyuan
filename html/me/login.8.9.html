@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>登录</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+    <style>
+		body{
+			background-color: #fff;
+			}
+    	.bottom-tip{
+    		font-size: 0.6rem;
+    		color: #999;
+    		left: 0;
+    		width: 100%;
+    		bottom: 0;
+    		z-index: 10;
+    		padding: 10px 0;
+    	}
+    	.bottom-tip span>span{
+    		color: #0a83ff;
+    	}
+    	.bottom-tip .flex-con{
+    		border-bottom: 1px solid #0a83ff;
+    		transform: translateY(-50%);
+    		-webkit-transform: translateY(-50%);
+    	}
+    </style>
+</head>
+<body class="z-fff">
+	<div id="main" style="margin-bottom: 0;position: relative;z-index: 10">
+		<div style="position: relative;margin-bottom: 60px">
+			<img style="width: 100%;vertical-align: top;" src="../../image/login_bg.png" alt="">
+			<div style="position: absolute;bottom: 0;left: 0;width: 100%;text-align: center;">
+				<img style="margin-bottom: -45px;border-radius: 100%" data-u='' width="90" height="90" src="../../image/avatar2.png" alt="" onerror="this.src='../../image/avatar2.png'">
+			</div>
+
+		</div>
+
+		<div class="z-login-column" style="padding: 0 15px;">
+			<label style="border-bottom: 1px solid #ddd;" for="phone">
+				<input onfocus="onF(this)" style="width: 80%" value="请输入您的手机号码" id="phone" type="tel">
+			</label>
+		</div>
+		<div class="z-login-column" style="padding: 0 15px;">
+			<label for="password" style="overflow: hidden;position: relative;border-bottom: 1px solid #ddd;">
+				<input onfocus="onF(this)" maxlength="6" id="code" type="tel" value="请输入验证码">
+				<div id="send" class="z-login-code-btn unclick">获取验证码</div>
+			</label>
+		</div>
+		<!-- <div class="login-tip">如长时间获取不到验证码，<span>请30s后重新获取</span></div> -->
+		<div style="height: 15px"></div>
+		<div style="font-size: 0.8rem;padding: 8px 15px" onclick="login();" class="z-login-column z-login-column-btn unclick">
+			<label> 登录 </label>
+		</div>
+		<div class="bottom-tip">
+			<span style="margin: 0 0.8rem"><span class="icon iconfont icon-xuanzhong" style="margin-right: 0.4rem"></span>登录即表示你已阅读并同意<span data-href="../../html/me/agreement.html" data-name="agreement">《用户协议》</span></span>
+		</div>
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script>
+	var clicked = false;
+	var s = 30;
+	var Will = 0;
+	var inte;
+	var phone,code;
+	var dialogBox;
+	var type = 1;//如果用户不点获取验证码就登录就默认是登录接口
+	var offsetTop = 0;
+	apiready = function(){
+		offsetTop =  $api.offset($api.byId('code')).t;
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('LoginPage',{'Active':'加载'},'登录界面');"});
+		//MD End
+
+		dialogBox = api.require('dialogBox');
+		api.addEventListener({
+		    name: 'keyback'
+		}, function(ret, err) {
+			if(Will == 0){
+				Will = Will+1;
+				api.toast({
+				    msg: '再次返回将退出应用',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+			}else{
+				api.closeWidget({silent:true});
+			}
+		});
+
+		if(localStorage.getItem('face')){
+			document.querySelector("[data-u]").src = localStorage.getItem('face');
+		}
+
+		api.getPrefs({
+		    key: 'tel'
+		}, function(ret, err){
+		    if( ret ){
+					tel = ret.value;
+					if(tel && (tel.length == 11)){
+						document.getElementById('phone').value = tel;
+						document.querySelector('.z-login-code-btn').className = document.querySelector('.z-login-code-btn').className.replace('unclick','');
+					}
+		    }
+		});
+
+		document.getElementById('phone').onkeyup = function(){
+			if((this.value.length == 11) && !isNaN(this.value)){
+				document.querySelector('.z-login-code-btn').className = document.querySelector('.z-login-code-btn').className.replace('unclick','');
+			}else{
+				document.querySelector('.z-login-code-btn').className = document.querySelector('.z-login-code-btn').className.replace('unclick','') + ' unclick';
+			}
+		}
+
+		document.getElementById('code').onkeyup = function(){
+			if((this.value.length == 6) && !isNaN(this.value)){
+				document.querySelector('.z-login-column-btn').className = document.querySelector('.z-login-column-btn').className.replace('unclick','');
+				login();
+			}
+		}
+
+		document.getElementById('send').onclick = function(){
+			if(App.State()){
+				if(clicked){return;}
+				api.execScript({name: 'root', script: "ChatAna('LoginPage',{'Active':'获取验证码'},'登录界面-获取验证码');"});
+				clicked = true;
+				phone = document.getElementById('phone').value;
+				if((phone.length != 11) || !IsPhoneNumber(phone)){return;}
+				clickSendBtn();
+				document.getElementById('code').focus();
+				inte = setInterval(clickSendBtn,1000);
+				api.execScript({name: 'root',script: "XO.GetCode('"+phone+"',{name:'login',fun:'sendSuccess'},{name:'login',fun:'codefail'});"});
+			}
+		}
+
+	};
+
+	function onF(dom){
+		if(!/^\d*$/g.test(dom.value)){
+			dom.value = '';
+		}
+	}
+
+	function codeFailCheck(){
+		App.tips('验证码获取失败!');
+	}
+
+	function sendSuccess(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		api.toast({
+		    msg: data.msg,
+		    duration: 2000,
+		    location: 'bottom'
+		});
+
+		api.execScript({name: 'root', script: "ChatAna('sendCode',{'is_success':true},'登录界面-验证码获取成功');"});
+	}
+
+	function codefail(msg){
+		api.hideProgress();
+		api.toast({
+		    msg: msg,
+		    duration: 2000,
+		    location: 'bottom'
+		});
+		api.execScript({name: 'root', script: "ChatAna('sendCode',{'is_success':false},'登录界面-验证码获取失败');"});
+	}
+
+	function clickSendBtn(){
+		if(s > 0){
+			document.getElementById('send').innerHTML = s +'s后重新获取';
+			s--;
+		}else{
+			document.getElementById('send').innerHTML = '获取验证码';
+			s = 30;
+			clicked = false;
+			clearInterval(inte);
+		}
+	}
+
+	function login(){
+		hide();
+		if(App.State()){
+			phone = document.getElementById('phone').value;
+			code = document.getElementById('code').value;
+			if(!phone){
+				api.toast({
+				    msg: '请输入手机号',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+				return;
+			}else{
+				if(!IsPhoneNumber(phone)){
+					api.toast({
+					    msg: '请输入正确手机号',
+					    duration: 2000,
+					    location: 'bottom'
+					});
+					return;
+				}
+			}
+			if(!code || !/^\d*$/g.test(code)){
+				api.toast({
+				    msg: '请输入验证码',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+				return;
+			}
+			api.showProgress({
+				style: 'default',
+				animationType: 'fade',
+				title: '登录中...',
+				modal: false
+			});
+			api.execScript({name: 'root', script: "ChatAna('LoginPage',{'Active':'提交登录'},'登录界面-提交登录');"});
+			api.execScript({name: 'root',script: "XO.Login('"+phone+"','"+code+"',{name:'login',fun:'Login'},{name:'login',fun:'failLogin'});"});
+		}
+	}
+
+	function Login(data){
+		api.hideProgress();
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		api.execScript({name: 'root', script: "ChatAna('login',{'is_success':true},'登录界面-登录成功');"});
+		$api.setStorage('token',data.token);
+		api.execScript({name: 'root',script: "XO.GetUinfo('"+ data.token +"',{name:'root',fun:'getUinfoUpview'},{name:'root',fun:'getUinfoFail'});"});
+		api.execScript({
+      name: 'root',
+      script: 'openIndexFrameGroup();'
+		});
+		setTimeout(function(){
+			api.closeToWin({
+	      name: 'root'
+	    });
+		},500);
+	}
+
+  function failLogin(data){
+		api.hideProgress();
+    api.toast({
+	    msg: data,
+	    duration: 2000,
+	    location: 'bottom'
+		});
+		api.execScript({name: 'root', script: "ChatAna('login',{'is_success':false},'登录界面-登录失败');"});
+  }
+
+	function IsPhoneNumber(num){
+		var myreg = /^(((13[0-9]{1})|(15[0-9]{1})|(17[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+		if(myreg.test(num)){
+			return true;
+		}
+		return false;
+  }
+
+	function hide(){
+		var UIInput = api.require('UIInput');
+		UIInput.open({
+		    rect: {
+		        x: 0,
+		        y: 0,
+		        w: 0,
+		        h: 0
+		    },
+		    autoFocus: true,
+		    maxRows: 4,
+		    placeholder: '',
+		    keyboardType: 'number',
+		    fixedOn: api.frameName
+		}, function(ret, err) {
+		    if (ret) {
+					UIInput.closeKeyboard({id:ret.id});
+					UIInput.close({id:ret.id});
+				}
+		});
+	}
+</script>
+</html>

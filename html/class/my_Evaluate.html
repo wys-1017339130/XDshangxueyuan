@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <meta name="viewport"
+        content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+  <link rel="stylesheet" href="../../css/api.css">
+  <link rel="stylesheet" href="../../css/Order.css">
+  <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+</head>
+<style>
+  #header {
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    height: 2.2rem;
+    line-height: 2.2rem;
+  }
+
+  .left-box {
+    font-size: 1rem;
+    margin-left: 0.5rem;
+  }
+
+  .right-box {
+    position: absolute;
+    font-size: 0.75rem;
+    right: 0.5rem;
+  }
+
+  .Star {
+    height: 2.6rem;
+    font-size: 0.8rem;
+    padding: 0 0.5rem;
+  }
+
+  .texts {
+    width: 92%;
+    height: 4.6rem;
+    resize: none;
+    outline: none;
+    padding: 0.75rem 4%;
+    font-size: 0.7rem;
+    color: #757575;
+    margin-top: 10px;
+  }
+
+  .input {
+    margin: 0 0.6rem;
+    background-color: #d9b270;
+    color: #ffffff;
+    text-align: center;
+    border-radius: 3px;
+    height: 2.2rem;
+    line-height: 2.2rem;
+    font-size: 0.7rem;
+    margin-top: 1.5rem;
+  }
+
+  .box {
+    background-color: white;
+  }
+</style>
+<body style="background-color: #f2f2f2;">
+<div id='app'>
+  <header class="aui-bar aui-bar-nav" id="header">
+    <a class="left-box iconfont icon-jiantou z-fanhui" @click="closeWindow()"></a>
+    <span class="aui-title">我的评价</span>
+  </header>
+  <textarea class="texts box" v-model="textList" placeholder="请填写本次服务的心得..."></textarea>
+  <div class="Star box xingxing" style="margin-top: -4px">
+    <span>您对本次服务的评价：</span>
+    <img align="center" v-for="n in xing" @click="wakong(n)" src="../../image/xingxing.png" alt="">
+    <img align="center" v-for="num in xingNum" @click="tianman(num)" src="../../image/kongxing.png" alt="1">
+    <!--<img align="center"  src="../../image/kongxing.png" alt="">-->
+    <!--<img align="center"  src="../../image/kongxing.png" alt="">-->
+    <!--<img align="center"  src="../../image/kongxing.png" alt="">-->
+    <!--<img align="center"  src="../../image/kongxing.png" alt="">-->
+  </div>
+  <div class="input" @click="boxWin()">提交</div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#app',
+    data: {
+      textList: '',
+      xingNum: 5,
+      xing: 0
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+      }
+    },
+    methods: {
+      wakong: function (m) {
+        app.xing = m - 1
+        app.xingNum = 5 - m +1
+      },
+      tianman: function (is) {
+        app.xingNum = 5 - (app.xing + is)
+        if (app.xing != 5) {
+          app.xing += is
+        }
+      },
+      u_toEvaluate: function (order_sn, evaluate) {
+        var token = $api.getStorage('token')
+        var post = {
+          hash: token,
+          order_sn: order_sn,
+          evaluate: evaluate
+        }
+        sendAjax(this, post, function (res) {
+//          alert(JSON.stringify(res))
+        })
+      },
+      boxWin: function () {
+        this.u_toEvaluate('', app.textList)
+        api.closeWin()
+      },
+      closeWindow: function () {
+        api.closeWin()
+      }
+    }
+  })
+</script>
+</html>

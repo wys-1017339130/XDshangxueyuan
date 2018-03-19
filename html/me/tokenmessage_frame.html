@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <title>全部评论</title>
+  <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+  <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+  <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+  <link rel="stylesheet" href="../../iconfont/iconfont.css">
+  <style>
+    *{
+      padding: 0;
+      margin: 0;
+    }
+    .headerimg{
+      border-radius: 50%;
+      width: 1.7rem;
+      height: 1.7rem;
+      display: block;
+    }
+    .headerpimgleft{
+      width: auto;
+      margin-right: 0.7rem;
+      display: inline-block;
+    }
+    .mastercontent{
+      padding: 10px 15px 1rem 15px;
+      box-sizing: border-box;
+      background: white;
+    }
+    .mastercontentmin{
+      box-sizing: border-box;
+      background: #f9f9f9;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #eaeaea;
+    }
+    .publicimg{
+      width: 5.5rem;
+      margin: 0 1.2%;
+      /*flex: 1;*/
+      text-align: center;
+      height: 5.5rem;
+    }
+    .contentp{
+      font-size: 15px;
+      padding-top: 0.5rem;
+      line-height: 1.3rem;
+    }
+    .bottomdo span{
+      line-height: 2rem;
+      margin: 0 5px 0 0.5rem;
+    }
+    .tokenlist{
+      padding: 0 15px;
+      background: #f9f9f9;
+      box-sizing: border-box;
+    }
+
+    /*分页*/
+    .bottomdiv {
+      width: 100%;
+      height: 3rem;
+      text-align: center;
+      line-height: 3rem;
+      background: #f3f3f3;
+      color: black;
+    }
+    .uptext {
+      color: #bfbfbf;
+      font-size: 13px;
+    }
+    .publicfont {
+      width: 20px;
+      height: 20px;
+      margin: auto;
+    }
+    .dianzanstyle {
+      width: 1.2rem;
+      height: 1.2rem;
+      float: right;
+    }
+    .fonttextnum {
+      float: right;
+      line-height: 1.5rem;
+      margin-right: 5px
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div>
+    <div class="mastercontent">
+      <div style="width: 100%">
+        <div class="headerpimgleft"><img class="headerimg" :src="formatImg(usermessage.face)"></div>
+        <div style="display: inline-block">
+          <p style="font-size: 14px;display: flex">
+            <span style="font-size: 13px">{{usermessage.nickname}}</span>
+            <img v-if="usermessage.level==5" src="../../image/haungguanpai.png" style="width: 13px;height: 15px;margin-left: 3px;margin-right: 3px">
+            <img v-if="usermessage.level==3" src="../../image/haungjinpai.png" style="width: 13px;height: 15px;margin-left: 3px;margin-right: 3px">
+            <img v-if="usermessage.level==4" src="../../image/zuanshipai.png" style="width: 13px;height: 15px;margin-left: 3px;margin-right: 3px">
+            <img v-if="usermessage.level==1" src="../../image/tongpai.png" style="width: 13px;height: 15px;margin-left: 3px;margin-right: 3px">
+            <img v-if="usermessage.level==2" src="../../image/yinpai.png" style="width: 13px;height: 15px;margin-left: 3px;margin-right: 3px">
+            <span style="color: #d3b57e;font-size: 12px">{{usermessage.levelText}}</span>
+          </p>
+          <p style="padding-top: 5px;color: #9c9c9c;font-size: 12px">{{usermessage.addtime | format}}</p>
+        </div>
+          <img @click="headerclick" src="../../image/dianzan.png" v-if="usermessage.agree==0" style="margin-right: 15px;float: right;width: 1.2rem;height: 1.2rem">
+          <img @click="headerclick" src="../../image/zancopy.png" v-if="usermessage.agree==1" style="margin-right: 15px;float: right;width: 1.2rem;height: 1.2rem">
+        <span style="float: right;margin-right: 5px;line-height: 1.5rem">{{usermessage.agreeCount}}</span>
+      </div>
+      <p class="contentp">{{usermessage.content}}</p>
+    </div>
+    <div class="tokenlist">
+      <p style="padding: 0.75rem 0;font-size: 16px">评论列表（{{countnumber}}）</p>
+      <div class="mastercontent" v-for="(item,index) in masterlist" style="background: #f9f9f9">
+        <div style="width: 100%">
+          <div class="headerpimgleft"><img class="headerimg" :src="formatImg(item.face)"></div>
+          <div style="display: inline-block">
+            <p style="font-size: 14px;display: flex">
+              <span style="font-size: 13px">{{item.nickname}}</span>
+              <img v-if="item.level==5" src="../../image/haungguanpai.png" style="width: 13px;height: 15px;margin-left: 3px;margin-right: 3px">
+              <img v-if="item.level==3" src="../../image/haungjinpai.png" style="width: 13px;height: 15px;margin-left: 3px;margin-right: 3px">
+              <img v-if="item.level==4" src="../../image/zuanshipai.png" style="width: 13px;height: 15px;margin-left: 3px;margin-right: 3px">
+              <img v-if="item.level==1" src="../../image/tongpai.png" style="width: 13px;height: 15px;margin-left: 3px;margin-right: 3px">
+              <img v-if="item.level==2" src="../../image/yinpai.png" style="width: 13px;height: 15px;margin-left: 3px;margin-right: 3px">
+              <span style="color: #d3b57e;font-size: 12px">{{item.levelText}}</span>
+            </p>
+            <p style="color: #9c9c9c;font-size: 11px">{{item.addtime | sheng}}</p>
+          </div>
+
+          <img @click="dianzanbtn(index)" class="dianzanstyle" v-if="item.agree == 0" src="../../image/dianzan.png">
+          <img @click="dianzanbtn(index)" class="dianzanstyle" v-if="item.agree == 1" src="../../image/zancopy.png">
+          <span class="fonttextnum">{{item.agreeCount}}</span>
+        </div>
+        <p class="contentp" style="padding-left: 2.9rem;box-sizing: border-box">{{item.content}}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottomdiv">
+    <span v-if="rote" class="uptext">---上拉加载---</span>
+    <img v-if="load" class="publicfont" src="../../image/timg.gif">
+    <span v-if="overlate" class="uptext">数据已全部加载</span>
+  </div>
+
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {});
+  document.onclick = function() {
+    api.sendEvent({
+      name: 'closethisjp',
+      extra: {
+        ifshowjp:false
+      }
+    });
+    app.ifshowjp = false
+  };
+  var app = new Vue({
+    el: '#app',
+    data:{
+      reid:'',
+      rote: false,
+      overlate: false,
+      load: false,
+      page:1,
+      masterlist:'',
+      countnumber:'',
+      usermessage:'',
+      ifshowjp:false,
+      formatImg:formatImg
+    },
+    created: function () {
+      apiready = function () {
+        app.reid = api.pageParam.reid;
+        app.usermessage = api.pageParam.usermessage;
+        app.gettokenlist(1);
+        //滑动监听
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 30 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+//                滑动时候改变的值
+        }, function (ret, err) {
+//                app.rote = true;
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.gettokenlist()
+        });
+        //    //评论的评论
+        api.addEventListener({
+          name: 'tokenistoken'
+        }, function(ret, err) {
+          app.messagevalue = ret.value.messagevalue;
+          app.sendthismessage(app.messagevalue)
+        });
+        //        键盘事件
+        api.addEventListener({
+          name: 'jpevent'
+        }, function(ret, err) {
+          app.ifshowjp = ret.value.ifshowjp
+        });
+        //下拉刷新
+        api.setCustomRefreshHeaderInfo({
+          bgColor: '#efefef',
+          image: {
+            pull: 'widget://res/refresh/pull_image.png',
+            transform: [
+              'widget://res/refresh/refreshing_image_frame_01.png',
+              'widget://res/refresh/refreshing_image_frame_02.png',
+              'widget://res/refresh/refreshing_image_frame_03.png',
+              'widget://res/refresh/refreshing_image_frame_04.png',
+              'widget://res/refresh/refreshing_image_frame_05.png',
+              'widget://res/refresh/refreshing_image_frame_06.png',
+              'widget://res/refresh/refreshing_image_frame_07.png',
+              'widget://res/refresh/refreshing_image_frame_08.png',
+              'widget://res/refresh/refreshing_image_frame_09.png',
+              'widget://res/refresh/refreshing_image_frame_10.png',
+              'widget://res/refresh/refreshing_image_frame_11.png',
+              'widget://res/refresh/refreshing_image_frame_12.png'
+            ],
+            load: [
+              'widget://res/refresh/pull_end_image_frame_01.png'
+            ]
+          }
+        }, function () {
+          if (api.connectionType == 'none') {
+            api.refreshHeaderLoadDone();
+            api.toast({
+              msg: '未连接网络',
+              duration: 2000,
+              location: 'bottom'
+            });
+          } else {
+            app.page = 1;
+            app.rote = true;
+            app.overlate = false;
+            app.load = false;
+            app.gettokenlist(1,function() {
+              api.refreshHeaderLoadDone();
+            })
+
+          }
+        });
+      };
+    },
+    filters: {
+      //计算时间XX -YY -ZZ时间前
+      sheng: function (chavaluetime) {
+        var diff = app.newdatatime - chavaluetime;
+        if (diff > 31536000) {
+          return parseInt(diff / 31536000) + '年前';
+        } else if (diff > 2592000) {
+          return parseInt(diff / 2592000) + '月前';
+        } else if (diff > 86400) {
+          return parseInt(diff / 86400) + '天前';
+        } else if (diff > 3600) {
+          return parseInt(diff / 3600) + '小时前';
+        } else if (diff > 60) {
+          return parseInt(diff / 60) + '分钟前';
+        } else {
+          return diff + '秒前';
+        }
+      },
+      format:function(shijianchuo) {
+        var time = new Date(Number(shijianchuo));
+        var y = time.getFullYear();
+        var m = time.getMonth()+1;
+        var d = time.getDate();
+        var h = time.getHours();
+        var mm = time.getMinutes();
+        var s = time.getSeconds();
+        return y+'-'+add0(m)+'-'+add0(d)+' '+add0(h)+':'+add0(mm)+':'+add0(s);
+      },
+    },
+    methods:{
+
+      //获取评论列表
+      gettokenlist:function(ref, callback) {
+        var post ={
+          hash:$api.getStorage('token'),
+          type:3,
+          reid:app.reid,
+          page:app.page,
+          perPage:10
+        };
+        sendAjax(this,post,'/Api/Official/getOfficialList',function (res) {
+          app.newdatatime = res.data.now;
+          app.countnumber = res.data.count;
+          if (ref == 1) {
+            app.masterlist = res.data.prolist;
+            app.load = false;
+//            if(res.data.prolist.length==0){
+//              app.ifshow = 0
+//            } else {
+//              app.ifshow = 1
+//            }
+          } else {
+            app.masterlist = app.masterlist.concat(res.data.prolist);
+            app.load = false
+          }
+          if (res.data.prolist.length == 0 || res.data.prolist == null) {
+            app.overlate = true;
+            app.rote = false;
+            app.load = false
+          }
+          if(callback) {
+            callback()
+          }
+        })
+      },
+      //点赞 取消赞
+      dianzanbtn:function(index) {
+        if(app.masterlist[index].agree == 1) {
+          app.masterlist[index].agree = 0;
+          app.masterlist[index].agreeCount = app.masterlist[index].agreeCount - 1
+        } else {
+          app.masterlist[index].agreeCount++;
+          app.masterlist[index].agree = 1
+        }
+        var post ={
+          hash:$api.getStorage('token'),
+          oid:app.masterlist[index].id
+        };
+        sendAjax(this,post,'/Api/Official/officialAgree',function (res) {
+        })
+      },
+      //发送评论
+      sendthismessage:function(messagevalue) {
+        var post ={
+          hash:$api.getStorage('token'),
+          content:messagevalue,
+          reid:app.reid,
+          type:3,
+        };
+        sendAjax(this,post,'/Api/Official/addOfficial',function (res) {
+          if(res.code ==1) {
+            app.page = 1;
+            toastMsg('评论成功');
+            app.gettokenlist(1);
+            api.sendEvent({
+              name: 'newmessagelist',
+            });
+          } else {
+            toastMsg(res.message)
+          }
+        })
+      },
+      //点赞
+      headerclick:function() {
+        if(app.usermessage.agree==0) {
+          app.usermessage.agree = 1;
+          app.usermessage.agreeCount++;
+        } else {
+          app.usermessage.agree = 0;
+          app.usermessage.agreeCount = app.usermessage.agreeCount - 1
+        }
+        var post ={
+          hash:$api.getStorage('token'),
+          oid:app.usermessage.id
+        };
+        sendAjax(this,post,'/Api/Official/officialAgree',function (res) {
+          api.sendEvent({
+            name: 'sendzan',
+          });
+        })
+      }
+    }
+  });
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+</html>

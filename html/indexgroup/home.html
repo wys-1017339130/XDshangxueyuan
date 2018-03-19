@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html style="height: auto">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>我的</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+</head>
+<style type="text/css">
+    #header {
+        display: flex;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        height: 2.2rem;
+        line-height: 2.2rem;
+        border: 0px solid;
+        background-color: #fffcf7;
+        z-index: 1000;
+    }
+
+    .left-box {
+        font-size: 1rem;
+        position: relative;
+        margin-left: 0.5rem;
+    }
+
+    .left-box > img {
+        width: 1.1rem;
+    }
+
+    .right-box {
+        position: absolute;
+        right: 10px;
+    }
+
+    .right-box > img {
+        width: 1.1rem;
+    }
+
+    .ima > img {
+        display: block;
+        width: 100%;
+    }
+
+    .home-avatar-1 {
+        margin-left: 25px;
+        margin-right: 10px;
+    }
+
+    .headtitle {
+        width: 8px;
+        height: 8px;
+        position: absolute;
+        right: -4px;
+        bottom: 12px;
+    }
+
+    .new-bg {
+        background-color: #fffcf7;
+    }
+</style>
+<body style="position: relative;">
+<div id="app">
+    <header class="aui-bar aui-bar-nav" id="header" style="background-color:#fffcf7; ">
+    <span class="left-box" @click="closeWindow()"><img align="center" src="../../image/gRZxin.png" alt=""><span
+            v-show="mYlist.ucenterlsRed == 1" class=" reds headtitle fonts"></span></span>
+        <span class="aui-title"></span>
+        <span class="right-box" @click="set()"><img align="center" src="../../image/shezhi.png" alt=""><span
+                class=" reds headtitle fonts" v-if="listimg == 'undefined'"></span></span>
+    </header>
+    <p style="height: 44px;"></p>
+    <div style="text-align: center;" class="home-img-box new-bg">
+        <div class="box_Head-portrait">
+            <div class="box_Head-portrait2">
+                <img data-u='face' style="width: 2.9rem;height: 2.9rem;margin-top:0" :src="formatImg(mYinfo.face)"
+                     class="home-avatar-1"
+                     style="margin-top: 0px;">
+                <div @click="closeWindow">
+                    <div id="z-home-name aui-ellipsis-1" data-des="0"
+                         style="color: #473920;font-size: 0.9rem;font-weight: bold;height: 1rem;margin: 8px 0;">
+                        {{mYinfo.nickname || '游客'}}
+                    </div>
+                    <div id="z-home-login" data-des="0"
+                         data-href="../../html/me/login.html"
+                         data-name="login"
+                         style="font-size: 0.6rem;width: 100%;background-color: transparent;padding: 0px"
+                         class="new-login-btn"
+                         v-show="mYinfo.nickname == null "
+                    >
+                        请先注册&nbsp;/&nbsp;登录
+                    </div>
+                    <div class="new-login-btns" style="display: none;font-size: 0.6rem" id="lognas"
+                         v-show="mYinfo.nickname">
+                        {{mYlist.level}}{{ mYlist.credit === '0' ? '' : mYlist.credit }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-name="promoter"
+             style="position: absolute;right: 17%;top: 2rem;height:3rem;width: 3rem;z-index:999">
+            <div style="position: absolute;width: 100%;height: 100%;" class="ima">
+                <img v-show="mYlist.index == 1" src="../../image/huangguan02.png" alt="">
+                <img v-show="2 <= mYlist.index && mYlist.index <= 20" src="../../image/zuanshi0.png" alt="">
+                <img v-show="21 <= mYlist.index && mYlist.index < 100" src="../../image/huangjin02.png" alt="">
+                <img v-show="100 <= mYlist.index && mYlist.index <= 500" src="../../image/baiyin02.png" alt="">
+                <img v-show="500 < mYlist.index" src="../../image/qingtong02.png" alt="">
+                <img v-show="mYlist.index == 0" src="../../image/qingtong02.png" alt="">
+                <img v-show="mYlist.index == null" src="../../image/qingtong02.png" alt="">
+            </div>
+        </div>
+    </div>
+    <p style="height: 10px; background-color: #f2f2f2;"></p>
+    <div class="up-box" style="border-bottom: 5px solid #f2f2f2">
+        <div class="home-2" style="margin-top: 0px;">
+            <div class="z-home-menu new-home-menu" @click="studylist()">
+                <img src="../../image/jilus.png" alt="">学习记录<span class="icon iconfont icon-ch2 fr"></span>
+            </div>
+            <div class="z-home-menu new-home-menu" @click="myclass()">
+                <img src="../../image/kc.png" alt="">我的课程<span class="icon iconfont icon-ch2 fr"></span>
+                <span class="fr fonts">{{rightText.countCourse ==0 ? '' : rightText.countCourse}}
+                    </span>
+            </div>
+            <div class="z-home-menu new-home-menu" id="myclick" @click="Examination()">
+                <img src="../../image/xg.png" alt="">练习考试<span class="icon iconfont icon-ch2 fr"></span>
+                <span class="fr reds" v-show="rightText.examIsRed == 1">&nbsp;</span>
+            </div>
+            <div class="z-home-menu new-home-menu marings"
+                 @click="score()">
+                <img src="../../image/kb.png" alt="">我的行币<span class="icon iconfont icon-ch2 fr"></span>
+                <span class="fr fonts">{{rightText.score ==0 ? '' : rightText.score}}
+                    </span>
+            </div>
+            <div class="z-home-menu new-home-menu" @click="credit()">
+                <img src="../../image/xuefen1.png" alt="">我的学分<span class="icon iconfont icon-ch2 fr"></span>
+                <span class="fr fonts">{{rightText.credit ==0 ? '' : rightText.credit}}
+                    </span>
+            </div>
+            <div id="click" class="z-home-menu new-home-menu" @click="certificate()">
+                <img src="../../image/zhengshu.png" alt="">我的证书<span class="icon iconfont icon-ch2 fr"></span>
+                <span class="fr fonts">{{rightText.count_cert ==0 ? '' : rightText.count_cert}}
+                    </span>
+            </div>
+
+
+            <!---
+            <div class="z-home-menu new-home-menu marings" @click="order()">
+            <img src="../../image.png" alt="">咨询订单<span class="icon iconfont icon-ch2 fr"></span>
+            <sapn class="fr reds" v-show="rightText.consultIsRed == 1"><pn>
+            </div>
+            -->
+
+            <div class="z-home-menu new-home-menu" @click="ranking()">
+                <img src="../../image/rinking.png" alt="">学霸排行榜<span class="icon iconfont icon-ch2 fr"></span>
+                <span class="fr fonts" v-show="rightText.index != null">第<span id="rank">{{rightText.index}}</span>名
+                    </span>
+                <span class="fr fonts" v-show="rightText.index == null">未上榜</span>
+            </div>
+            <div class="z-home-menu new-home-menu" style="display: none;" @click="query()">
+                <img src="../../image/chakan1.png" alt="">学员查看<span class="icon iconfont icon-ch2 fr"></span>
+            </div>
+            <div class="z-home-menu new-home-menu" @click="daiyanren()">
+                <img src="../../image/fmicon4.png" alt="">学习代言人<span></span><span
+                    class="icon iconfont icon-ch2 fr"></span>
+                <span class="fr fonts"></span>
+            </div>
+        </div>
+    </div>
+
+    <!--
+    <div class="box_List">
+        <div class="boxTitle">
+            <div>当月累计学习时长</div>
+            <div style="text-align: right;">超越了{{mYlist.pass}}%的用户</div>
+        </div>
+        <div class="Cumulative">
+            <div>
+                <p><span style="font-size: 1.5rem;font-weight: 800;color: #d2b379;"
+                         v-show="mYlist.month_current == null">0</span><span
+                        style="font-size: 1.5rem;font-weight: 800;color: #d2b379;"
+                        v-show="mYlist.month_current != null">{{mYlist.month_current}}</span>分钟
+                </p>
+                <p style="margin-top: 15px;">获得{{mYlist.get_score}}个行币奖励</p>
+            </div>
+        </div>
+        <div class="flex-wrap new-data">
+            <div style="line-height: 1.6;padding: 10px 0" class="flex-con z-ellipsis new-border new-border-2"
+                 @click="kecheng(mYinfo.id)">
+        <span id="z-home-second" style="font-size: 0.7rem;color: #000;">
+          <span style="font-size: 1rem;" v-show="mYlist.month_current != null">{{mYlist.week_current}}</span>
+            <span style="font-size: 1rem;" v-show="mYlist.month_current == null">0</span>分钟</span><br><span
+                    class="new-little-title">本周学习</span>
+            </div>
+            <div style="line-height: 1.6;padding: 10px 0" class="flex-con z-ellipsis new-border new-border-2"
+                 @click="jilu()">
+                <span id="z-home-colume" style="font-size: 0.7rem;color: #000;"><span style="font-size: 1rem;">{{mYlist.lesson_current}}</span></span><br><span
+                    class="new-little-title">学习课程</span>
+            </div>
+            <div style="line-height: 1.6;padding: 10px 0" class="flex-con z-ellipsis new-ch2" @click="certificate()">
+        <span id="z-home-day" style="font-size: 0.7rem;color: #000;"><span
+                style="font-size: 1rem;">{{mYlist.get_cert}}</span></span><br><span
+                    class="new-little-title">学习证书</span>
+                <span class="icon iconfont icon-ch2" style="display:none;"></span>
+            </div>
+        </div>
+    </div>
+    <div class="up-box">
+        <div class="home-2">
+            <div class="box_List">
+                <p>当月课程学习情况</p>
+                <div class="ListBox" v-for="item in mYlist.learn_state">
+                    <p style="font-size: 0.7rem;font-weight: 800;color: #252525;">{{item.title}}</p>
+                    <p style="font-size: 0.6rem; color: #666;">当月累计学习了<span
+                            style="color: #ff5317;">{{item.sum_real}}</span>分钟，出超过了{{item.beyond}}%的用户
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    -->
+    <div id="hsminiplay" style="height: 40px;background-color: #f5f5f5"></div>
+</div>
+</body>
+<script id="home_Tpl" type="text/template"></script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+    /*var tou = document.querySelectorAll('[data-touch]');
+     for (var i in tou) {
+     if (typeof tou[i] == 'object') {
+     tou[i].addEventListener('touchstart', function () {
+     this.style.backgroundColor = '#f5f5f5';
+     });
+     tou[i].addEventListener('touchend', function () {
+     this.style.backgroundColor = '#fff';
+     });
+     }
+     }*/
+    //  var fs, wx;
+    //  var db, userID, userData;
+    var app = new Vue({
+      el: '#app',
+      data: {
+        mYlist: {
+          nickname: null
+        },
+        listimg: '',
+        mYinfo: {},
+        rightText: {},
+        fs: '',
+        db: '',
+        wx: ''
+      },
+      created: function () {
+        apiready = function () {
+          $api.fixStatusBar($api.dom('header'));
+          app.wx = api.require('wx');
+          app.db = api.require('db');
+          app.fs = api.require('fs');
+          app.u_getMyData()
+          app.getUserInfo()
+          app.u_getUcenterData()
+          api.setStatusBarStyle({
+            style: 'dark'
+          });
+          api.addEventListener({
+            name: 'LOING'
+          }, function (ret, err) {
+            app.u_getMyData()
+            app.getUserInfo()
+          })
+        };
+      },
+      methods: {
+        Refresh: function () {
+          api.execScript({
+            name: 'root',
+            script: "XO.GetUser('" + $api.getStorage('token') + "',{name:'home',fun:'app.upviewInfo'},{name:'home',fun:'fail'});"
+          });
+        },
+        upviewInfo: function (data) {
+          var data = JSON.parse(data);
+          localStorage.setItem('userID', data.id);
+        },
+        kecheng: function (id) {
+          api.openWin({
+            name: 'sharepage_win',
+            url: '../me/sharepage_win.html',
+            pageParam: {
+              id: id
+            }
+          })
+        },
+        upview: function (data) {//这个函数在refresh中触发了，是获取数据的函数
+          if (typeof data == 'string') {
+            var data = JSON.parse(data);
+          }
+          localStorage.setItem('userID', data.id);
+          if (!data.nickname) {
+            if ($api.getStorage('nickname')) {
+              data.nickname = $api.getStorage('nickname');
+            }
+          }
+          $api.setStorage('nickname', data.nickname);
+          $api.setStorage("industry", data.industry);
+          $api.setStorage("profession", data.profession);
+          $api.setStorage("company", data.company);
+
+          api.execScript({
+            name: 'root',
+            script: "saAPICloud.login({loginId: " + parseInt(data.id) + "});saAPICloud.flush();"
+          });
+          setTimeout(function () {
+            api.execScript({
+              name: 'root',
+              script: "XO.Profile('" + $api.getStorage('token') + "',{name:'home',fun:'app.pro'},{name:'home',fun:'app.pro'});"
+            });
+          }, 8000);
+          if (data.face && (data.face != "undefined") && (data.face != "null")) {
+            var _file = App.file(data.face);
+            app.fs.exist({
+              path: (api.fsDir + '/file/' + _file.full)
+            }, function (ret, err) {
+              if (ret.exist) {
+                data.face = (api.fsDir + '/file/' + _file.full);
+                $api.setStorage('face', data.face);
+                localStorage.setItem('face', data.face);
+                document.querySelector("[data-u]").src = data.face;
+                var sql1 = "update user set face='" + data.face + "' where id=" + data.id;
+                app.db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                });
+              } else {
+                if (data.face.indexOf('/') == 0) {
+                  var dface = App.url + data.face;
+
+                } else {
+                  var dface = data.face;
+                }
+                api.download({
+                  url: dface,
+                  savePath: ('fs://file/' + _file.full),
+                  cache: true,
+                  allowResume: true
+                }, function (ret, err) {
+                  data.face = (api.fsDir + '/file/' + _file.full);
+                  $api.setStorage('face', data.face);
+                  localStorage.setItem('face', data.face);
+                  document.querySelector("[data-u]").src = data.face;
+                  var sql1 = "update user set face='" + data.face + "' where id=" + data.id;
+                  app.db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+                  });
+                });
+              }
+            });
+          } else {
+            $api.setStorage('face', data.face);
+          }
+          var token = $api.getStorage('token');
+          if (token && (token != App.guest)) {
+            if (!data.record.index) {
+              data.record.index = 0;
+            }
+            if (!data.record.invitation) {
+              data.record.invitation = 0;
+            }
+          }
+          //scroll(document.querySelector('.up-box'));//isScroll底部有bug还是自己写好了
+          App.init();//动态生产html后腰重新绑定事件
+        },
+        upface: function () {
+          var pic = $api.getStorage('face');
+          document.querySelector("[data-u]").src = pic;
+        },
+        pro: function () {
+        },
+        fail: function (msg) {
+          App.tips(msg);
+        },
+        red: function (Ty) {
+          if (Ty) {
+            //document.querySelector('.tips_red').style.display = 'inline-block';
+          } else {
+            //document.querySelector('.tips_red').style.display = 'none';
+          }
+        },
+        closeWindow: function () {
+          App.checkLogin();
+          api.openWin({
+            name: 'my_PersonalCenter',
+            url: '../class/my_PersonalCenter.html',
+            pageParam: {}
+          })
+        },
+        //  我的页，接口
+        u_getMyData: function () {
+          api.showProgress({
+            title: '努力加载中...',
+            modal: false
+          });
+          var token = $api.getStorage('token');
+          var post = {
+            hash: token
+          };
+          sendAjax(this, post, '/Api/Ucenter/u_getMyData', function (res) {
+            api.hideProgress();
+            app.mYlist = res.data
+//            app.mYinfo = res.data.info
+          })
+        },
+        getUserInfo: function () {
+          var token = $api.getStorage('token');
+          var post = {
+            hash: token
+          };
+          sendAjax(this, post, '/Api/Ucenter/getUserInfo', function (res) {
+            console.log('---------------------------ahahahhaha' + JSON.stringify(res));
+            localStorage.setItem('userID', res.data.id);
+            app.mYinfo = res.data
+          })
+        },
+        jilu: function () {
+          api.openWin({
+            name: 'studyList_win',
+            url: '../class/studyList_win.html',
+            pageParam: {}
+          })
+        },
+        // 设置页
+        set: function () {
+          App.checkLogin();
+          api.openWin({
+            name: 'set',
+            url: '../me/set.html',
+            pageParam: {}
+          })
+        },
+        u_getUcenterData: function () {
+          var token = $api.getStorage('token')
+          var post = {
+            hash: token
+          }
+          sendAjax(this, post, '/Api/Ucenter/u_getUcenterData', function (res) {
+            app.rightText = res.data
+          })
+        },
+        score: function () {
+          api.openWin({
+            name: 'score',
+            url: '../me/score.html',
+            pageParam: {}
+          })
+        },
+
+        studylist: function () {
+          api.openWin({
+            name: 'studyList_win',
+            url: '../class/studyList_win.html',
+            pageParam: {}
+          })
+        },
+        myclass: function () {
+          api.openWin({
+            name: 'myclass_win',
+            url: '../class/myclass_win.html',
+            pageParam: {}
+          })
+        },
+        Examination: function () {
+          api.openWin({
+            name: 'MyRecord_fm',
+            url: '../class/MyRecord_fm.html',
+            pageParam: {}
+          })
+        },
+        order: function () {
+          api.openWin({
+            name: 'SearchForOrders_win',
+            url: '../class/SearchForOrders_win.html',
+            pageParam: {}
+          })
+        },
+        ranking: function () {
+          api.openWin({
+            name: 'Ranking',
+            url: '../class/Ranking.html',
+            pageParam: {}
+          })
+        },
+        query: function () {
+          api.openWin({
+            name: 'Ranking',
+            url: '../class/query.html',
+            pageParam: {}
+          })
+        },
+        credit: function () {
+          api.openWin({
+            name: 'credit_fm',
+            url: '../class/credit_fm.html',
+            pageParam: {}
+          })
+        },
+        daiyanren: function () {
+          api.openWin({
+            name: 'promoter',
+            url: 'widget://html/me/promoter.html',
+            pageParam: {
+              des: 0
+            }
+          })
+        },
+
+        //  证书
+        certificate: function () {
+          api.openWin({
+            name: 'certificate_fm',
+            url: '../class/certificate_fm.html',
+            pageParam: {}
+          })
+        }
+      }
+    })
+
+
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

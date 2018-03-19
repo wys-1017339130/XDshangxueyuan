@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>行币奖励</title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <style>
+        .sys_close_box{
+            width:1.6rem;
+            height:auto;
+            position: absolute;
+            top:-0.8rem;
+            right:-0.8rem;
+        }
+        /*行币奖励*/
+        .dialog_box_up_father{
+            /*padding-top:12rem;*/
+            /*background-color: red;*/
+        }
+        .up_box_center{
+            border-radius: 5px;
+            width:14rem;
+            height:9rem;
+            background-color: white;
+            margin: auto;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+        }
+        .dialog_box_up{
+            height:10rem;
+        }
+        .up_message{
+            /*background-color: pink;*/
+            width: 85%;
+            text-align: left;
+            font-size:0.8rem;
+            color:#898989;
+            margin:5rem auto 1rem auto;
+        }
+        .up_box{
+            /*height:11rem;*/
+        }
+        .noXB{
+            margin:4.5rem auto 1.5rem auto;
+        }
+
+        .up_now_btn{
+            width:100%;
+            height:2.2rem;
+            line-height:2.2rem;
+            font-size:0.8rem;
+            color:white;
+            letter-spacing:1px;
+            text-align: center;
+            background-color:#D9B270 ;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+
+        .icon_box{
+            display: block;
+            /*width:15rem;*/
+            width:100%;
+            height:auto;
+            margin:0 auto;
+            position: absolute;
+            top:-5rem;
+        }
+        .noicon_box {
+            display: block;
+            /*width:15rem;*/
+            width: 50%;
+            height: auto;
+            position: absolute;
+            top: -4.5rem;
+            left: 25%;
+        }
+    </style>
+</head>
+<body style="margin:0">
+<div id="app">
+    <!--行币奖励-->
+    <div class="dialog_box_up_father">
+        <!--<div class="dialog_box_up_father" v-show=" true ">-->
+        <div class="up_box_center">
+            <div class="dialog_box_up" :class="{ up_box : XBicon  }">
+                <!--关闭-->
+                <img src="../../image/close_icon.png" class="sys_close_box" alt="" @click="closeBox()">
+                <!--行币icon-->
+                <div class="">
+                    <img class="icon_box" src="../../image/XB.png" v-show="!XBicon">
+                    <img class="noicon_box" src="../../image/noXB.png" v-show="XBicon">
+                </div>
+                <!--信息-->
+                <div class="up_message" :class="{ noXB : XBicon  }">{{message}}</div>
+                <div class="up_now_btn" @click="closeBox()">我知道了</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      message:'您上次啥都没学您上次啥都没学您上次啥都没学您上次啥都没学您上次啥都没学',  //行币
+      XBicon:true  //默认没有
+    },
+    created: function () {
+      apiready = function () {
+//        行币
+        if(api.pageParam.message){
+          app.messageID = api.pageParam.messageID;
+          app.message = api.pageParam.message;
+          if(app.messageID== '-1' ){
+            app.XBicon = true;
+          }else{
+            app.XBicon = false;
+          }
+        }
+      }
+    },
+    methods: {
+      closeBox:function () {
+//          行币奖励
+        api.execScript({name: 'root', frameName: 'FM', script: "app.closeXBbox();"});
+        api.execScript({name: 'root', frameName: 'FM', script: "app.getHomeLink();"});
+      }
+    }
+  })
+</script>
+</body>
+</html>

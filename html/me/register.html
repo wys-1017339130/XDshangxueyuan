@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>完善信息</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body class="z-fff">
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">设置</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div class="z-login-title">请完善个人信息</div>
+		<div class="z-column2">
+			<label for="nickname" class="z-row z-border-bottom z-edit">
+				<span>姓名：</span>
+				<input autofocus="true" id="nickname" readonly value="" placeholder="请输入真实姓名" type="text">
+			</label>
+			<div style="padding: 0 !important" class="z-login-column">
+				<label style="border-bottom: 1px solid #ddd;">
+					<span style="font-size: 0.8rem;color: #333" class="text-span">性别：</span>
+					<label onclick="choseSex(1)" style="width: 20% !important;display: inline-block !important;margin-left: 15px;font-size: 0.8rem" for="man">
+						<img style="vertical-align: middle;margin-right: 0.4rem" id="man_pic" class="ch" width="20" src="../../image/checked.png" alt="">男
+					</label>
+					<label onclick="choseSex(0)" style="width: 20% !important;display:inline-block !important;font-size: 0.8rem" for="woman">
+						<img style="vertical-align: middle;margin-right: 0.4rem" class="ch" width="20" src="../../image/check.png" id="woman_pic">女
+					</label>
+				</label>
+			</div>
+			<label for="industry" class="z-row z-border-bottom z-edit">
+				<span>行业：</span>
+				<input onclick="selectorIndustry();" id="industry" value="" placeholder="请输入行业" type="text" readonly="true">
+			</label>
+			<label for="company" class="z-row z-border-bottom z-edit">
+				<span>公司：</span>
+				<input id="company" value="" placeholder="请输入公司名称" type="text">
+			</label>
+			<label for="job" class="z-row z-border-bottom z-edit">
+				<span>职务：</span>
+				<input onclick="selectorJob();" id="job" value="" placeholder="请输入职务" type="text" readonly="true">
+			</label>
+<!-- 			<label for="province" class="z-row z-border-bottom z-edit">
+				<span>省份：</span>
+				<input onclick="selectorProvince(this);" id="province" value="" placeholder="请输入省份" type="text" readonly="true">
+			</label> -->
+		</div>
+		<div class="z-column2">
+			<div id="next" class="z-login-btn">提交资料</div>
+		</div>
+
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript">
+	var HeadBar = $api.byId('HeadBar');
+	var phone,nickname,sex,industry,job,province,company;
+	var UIActionSelector;
+	var dialogBox;
+
+	//性别
+	var sex = 1;
+
+	//行业
+	var industryJSON = [
+		{"name":"互联网/电子商务/IT"},
+		{"name":"金融业"},
+		{"name":"零售业"},
+		{"name":"制造业"},
+		{"name":"广告/传媒"},
+		{"name":"教育/培训"},
+		{"name":"房地产/建筑"},
+		{"name":"服务业"},
+		{"name":"物流/运输"},
+		{"name":"制药/医疗"},
+		{"name":"政府/非盈利"},
+		{"name":"其他"}
+	];
+
+	//职务
+	var jobJSON = [
+		{"name":"创始人/合伙人"},
+		{"name":"股东/董事"},
+		{"name":"投资人"},
+		{"name":"总裁/CEO/负责人"},
+		{"name":"高层管理"},
+		{"name":"中层管理"},
+		{"name":"一般管理"},
+		{"name":"职员"},
+		{"name":"其他"}
+	];
+
+	//优化安卓与苹果
+	var _font = 16;
+
+	var isSelector = false;//优化back键，当选择器弹出时back键为关闭弹窗，每次打开弹窗此值变true，弹窗回掉事件中变false，cancel和ok都要变
+	apiready = function(){
+		phone = api.pageParam.phone;
+		$api.fixStatusBar(HeadBar);
+		dialogBox = api.require('dialogBox');
+		UIActionSelector = api.require('UIActionSelector');
+		if(!App.iphone){
+	    	_font = 14;
+	    }
+	    choseSex(1);
+		App.init();
+
+		nickname = $api.getStorage('nickname');
+		if(nickname && (nickname.length>1)){
+			document.getElementById('nickname').value = nickname;
+		}
+		document.getElementById('next').onclick = function(){
+			if(App.State()){
+				/*
+				nickname = document.getElementById('nickname').value;
+				if(nickname == ''){
+					api.toast({
+					    msg: '请输入昵称',
+					    duration: 2000,
+					    location: 'bottom'
+					});
+					return;
+				}
+
+				if(nickname.length < 2){
+					api.toast({
+					    msg: '昵称过短',
+					    duration: 2000,
+					    location: 'bottom'
+					});
+					return;
+				}
+				*/
+
+				industry = document.getElementById('industry').value;
+				if(!industry || industry == '请输入行业'){
+					api.toast({
+					    msg: '请输入行业',
+					    duration: 2000,
+					    location: 'bottom'
+					});
+					return;
+				}
+				company = document.getElementById('company').value;
+				if(!company || company == '请输入公司名称'){
+					api.toast({
+					    msg: '请输入公司名称',
+					    duration: 2000,
+					    location: 'bottom'
+					});
+					return;
+				}
+				profession = document.getElementById('job').value;
+				if(!profession || profession == '请输入职务'){
+					api.toast({
+					    msg: '请输入职务',
+					    duration: 2000,
+					    location: 'bottom'
+					});
+					return;
+				}
+				// province = document.getElementById('province').value;
+				// if(!province || province == '请输入省份'){
+				// 	api.toast({
+				// 	    msg: '请输入省份',
+				// 	    duration: 2000,
+				// 	    location: 'bottom'
+				// 	});
+				// 	return;
+				// }
+
+				api.execScript({name: 'root',script: "XO.PostUser('"+ $api.getStorage('token') +"','"+nickname+"','"+sex+"','','"+company+"','"+industry+"','"+profession+"','','','',{name:'register',fun:'savesuccess'},{name:'register',fun:'fail'});"});
+			}
+		}
+
+		api.addEventListener({
+		    name: 'keyback'
+		}, function(ret, err) {
+			if(isSelector){
+				UIActionSelector.close();
+			}else{
+				//loginOut();
+				api.closeWin();
+			}
+		});
+	};
+
+	function loginOut(){
+	    var dialogBox = api.require('dialogBox');
+			dialogBox.evaluation({
+			    styles: {
+			        bg: '#fff',
+			        w: 250,
+			        buttons: [{
+			            marginB: 0,
+			            marginL: 0,
+			            w: 250,
+			            h: 50,
+			            bg: '#f5f5f5',
+			            color: '#007FFF',
+			            size: 14
+			        }, {
+			            marginB: 0,
+			            marginL: 0,
+			            w: 250,
+			            h: 50,
+			            bg: '#fff',
+			            color: '#007FFF',
+			            size: 14
+			        }]
+			    },
+			    texts: {
+			        buttons: [{
+			            text: '返回'
+			        }, {
+			            text: '退出登录'
+			        }]
+			    }
+			}, function(ret, err) {
+			    if (ret) {
+			        var dialogBox = api.require('dialogBox');
+			        dialogBox.close({
+			            dialogName: 'evaluation'
+			        });
+			        if(ret.index == 1){
+								api.showProgress({
+										style: 'default',
+										animationType: 'fade',
+										title: '退出中...',
+										modal: false
+								});
+								setTimeout(function(){
+									api.hideProgress();
+									out();
+								},1000);
+		    		 }
+			    }
+			});
+   }
+
+	function selectorJob(){
+		selector(document.getElementById('job'),jobJSON);
+	}
+
+	function choseSex(sex1){
+		//label触发两次,不影响
+
+		var man_pic = document.getElementById("man_pic");
+		var woman_pic = document.getElementById("woman_pic");
+		if(sex1 === 1){
+			woman_pic.src = "../../image/check.png";
+			man_pic.src = "../../image/checked.png";
+			sex = 1;
+		}else if(sex1 === 0){
+			man_pic.src = "../../image/check.png";
+			woman_pic.src = "../../image/checked.png";
+			sex = 0;
+		}
+
+	}
+
+	function selectorIndustry(){
+		selector(document.getElementById('industry'),industryJSON);
+	}
+
+	function selector(input,json){
+		isSelector = true;
+
+		UIActionSelector.open({
+		    datas: json,
+		    layout: {
+		        row: 2,
+		        col: 1,
+		        height: 30,
+		        size: _font,
+		        sizeActive: _font+2,
+		        rowSpacing: 2,
+		        colSpacing: 2,
+		        maskBg: 'rgba(0,0,0,0.2)',
+		        bg: '#fff',
+		        color: '#888',
+		        colorActive: '#0084ff',
+		        colorSelected: '#0084ff'
+		    },
+		    animation: true,
+		    cancel: {
+		        text: '取消',
+		        size: _font,
+		        w: 90,
+		        h: 35,
+		        bg: '#eee',
+		        bgActive: '#ccc',
+		        color: '#888',
+		        colorActive: '#fff'
+		    },
+		    ok: {
+		        text: '确定',
+		        size: _font,
+		        w: 90,
+		        h: 35,
+		        bg: '#eee',
+		        bgActive: '#ccc',
+		        color: '#888',
+		        colorActive: '#fff'
+		    },
+		    title: {
+		        text: '',
+		        size: 16,
+		        h: 44,
+		        bg: '#eee',
+		        color: '#888'
+		    },
+		    fixedOn: api.frameName
+		}, function(ret, err) {
+		    if (ret) {
+		        isSelector = false;
+		        if(ret.eventType == 'ok'){
+		        	input.value = ret.selectedInfo[0].name;
+		        }
+		    }
+				UIActionSelector.close();
+		});
+	}
+
+	function fail(msg){
+		api.toast({
+		    msg: msg,
+		    duration: 2000,
+		    location: 'bottom'
+		});
+	}
+
+	function savesuccess(data){
+//		alert(industry + '|' + profession + '|' + nickname + '|' + company);
+		$api.setStorage("noIdentifyPlayNum",2);
+		// api.execScript({name: 'root',script: "XO.CheckReg('"+ $api.getStorage('token') +"');"});
+    $api.setStorage("industry",industry);
+    $api.setStorage("profession",profession);
+    $api.setStorage("nickname",nickname);
+    $api.setStorage("company",company);
+    $api.setStorage("noIdentifyPlayNum",2);
+		var current = $api.getStorage('now_current');
+		if(!isNaN(current)){
+			api.execScript({name: 'root', script: "((current="+current+") && audioPlayer.play());"});
+		}else{
+			api.execScript({name: 'root', script: "playNext();"});
+		}
+		api.closeWin();
+	}
+
+	function selectorProvince(input){
+		isSelector = true;
+		UIActionSelector.open({
+		    datas: "widget://res/address.json",
+		    layout: {
+		        row: 2,
+		        col: 2,
+		        height: 30,
+		        size: _font,
+		        sizeActive: _font+2,
+		        rowSpacing: 2,
+		        colSpacing: 2,
+		        maskBg: 'rgba(0,0,0,0.2)',
+		        bg: '#fff',
+		        color: '#888',
+		        colorActive: '#0084ff',
+		        colorSelected: '#0084ff'
+		    },
+		    animation: true,
+		    cancel: {
+		        text: '取消',
+		        size: _font,
+		        w: 90,
+		        h: 35,
+		        bg: '#eee',
+		        bgActive: '#ccc',
+		        color: '#888',
+		        colorActive: '#fff'
+		    },
+		    ok: {
+		        text: '确定',
+		        size: _font,
+		        w: 90,
+		        h: 35,
+		        bg: '#eee',
+		        bgActive: '#ccc',
+		        color: '#888',
+		        colorActive: '#fff'
+		    },
+		    title: {
+		        text: '',
+		        size: 16,
+		        h: 44,
+		        bg: '#eee',
+		        color: '#888'
+		    },
+		    fixedOn: api.frameName
+		}, function(ret, err) {
+		    if (ret) {
+		        isSelector = false;
+		        if(ret.eventType == 'ok'){
+		        	input.value = ret.selectedInfo[0].name+' '+ret.selectedInfo[1].name;
+		        }
+		    }
+				UIActionSelector.close();
+		});
+	}
+</script>
+</html>

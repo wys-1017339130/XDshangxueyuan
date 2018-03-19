@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>官方</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body class="z-fff">
+	<ul id="list" class="chat-list"></ul>
+	<div id="last" style="height: 80px"></div>
+</body>
+<script id="other_list_Tpl" type="text/template">
+	{{#data}}
+	<li class="chat-left clear">
+		<img width="50" height="50" src="{{face}}" style="border-radius:3px;" class="fl" onerror="this.src='../../image/chat_user_default.png'">
+		<div class="chat-left-box">
+			<div class="chat-left-name">{{nickname}}</div>
+			<div class="chat-left-text">
+				<div class="chat-text-triangle"></div>
+				{{#if pic}}<img onload="resizes()" onclick="showChatImg(this)" width="100%" src="{{pic}}" alt="">{{else}}{{text}}{{/if}}
+			</div>
+		</div>
+	</li>
+	{{/data}}
+</script>
+<script id="time_list_Tpl" type="text/template">
+	{{#data}}
+	<li class="chat-time"><span>09:30</span></li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var pageNum = 0;
+	var type = 0;
+	var HeadBar = $api.byId('HeadBar');
+	var playID = 0;
+	var isplay = false;
+	var fs,db,UIActionProgress,dialogBox,UIChatBox;;
+	var messageArray = [];
+	var pattern1 = /[\u4e00-\u9fa5]+/g;
+	var userID;
+	var user;
+	var lastid = 0;
+	var preid = 0;
+	var sse;
+	var LoadDone = false;
+	var isold = false;
+
+	apiready = function(){
+		fs = api.require('fs');
+		db = api.require("db");
+		wx = api.require("wx");
+		dialogBox = api.require('dialogBox');
+		UIChatBox = api.require('UIChatBox');
+
+		if(!App.State()){
+			document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">未连接网络</div></li>';
+		}else{
+			setTimeout(function(){unres = false;},3000);
+			Refresh(1);
+		}
+
+		api.setCustomRefreshHeaderInfo({
+		    bgColor: '#efefef',
+		    image: {
+		        pull: 'widget://res/refresh/pull_image.png',
+		        transform: [
+		            'widget://res/refresh/refreshing_image_frame_01.png',
+		            'widget://res/refresh/refreshing_image_frame_02.png',
+		            'widget://res/refresh/refreshing_image_frame_03.png',
+		            'widget://res/refresh/refreshing_image_frame_04.png',
+		            'widget://res/refresh/refreshing_image_frame_05.png',
+		            'widget://res/refresh/refreshing_image_frame_06.png',
+		            'widget://res/refresh/refreshing_image_frame_07.png',
+		            'widget://res/refresh/refreshing_image_frame_08.png',
+		            'widget://res/refresh/refreshing_image_frame_09.png',
+		            'widget://res/refresh/refreshing_image_frame_10.png',
+		            'widget://res/refresh/refreshing_image_frame_11.png',
+		            'widget://res/refresh/refreshing_image_frame_12.png'
+		        ],
+		        load: [
+							'widget://res/refresh/refreshing_image_frame_01.png',
+							'widget://res/refresh/refreshing_image_frame_02.png',
+							'widget://res/refresh/refreshing_image_frame_03.png',
+							'widget://res/refresh/refreshing_image_frame_04.png',
+							'widget://res/refresh/refreshing_image_frame_05.png',
+							'widget://res/refresh/refreshing_image_frame_06.png',
+							'widget://res/refresh/refreshing_image_frame_07.png',
+							'widget://res/refresh/refreshing_image_frame_08.png',
+							'widget://res/refresh/refreshing_image_frame_09.png',
+							'widget://res/refresh/refreshing_image_frame_10.png',
+							'widget://res/refresh/refreshing_image_frame_11.png',
+							'widget://res/refresh/refreshing_image_frame_12.png'
+		        ]
+		    }
+		}, function() {
+		    //下拉刷新被触发，使用 api.refreshHeaderLoadDone() 结束加载中状态
+				if(App.State()){
+					LoadDone = true;
+					Refresh(0);
+				}else{
+					api.refreshHeaderLoadDone();
+				}
+		});
+	};
+
+	function CloseChat(){
+		UIChatBox.closeKeyboard();
+		UIChatBox.closeBoard();
+		UIChatBox.close();
+	}
+
+	function showChatImg(dom){
+		CloseChat();
+		api.execScript({name: 'chat',script: "showChatImg('"+ dom.getAttribute('src') +"');"});
+	}
+
+	function Refresh(Type){
+		if(Type){
+			clearInterval(sse);
+			$api.get('http://101.132.76.100/of.php?pre=0&id=' + lastid,function(res){
+				clearInterval(sse);
+				sse = setInterval(function(){
+					Refresh(1);
+				},5000);
+				console.log(JSON.stringify(res));
+				if(typeof res == 'string'){
+					var res = App.JSON(res);
+				}
+				if(res.status){
+					var data = [];
+					for(var j in res.info){
+						var tp = {
+							id:0,
+							face: res.info[j].face,
+							nickname:res.info[j].nickname,
+							text:res.info[j].content,
+							vtime:res.info[j].vtime,
+							me:0,
+							pic:res.info[j].pic
+						};
+						if(preid == 0){
+							preid = res.info[j].id;
+						}else if(preid > res.info[j].id){
+							preid = res.info[j].id;
+						}
+						if(lastid == 0){
+							lastid = res.info[j].id;
+						}else if(lastid < res.info[j].id){
+							lastid = res.info[j].id;
+						}
+						data.push(tp);
+					}
+					upview(data,'');
+				}
+			});
+		}else{
+			$api.get('http://101.132.76.100/of.php?pre=1&id=' + preid,function(res){
+				api.refreshHeaderLoadDone();
+				console.log(JSON.stringify(res));
+				if(typeof res == 'string'){
+					var res = App.JSON(res);
+				}
+				if(res.status){
+					var data = [];
+					for(var j in res.info){
+						var tp = {
+							id:0,
+							face: res.info[j].face,
+							nickname:res.info[j].nickname,
+							text:res.info[j].content,
+							vtime:res.info[j].vtime,
+							me:0,
+							pic:res.info[j].pic
+						};
+						if(preid == 0){
+							preid = res.info[j].id;
+						}else if(preid > res.info[j].id){
+							preid = res.info[j].id;
+						}
+						data.push(tp);
+					}
+					upview(data,'old');
+				}
+			});
+		}
+	}
+
+	var lasttime = 0;
+	function upview(data,Type){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		if(LoadDone){
+			LoadDone = false;
+			api.refreshHeaderLoadDone();
+		}
+		if(data.length > 0){
+			if((parseInt(data[0].vtime) - parseInt(lasttime))>(60 * 5)){
+				lasttime = parseInt(data[0].vtime);
+				document.getElementById('list').innerHTML += '<li class="chat-time"><span>'+App.dateStr(data[0].vtime)+'</span></li>';
+			}
+			loaddata(data,Type);
+		}
+		api.hideProgress();
+	}
+
+	function loaddata(data,type){
+		var slen = data.length;
+		data.forEach(function(arg,dex,arr){
+			if(arg.text){
+				var msg = arg.text;
+				var str = msg.match(pattern1);
+
+				if(str && str.length>0){
+					for(var i =0; i<str.length;i++){
+						var newstr = App.face(str[i]);
+						msg = msg.replace('['+ str[i] +']',newstr);
+					}
+					arg.text = msg;
+				}
+			}
+
+			if(!arg.face){
+				arg.face = 'http://online.xdjy100.com/image/chat_user_default.jpg';
+			}
+			var _file = App.file(arg.face);
+			fs.exist({
+					path: (api.fsDir + '/file/' +_file.full)
+			}, function(ret, err) {
+					if (ret.exist) {
+						arg.face = (api.fsDir + '/file/' +_file.full);
+						temp(arg,type,dex,arr,slen);
+					}else{
+						if(arg.face.indexOf('/') == 0){
+							var dpic = App.url + arg.face;
+						}else{
+							var dpic = arg.face;
+						}
+						api.download({
+								url: dpic,
+								savePath: ('fs://file/' +_file.full),
+								cache: true,
+								allowResume: true
+						}, function(ret, err) {
+							arg.face = (api.fsDir + '/file/' +_file.full);
+							temp(arg,type,dex,arr,slen);
+						});
+					}
+			});
+		});
+	}
+
+	function fail(msg){
+		document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" alt=""><div class="no-tips">当前暂无留言</div></li>';
+		api.hideProgress();
+	}
+
+  function temp(data,type,dex,arr,len){
+		if((data.pic.length>10) && (data.pic.indexOf('ttp://')<1)){
+			data.pic = 'http://106.14.124.67/' + data.pic;
+			//App.url
+			api.imageCache({url: data.pic}, function(ret, err) {});
+		}
+  	//超过10分钟多一个时间
+		if((dex>1)&&(Math.abs(data.vtime - arr[dex-1].vtime) > 600)){
+			if(type == 'old'){
+				document.getElementById('list').innerHTML = '<li class="chat-time"><span>'+App.dateStr(arr[dex-1].vtime)+'</span></li>' + document.getElementById('list').innerHTML;
+			}else{
+				document.getElementById('list').innerHTML += '<li class="chat-time"><span>'+App.dateStr(data.vtime)+'</span></li>';
+				if(dex>=(len - 1)){
+					$('html, body').animate({
+						scrollTop: $("#last").offset().top
+					}, 500);
+				}
+			}
+		}
+
+		var TM = new T7({tm: document.getElementById('other_list_Tpl')});
+		var html = TM.Tpl(data);
+		if(type == 'old'){
+			isold = true;
+			document.getElementById('list').innerHTML = html + document.getElementById('list').innerHTML;
+		}else{
+			isold = false;
+			document.getElementById('list').innerHTML = document.getElementById('list').innerHTML + html;
+			if(dex>=(len - 1)){
+				$('html, body').animate({
+					scrollTop: $("#last").offset().top
+				}, 500);
+			}
+		}
+  }
+
+	function comment(){
+		var yupanda = $api.getStorage('yupanad');
+		if(yupanda != '1') return;
+		UIChatBox.open({
+		    placeholder: '',
+		    maxRows: 4,
+		    emotionPath: 'widget://res/chatbox/emotion',
+		    texts: {
+		        sendBtn:{
+		            title:'发送'
+		        }
+		    },
+		    styles: {
+		        inputBar: {
+		            borderColor: '#d9d9d9',
+		            bgColor: '#f2f2f2'
+		        },
+		        inputBox: {
+		            borderColor: '#B3B3B3',
+		            bgColor: '#FFFFFF'
+		        },
+		        emotionBtn: {
+		            normalImg: 'widget://res/chatbox/face1.png'
+		        },
+						extrasBtn: {
+		            normalImg: 'widget://res/chatbox/add1.png'
+		        },
+						keyboardBtn: {
+		            normalImg: 'widget://res/chatbox/key3.png'
+		        },
+		        indicator: {
+		            target: 'both',
+		            color: '#c4c4c4',
+		            activeColor: '#9e9e9e'
+		        },
+		        sendBtn: {
+		            titleColor: '#fff',
+		            bg: '#5099FB' ,
+		            activeBg: '#2e73d0',
+		            titleSize: 12
+		        }
+		    },
+		    extras: {
+		        titleSize: 12,
+		        titleColor: '#a3a3a3',
+		        btns: [{
+		            title: '图片',
+		            normalImg: 'widget://res/chatbox/album1.png',
+		            activeImg: 'widget://res/chatbox/album2.png'
+		        }]
+		    }
+			},function(ret, err){
+		    if(ret){
+		    		if(ret.eventType=='clickExtras'){
+							CloseChat();
+							api.getPicture({
+							    sourceType: 'album',
+							    encodingType: 'jpg',
+							    mediaValue: 'pic',
+							    destinationType: 'url',
+							    allowEdit: false,
+							    quality: 100,
+							    saveToPhotoAlbum: false
+							}, function(ret, err) {
+						    if(ret){
+						    	uppic(ret.data);
+						    }
+							});
+		    		}else if(ret.eventType=='send'){
+		    			var msg = ret.msg;
+		    			if(msg.length<1){
+		    				api.toast({
+								    msg: '不能发送空内容!',
+								    duration: 2000,
+								    location: 'bottom'
+								});
+		    				return;
+		    			}
+							var token = $api.getStorage('token');
+							$.post(App.url + '/?r=up&a=pic&token='+token,{content:msg},function(res){
+								CloseChat();
+								Refresh(1);
+							});
+						}
+		    }
+		});
+	}
+
+	function uppic(img_path){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '上传中...',
+		    modal: false
+		});
+
+		var token = $api.getStorage('token');
+		if(token){
+			console.log(App.url + '/?r=up&a=pic&token='+token);
+			api.ajax({
+			    url: 'http://106.14.124.67/?r=up&a=pic&token='+token,
+			    method: 'post',
+			    data: {
+			        files: {
+			            file: img_path
+			        }
+			    }
+			}, function(ret, err) {
+				api.hideProgress();
+				console.log(JSON.stringify(ret));
+				//console.log(JSON.stringify(err));
+		    if(ret){
+	    		//api.execScript({name: 'root',script: "XO.getInfo('"+ token +"');"});
+		    }
+			});
+		}
+	}
+
+	var settres;
+	function resizes(){
+		if(isold) return;
+		clearInterval(settres);
+		settres = setInterval(function(){
+			clearInterval(settres);
+			settres = null;
+			$('html, body').animate({
+				scrollTop: $("#last").offset().top
+			}, 500);
+		},1000);
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title>Document</title>
+	<link rel="stylesheet" href="../../css/api.css">
+	<link rel="stylesheet" href="../../css/static.css">
+	<link rel="stylesheet" href="../../css/stylewz.css">
+</head>
+<body>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">发布话题</div>
+			<div class="z-head-preview z-head-finish">完成</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div class="z-space15"></div>
+		<div class="z-column box">
+			<input placeholder="请输入标题" class="dy-title" type="text" id="title">
+		</div>
+		<div class="z-column box">
+			<textarea placeholder="请输入内容" autofocus name="z-update-dynamics" id="z-update-dynamics"></textarea>
+			<ul class="z-img-warp clear" id="img_warp">
+			</ul>
+			<div class="z-update-add-img">+</div>
+		</div>
+	</div>
+
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+	var UIMediaScanner;
+	var HeadBar = $api.byId('HeadBar');
+	var info;
+	var id = 0;
+	var fs;
+	apiready = function(){
+		UIMediaScanner = api.require('UIMediaScanner');
+		$api.fixStatusBar(HeadBar);
+		fs = api.require('fs');
+		info = api.pageParam.des||0;
+		if((info != 0) && (info.indexOf('/')>-1)){
+			info = info.split('/');
+			id = info[0];
+			if(info[1] == 'edit'){
+				api.execScript({name: 'root', script: "ChatAna('Topic',{'Active':'加载','Mode':'edit'},'修改话题');"});
+				api.execScript({name: 'root',script: "XO.GroupDetail('"+ $api.getStorage('token') +"','"+id+"',{name:'updateDynamics',fun:'upview'},{name:'updateDynamics',fun:'fail'});"});
+			}else{
+				api.execScript({name: 'root', script: "ChatAna('Topic',{'Active':'加载','Mode':'add'},'发布话题');"});
+			}
+		}else{
+			id = 0;
+			api.execScript({name: 'root', script: "ChatAna('Topic',{'Active':'加载','Mode':'add'},'发布话题');"});
+		}
+	}
+
+	function upview(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		document.getElementById("title").value = data.title;
+		document.getElementById("z-update-dynamics").value = data.content;
+		if(data.pic.length>0){
+			cachpics(0,data.pic.length,data.pic);
+		}
+	}
+
+	function fail(data){
+		api.toast({
+		    msg: data,
+		    duration: 2000,
+		    location: 'bottom'
+		});
+	}
+
+	function cachpics(i,max,data){
+		if(i<max){
+			if(data[i]){
+				var _file = App.file(data[i]);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i] = (api.fsDir + '/file/' +_file.full);
+				    		var tpl = '<li data-id-'+ i +' data-src="'+ data[i] +'"><img src="'+ data[i] +'" width="50" height="50" /><span class="DelImg" data-id="'+ i +'">-</span></li>';
+		    				$api.append(document.getElementById("img_warp"),tpl);
+				    		cachpics(i+1,max,data);
+				    }else{
+				    	if(data[i].indexOf('/') == 0){
+							var dface = App.url + data[i];
+						}else{
+							var dface = data[i];
+						}
+				    		api.download({
+						    url: dface,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i] = (api.fsDir + '/file/' +_file.full);
+							var tpl = '<li data-id-'+ i +' data-src="'+ data[i] +'"><img src="'+ data[i] +'" width="50" height="50" /><span class="DelImg" data-id="'+ i +'">-</span></li>';
+		    				$api.append(document.getElementById("img_warp"),tpl);
+							cachpics(i+1,max,data);
+						});
+				    }
+				});
+			}else{
+       			cachpics((i + 1),max,data);
+       		}
+		}else{
+			var objs = document.querySelectorAll('.DelImg');
+			for(var i in objs){
+				if(typeof objs[i] == 'object'){
+					objs[i].onclick = function(){
+						var id = this.getAttribute('data-id');
+						document.querySelector('[data-id-'+ id +']').remove();
+					}
+				}
+			}
+		}
+	}
+
+	document.querySelector('.z-update-add-img').onclick = function(){
+		OpenBr();
+	}
+
+	document.querySelector('.z-head-finish').onclick = function(){
+		var files = {};
+		var objs = document.querySelectorAll('[data-src]');
+		for(var i in objs){
+			if(typeof objs[i] == 'object'){
+				if(objs[i].getAttribute('data-src').length>10){
+					files['file' + i] = objs[i].getAttribute('data-src');
+				}
+			}
+		 }
+		 var token = $api.getStorage('token');
+
+		 var title = document.getElementById('title').value;
+		 if(title.length<5){
+		 	api.toast({
+			    msg: '标题至少5个字以上!',
+			    duration: 2000,
+			    location: 'bottom'
+			});
+		 }
+
+		 var content = document.querySelector('textarea').value;
+		 if((content.length<10) && (objs.length<1)){
+			api.toast({
+			    msg: '文字内容和图片至少添加一项!',
+			    duration: 2000,
+			    location: 'bottom'
+			});
+		 	return;
+		}else if((content.length>0) && (content.length<10)){
+			api.toast({
+			    msg: '文字内容至少10位长度以上!',
+			    duration: 2000,
+			    location: 'bottom'
+			});
+		 	return;
+		}
+
+		 api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '正在提交...',
+		    modal: false
+		});
+
+		api.ajax({
+		    url: App.url + '/?r=up&a=dynamics&id='+id+'&token='+token,
+		    method: 'post',
+		    data: {
+		        files:files,
+		        values:{content:document.querySelector('textarea').value,title:document.getElementById('title').value}
+		    }
+		}, function(rets, err) {
+			if(rets){
+				api.hideProgress();
+			    if (rets.status) {
+				    	api.execScript({
+						    name: 'group',
+						    script: "Refresh();"
+							});
+				    	api.toast({
+						    msg: '发表成功!',
+						    duration: 2000,
+						    location: 'bottom'
+							});
+							api.execScript({name: 'root', script: "ChatAna('Topic',{'is_success':true},'发布话题-提交');"});
+							setTimeout(function(){api.closeWin();},1000);
+			    }else{
+						api.execScript({name: 'root', script: "ChatAna('Topic',{'is_success':false},'发布话题-提交');"});
+					}
+			}else{
+				api.execScript({name: 'root', script: "ChatAna('Topic',{'is_success':false},'发布话题-提交');"});
+			}
+		});
+	}
+
+
+	function OpenBr(){
+		api.addEventListener({
+		    name: 'keyback'
+		}, function(ret, err) {
+			api.hideProgress();
+		});
+		UIMediaScanner.open({
+		    type: 'picture',
+		    column: 4,
+		    classify: true,
+		    max: 5,
+		    sort: {
+		        key: 'time',
+		        order: 'desc'
+		    },
+		    texts: {
+		        stateText: '已选择 * 项',
+		        cancelText: '取消',
+		        finishText: '完成'
+		    },
+		    styles: {
+		        bg: '#fff',
+		        mark: {
+		            icon: '',
+		            position: 'bottom_left',
+		            size: 20
+		        },
+		        nav: {
+		            bg: '#eee',
+		            stateColor: '#000',
+		            stateSize: 18,
+		            cancelBg: 'rgba(0,0,0,0)',
+		            cancelColor: '#000',
+		            cancelSize: 18,
+		            finishBg: 'rgba(0,0,0,0)',
+		            finishColor: '#000',
+		            finishSize: 18
+		        }
+		    },
+		    scrollToBottom: {
+		        intervalTime: -1,
+		        anim: false
+		    },
+		    exchange: true,
+		    rotation: true
+		}, function(ret) {
+		    if (ret) {
+		    		if((ret.eventType == 'confirm') && (ret.list.length>0)){
+		    			var files = {};
+		    			for(var i in ret.list){
+		    				var tpl = '<li data-id-'+ i +' data-src="'+ ret.list[i].path +'"><img src="'+ ret.list[i].path +'" width="50" height="50" /><span class="DelImg" data-id="'+ i +'">-</span></li>';
+		    				$api.append(document.getElementById("img_warp"),tpl);
+		    			}
+
+		    			var objs = document.querySelectorAll('.DelImg');
+		    			for(var i in objs){
+		    				if(typeof objs[i] == 'object'){
+		    					objs[i].onclick = function(){
+		    						var id = this.getAttribute('data-id');
+		    						document.querySelector('[data-id-'+ id +']').remove();
+		    					}
+		    				}
+		    			}
+		    		}
+		    }else{
+		    		api.hideProgress();
+		    }
+		});
+	}
+</script>
+</html>

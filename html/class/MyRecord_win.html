@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,initial-scale=1.0,width=device-width"/>
+</head>
+<link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+<style>
+    .titles {
+        background-color: #f2f2f2;
+        color: #bcbcbc;
+        font-size: 0.6rem;
+        text-indent: 12px;
+        color: #272727;
+    }
+
+    .bottomdiv {
+        clear: both;
+        width: 100%;
+        height: 2rem;
+        text-align: center;
+        line-height: 2rem;
+        color: black;
+    }
+
+    .uptext {
+        color: #bfbfbf;
+        font-size: 13px;
+    }
+
+    .publicfont {
+        width: 1rem;
+        height: 1rem;
+        margin: auto;
+    }
+
+    .R-home-menu {
+        color: #000;
+        font-size: 0.7rem;
+        height: 40px;
+        line-height: 40px;
+        margin: 0 10px;
+        position: relative;
+    }
+
+    .R-home-menu {
+        color: #000;
+        font-size: 0.7rem;
+        height: 40px;
+        line-height: 40px;
+        margin: 0 10px;
+        position: relative;
+    }
+
+</style>
+<body style="background-color: #FFF;">
+<div id="app">
+    <div class="titles">完成课后练习和考试将会获得学分、行币奖励哦</div>
+    <div class="topic" v-for="(item,index) in proList">
+        <div class="R-home-menu" @click="Historical(index, item)">
+            {{item.c_title || '无'}}<span></span><span class="icon iconfont icon-ch2 fr"></span>
+            <sapn class="fr fonts">
+                <span v-if="item.can_exam != '-1' && item.examed != 1" class="reds"
+                      style="margin-top: 0px;margin-right: 5px;"></span>
+                去考试&nbsp;
+            </sapn>
+        </div>
+        <div class="Examination" v-for="list in item.practice" @click="Examination(item.c_title,list)">
+            <div>
+                <p class="Examination_title aui-ellipsis-1">{{list.radio_title}}课后练习</p>
+                <p class="Examination_time">课程完成于{{list.complete_time}}</p>
+            </div>
+            <div class="Examination_img" style="background-image: url('../../image/weishenhe.png')"
+                 v-if="list.practice_state==3">未完成
+            </div>
+            <div class="Examination_img" style="background-image: url('../../image/yiwancheng.png')"
+                 v-else-if="list.practice_state==1">已完成
+            </div>
+            <div class="Examination_img" style="background-image: url('../../image/shenhezhong.png')"
+                 v-else="list.practice_state==2">审核中
+            </div>
+        </div>
+    </div>
+    <div class="bottomdiv">
+        <span v-if="rote" class="uptext">---查看更多---</span>
+        <img v-if="load" class="publicfont" src="../../image/timg.gif">
+        <span v-if="overlate" class="uptext">没有更多了...</span>
+    </div>
+    <div v-show="proList.length == 0"
+         style="position: absolute;top: 0px;width: 100%;height: 100%;display: -webkit-box;-webkit-box-pack: center;background-color: #f2f2f2;">
+        <div style="margin-top:4.75rem;">
+            <div style="display: -webkit-box;-webkit-box-pack: center;-webkit-box-align: center;">
+                <img style="width: 7.25rem;" src="../../image/nostudyList.png" alt="">
+            </div>
+            <p style="text-align: center;font-size: 0.6rem;color: #999999;">暂无练习内容</p>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      proList: [],
+      rote: false,
+      load: false,
+      overlate: false,
+      perPage: 10,
+      page: 1
+    },
+    created: function () {
+      apiready = function () {
+        app.u_getAllPractice(1)
+        // 下拉刷新
+        api.setCustomRefreshHeaderInfo({
+          bgColor: '#efefef',
+          image: {
+            pull: 'widget://res/refresh/pull_image.png',
+            transform: [
+              'widget://res/refresh/refreshing_image_frame_01.png',
+              'widget://res/refresh/refreshing_image_frame_02.png',
+              'widget://res/refresh/refreshing_image_frame_03.png',
+              'widget://res/refresh/refreshing_image_frame_04.png',
+              'widget://res/refresh/refreshing_image_frame_05.png',
+              'widget://res/refresh/refreshing_image_frame_06.png',
+              'widget://res/refresh/refreshing_image_frame_07.png',
+              'widget://res/refresh/refreshing_image_frame_08.png',
+              'widget://res/refresh/refreshing_image_frame_09.png',
+              'widget://res/refresh/refreshing_image_frame_10.png',
+              'widget://res/refresh/refreshing_image_frame_11.png',
+              'widget://res/refresh/refreshing_image_frame_12.png'
+            ],
+            load: [
+              'widget://res/refresh/pull_end_image_frame_01.png'
+            ]
+          }
+        }, function () {
+          api.refreshHeaderLoadDone()
+          app.page = 1
+          //下拉刷新被触发，使用 api.refreshHeaderLoadDone() 结束加载中状态
+          if (api.connectionType == 'none') {
+            api.refreshHeaderLoadDone()
+            api.toast({
+              msg: '未连接网络',
+              duration: 2000,
+              location: 'bottom'
+            });
+          } else {
+            api.refreshHeaderLoadDone();
+            app.u_getAllPractice('none')
+          }
+        });
+        api.addEventListener({
+          name: 'completionlist',
+        }, function (ret, err) {
+          location.reload();
+          app.u_getAllPractice(1)
+        });
+        // 上拉加载
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 5 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+        }, function (ret, err) {
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.u_getAllPractice(false)
+        });
+      }
+    },
+    methods: {
+      //  全部练习
+      u_getAllPractice: function (No) {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        var token = $api.getStorage('token');
+//        var token = 'ZmQ3YWQ3YWVlMjE1MmEwYWJkOGVjM2MyZjY3MzNmYTIxODI5';
+        var post = {
+          hash: token,
+          perPage: app.perPage,
+          page: app.page
+        };
+        sendAjax(this, post, '/Api/Ucenter/u_getAllPractice', function (res) {
+          console.log('----------------' + JSON.stringify(res));
+          api.hideProgress();
+//          api.refreshHeaderLoadDone();
+          if (No) {
+            app.proList = res.data.proList;
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          } else {
+            app.proList = app.proList.concat(res.data.proList);
+            app.overlate = false;
+            app.rote = true;
+            app.load = false
+          }
+          if (res.data.proList.length == 0) {
+            app.overlate = true;
+            app.rote = false;
+            app.load = false
+          }
+        })
+      },
+      // 考试页
+      Historical: function (index, item) {
+        if (app.proList[index].can_exam === -1) {
+          toastMsg('请先学习' + item.c_title + '课程后,再参加考试')
+        } else {
+          if (item.exam_id !== null) {
+            api.openWin({
+              name: 'Examination_fm',
+              url: './Examination_fm.html',
+              pageParam: {
+                texts: item.c_title,
+                id: item.exam_id,
+                cid: item.cid
+              }
+            })
+          } else {
+            toastMsg('课程更新尚未完结,敬请期待')
+          }
+        }
+      },
+      //   练习页
+      Examination: function (title, state) {
+        console.log(JSON.stringify(state));
+        api.openWin({
+          name: 'Completion_fm',
+          url: './Completion_fm.html',
+          pageParam: {
+            nameText: title,// 头标题
+            num: state.practice_state,
+            texts: state.practice_title,// 问题
+            id: state.practice_id,
+            rid: state.rid
+          }
+        })
+      }
+    }
+  })
+</script>
+</html>

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>播放列表</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+    <style>
+    	*{
+    		box-sizing: border-box;
+    		-webkit-box-sizing: border-box;
+    	}
+    	html,body{
+    		background-color: #fff;
+    	}
+    </style>
+</head>
+<body>
+<div class="up-box">
+				<div style="position: relative;" class="">
+					<div style="position: fixed;width: 100%;left: 0;top: 0;background-color: #fff;height: 50px;z-index: 10" class="z-column2 fm-title-box">
+						<span class="icon iconfont icon-gn kechengliebiaoicon"></span>课程列表
+						<span id="reverse" onclick="rev()" class="z-news-title2 fr" style="position: relative;"><span class="z-padding-15 paixu-text">排序</span><img width="20" height="20" src="../../image/reverse.png" class="paixu-img"></span>
+					</div>
+					<div style="height: 50px"></div>
+					<ul id="list2" class="profession-list" style="background-color: #fff">
+						<li class="padding-3">
+							<div class="z-FM-img-box">
+
+								<img width="75" height="75" src="../../image/list1@error.png">
+							</div>
+							<div class="fm-profession-list">
+								<div style="background-color: #efefef" class="fm-list-title"></div>
+								<div class="fm-list-text">
+									<div style="background-color: #efefef;height: 0.7rem;margin-bottom: 0.4rem"></div>
+									<div style="background-color: #efefef;height: 0.7rem"></div>
+								</div>
+								<div class="fm-below"><span style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem" class="fm-list-date"></span><span style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"></span></div>
+							</div>
+						</li>
+						<li class="padding-3">
+							<div class="z-FM-img-box">
+
+								<img width="75" height="75" src="../../image/list1@error.png">
+							</div>
+							<div class="fm-profession-list">
+								<div style="background-color: #efefef" class="fm-list-title"></div>
+								<div class="fm-list-text">
+									<div style="background-color: #efefef;height: 0.7rem;margin-bottom: 0.4rem"></div>
+									<div style="background-color: #efefef;height: 0.7rem"></div>
+								</div>
+								<div class="fm-below"><span style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem" class="fm-list-date"></span><span style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"></span></div>
+							</div>
+						</li>
+						<li class="padding-3">
+							<div class="z-FM-img-box">
+
+								<img width="75" height="75" src="../../image/list1@error.png">
+							</div>
+							<div class="fm-profession-list">
+								<div style="background-color: #efefef" class="fm-list-title"></div>
+								<div class="fm-list-text">
+									<div style="background-color: #efefef;height: 0.7rem;margin-bottom: 0.4rem"></div>
+									<div style="background-color: #efefef;height: 0.7rem"></div>
+								</div>
+								<div class="fm-below"><span style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem" class="fm-list-date"></span><span style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"></span></div>
+							</div>
+						</li>
+						<li class="padding-3">
+							<div class="z-FM-img-box">
+
+								<img width="75" height="75" src="../../image/list1@error.png">
+							</div>
+							<div class="fm-profession-list">
+								<div style="background-color: #efefef" class="fm-list-title"></div>
+								<div class="fm-list-text">
+									<div style="background-color: #efefef;height: 0.7rem;margin-bottom: 0.4rem"></div>
+									<div style="background-color: #efefef;height: 0.7rem"></div>
+								</div>
+								<div class="fm-below"><span style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem" class="fm-list-date"></span><span style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"></span></div>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+</body>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<li style="position: relative;" class="padding-3">
+		<div onclick="playAudio('{{id}}','{{ilock}}',this)">
+			<div class="z-FM-img-box">
+				<span class="icon iconfont icon-bofang2"></span>
+				<img data-pic="{{id}}" width="75" height="75" src="../../image/list1@error.png" onerror="this.src='../../image/list1@error.png'">
+			</div>
+			<div class="fm-profession-list" style="border-bottom: 1px solid #ddd;padding-bottom: 15px">
+				<div data-title="{{id}}" class="fm-list-title">{{title}}</div>
+				<div class="fm-list-text">{{des}}</div>
+				<div class="fm-below weekly-below"><span class="icon iconfont icon-1"></span><span>{{hearnum}}</span><span class="icon iconfont icon-shijian"></span><span>{{dur}}</span>{{#if likes}}<span class="icon iconfont icon-dianzan"></span><span>{{likes}}</span>{{/if}}</div>
+			</div>
+		</div>
+		<span data-down-id='{{id}}' data-down-title='{{title}}' data-download="0" onclick="download(this,'{{index}}','{{ilock}}','{{type}}')" style="right: 20px;bottom: 30px; font-size: 1rem !important;position: absolute;z-index: 999;" class="icon iconfont icon-xiazai2"></span>
+	</li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/islider.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var PageNum = 0;
+	var length = 0;
+	var score_data,fs,db;
+	var boo = [false,true];
+	var zhuge,td;
+	var islider1;
+	var list = [];
+	var mba;
+	var dialogBox;
+	var blockArray = [];
+	var blocks = [];
+	var listData = [];
+	apiready = function(){
+		fs = api.require("fs");
+		db = api.require("db");
+		dialogBox = api.require("dialogBox");
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('播放列表',true,{'行为':'打开'},'播放列表');"});
+		//MD End
+
+		api.addEventListener({
+		    name: 'topause'
+		}, function(ret, err) {
+		    pause(ret.value.key1);
+		});
+
+		api.addEventListener({
+		    name: 'PlayStatus'
+		}, function(ret, err) {
+			if(ret){
+				if(ret.value.id){
+					play(ret.value.id);
+				}else if(ret.value.key1){
+					play(ret.value.key1);
+				}
+			}
+		});
+
+		api.execScript({
+		    name: 'root',
+		    script: "getPlayList();"
+		});
+	};
+
+/*
+	function PlayStatus(data){
+		if(typeof data == 'string'){
+			var data = App.JSON(data);
+		}
+		if(data.id){
+			play(data.id);
+		}else if(data.key1){
+			play(data.key1);
+		}
+	}
+*/
+
+	function upview(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		document.getElementById("list2").innerHTML = '';
+		var iindex = 0;
+		blocks = [];
+		data.forEach(function(arg){
+			if(arg.hearnum>9999){
+				arg.hearnum = (arg.hearnum/10000).toFixed(1) + '万'
+			}
+			if(arg.likes>9999){
+				arg.likes = (arg.likes/10000).toFixed(1) + '万'
+			}
+			arg.index = iindex;
+			arg.date = App.dateStr(arg.vtime);
+			var m,s;
+			m = parseInt(arg.duration/60);
+			s = parseInt(arg.duration%60);
+			m = m > 9 ? m : '0' + m;
+			s = s > 9 ? s : '0' + s;
+			arg.dur = m + ':' + s;
+			blocks.push({id:arg.id,blocks:arg.blocks,type:arg.type});
+			blockArray[arg.id] = blocks;
+		});
+		listData = data;
+		var TM = new T7({tm: document.getElementById("list_Tpl")});
+		var html = TM.Tpl(data);
+		document.getElementById("list2").innerHTML = html;
+		if(document.querySelectorAll(".fm-profession-list").length == 1){
+			document.querySelector(".fm-profession-list").style.borderBottom = "none";
+		}
+	    api.execScript({
+	        name: 'root',
+	        script: "getPlayId();"
+	    });
+      	db.selectSql({
+	        name: 'main',
+	        sql: ('select * from downfile')
+	    }, function(ret, err) {
+	    	if(ret.status){
+	    		if(ret.data.length>0){
+
+	    			ret.data.forEach(function(arg){
+							$api.rmStorage('isdown' + arg.id);
+	    				if(document.querySelector("[data-down-id='"+arg.id+"']")){
+								$api.setStorage('isdown' + arg.id,1);
+	    					document.querySelector("[data-down-id='"+arg.id+"']").setAttribute("data-download",1)
+	    				}
+	    			});
+	    		}
+	    	}
+	    })
+		cachepics(0,data.length,data);
+
+		App.init();
+		api.hideProgress();
+	}
+
+	function fail(msg){
+		api.hideProgress();
+		App.tips(msg);
+	}
+
+	function rev(){
+		listData.reverse();
+		var TM = new T7({tm: document.getElementById("list_Tpl")});
+		var html = TM.Tpl(listData);
+		document.getElementById("list2").innerHTML = html;
+		api.execScript({
+		    name: 'root',
+		    script: "getPlayList();"
+		});
+		cachepics(0,listData.length,listData);
+		api.execScript({
+			name: 'root',
+			script: "reverseAudio(1);"
+		});
+		App.init();
+		api.hideProgress();
+	}
+
+	function cachepics(i,max,data){
+
+		if(i<max){
+			if(!data || !data[i]){
+				return;
+			}
+			if(data[i].pic){
+				var _file = App.file(data[i].pic);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i].pic = (api.fsDir + '/file/' +_file.full);
+				    		document.querySelector("[data-pic='"+data[i].id+"']").src = data[i].pic;
+				    		cachepics(i+1,max,data);
+				    }else{
+				    	if(data[i].pic.indexOf('/') == 0){
+							var dpic = App.url + data[i].pic;
+						}else{
+							var dpic = data[i].pic;
+						}
+				    	api.download({
+						    url: dpic,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i].pic = (api.fsDir + '/file/' +_file.full);
+							document.querySelector("[data-pic='"+data[i].id+"']").src = data[i].pic;
+							cachepics(i+1,max,data);
+						});
+				    }
+				});
+			}else{
+	   			cachepics((i + 1),max,data);
+	   		}
+		}
+	}
+
+	function play(id){
+		console.log('list play' + id);
+		var dom = document.querySelector("[data-title='"+id+"']");
+		var act = document.querySelector(".active");
+		if(act){
+			act.className = act.className.replace(/ active/,'');
+		}
+		if(dom){
+			dom.className = dom.className + ' active';
+		}
+	}
+
+	function pause(id){
+		var act = document.querySelector(".active");
+		if(act){
+			act.className = act.className.replace(/ active/,'');
+		}
+	}
+
+	var dpic = '';
+	var lpic = "widget://res/logo.png";
+	function upviewlittle(data){
+		//小兔地址data+1_,下载下来
+		var _file = App.file(data);
+		fs.exist({
+		    path: (api.fsDir + '/file/' +_file.full)
+		}, function(ret, err) {
+		    if (ret.exist) {
+	    		data = (api.fsDir + '/file/' +_file.full);
+	    		lpic = 'fs://file/' +_file.full;
+		    }else{
+		    	if(data.indexOf('/') == 0){
+					var dface = App.url + data;
+
+				}else{
+					var dface = data;
+				}
+		    		api.download({
+				    url: dface,
+				    savePath: ('fs://file/' +_file.full),
+				    cache: true,
+				    allowResume: true
+				}, function(ret, err) {
+					data = (api.fsDir + '/file/' +_file.full);
+					lpic = 'fs://file/' +_file.full;
+				});
+		    }
+		});
+	}
+
+	var CheckM = [];
+	function download(dom,index,ilock,type){
+		if(ilock == 0){
+			api.toast({
+        msg: "无法下载未解锁音频",
+        duration: 2000,
+        location: 'bottom'
+	    });
+	    return;
+		}
+		CheckM = [];
+		var title = dom.getAttribute("data-down-title");
+		var id = dom.getAttribute("data-down-id");
+		var boo = dom.getAttribute("data-download");
+		if(boo == 0){
+			dom.setAttribute("data-download",1);
+			api.execScript({
+				name: 'audio',
+				script: "changeDownloadState('"+id+"');"
+			});
+		}
+
+		api.execScript({name: 'root', script: "ChatAna('Download',{'courseTitle':'"+ title +"','courseID':"+ id +",'page':'audio'},'播放器-下载课程');"});
+
+		if((typeof blockArray[id][index] == 'object') && (blockArray[id][index].blocks.length>4)){
+			var blocks_temp = blockArray[id][index].blocks.split('|');
+			for(var i in blocks_temp){
+				var tempi = blocks_temp[i].split(',');
+				CheckM.push({id:blockArray[id][index].id,blocks:i,file:'',hash:tempi[1],type:type});
+			}
+
+			db.selectSql({
+		      name: 'main',
+		      sql: ("select * from downfile where `id`=" + blockArray[id][index].id)
+		  }, function(ret, err) {
+	      if(ret.status){
+	        if(ret.data.length>0){
+						if((ret.data.length != blocks_temp.length) && (blocks_temp.length>0)){
+							App.tips('已列入下载任务中!');
+							db.executeSql({name: 'main',sql: 'delete from downfile where id=' + blockArray[id][index].id},function(ret, err){
+			          Upfile(CheckM,0,CheckM.length);
+			        });
+						}else{
+							App.tips('下载任务已存在!');
+						}
+					}else{
+						App.tips('已列入下载任务中!');
+						Upfile(CheckM,0,CheckM.length);
+					}
+				}
+			});
+		}
+	}
+
+	function Upfile(CheckM,start,len){
+	  if(start<len){
+	    db.selectSql({
+	      name: 'main',
+	      sql: ('select * from downfile where id=' + CheckM[start].id + ' and blocks=' + CheckM[start].blocks)
+	    }, function(ret, err) {
+	      if (ret.status) {
+					var uptime = App.time();
+	        if(ret.data.length>0){
+	          var sql1 = "update downfile set file='" + CheckM[start].file + "',hash ='"+CheckM[start].hash+"',at=0,status=1,type="+ CheckM[start].type +" where id=" + CheckM[start].id + ' and blocks=' + CheckM[start].blocks;
+	        }else{
+	          var sql1 = "INSERT INTO downfile VALUES(" + CheckM[start].id + ",'" + CheckM[start].blocks + "','','" + CheckM[start].file + "','"+CheckM[start].hash+"',0,1,"+ CheckM[start].type +","+ uptime.stamp +")";
+	        }
+	        db.executeSql({name: 'main',sql: sql1},function(ret, err){
+	          Upfile(CheckM,(start + 1),len);
+	        });
+	      }
+	    });
+	  }else{
+			api.execScript({name: 'root', script: 'DownManage(0,\'doit\');'});
+		}
+	}
+
+	function playAudio(id,ilock,dom){
+		if(ilock == 0){
+			api.toast({
+          msg: "无法播放未解锁音频",
+          duration: 2000,
+          location: 'bottom'
+      });
+			return;
+		}
+
+		if(!dom.querySelector(".active")){
+			api.execScript({
+				name: 'root',
+				script: "setNewId();"
+			});
+		}
+
+		api.execScript({
+			name: 'root',
+			script: "isplaying('"+id+"');"
+		});
+
+		api.execScript({
+		    name: 'audio',
+		    script: "closeList();"
+		});
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

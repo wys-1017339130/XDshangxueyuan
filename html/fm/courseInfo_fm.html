@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html style="height: auto">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>详情</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+        }
+
+        .footerbox {
+            position: fixed;
+            /*bottom: 49px;*/
+            bottom: 0px;
+            left: 0;
+            height: 51px;
+            width: 100%;
+            background: white;
+            z-index: 9999;
+            border-top:1px solid #ddd;
+        }
+
+        .footerleft {
+            float: left;
+            width: 65%;
+            padding-left: 0.5rem;
+            padding-top: 0.5rem;
+        }
+
+        .footerright {
+            float: left;
+            width: 35%;
+            line-height: 51px;
+            color: white;
+            text-align: center;
+            font-size: 0.9rem;
+            background: #d9b270;
+        }
+
+        /*宣传图*/
+        .Propaganda_box {
+            width: 100%;
+            height: 8.5rem;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        /*课程介绍*/
+        .why_box, .teacher_box, .class_box {
+            padding: 0.75rem;
+        }
+
+        .why_box_title, .teacher_box_title, .class_box_title {
+            padding-bottom: 0.75rem;
+            font-size: 0.725rem;
+            color: #252525;
+        }
+
+        .why_box_message {
+            color: #898989;
+            margin-top: 0.3rem;
+        }
+
+        .teacher_box_pic {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+        }
+
+        .name-box {
+            font-size: 0.75rem;
+            color: #252525;
+            padding-left: 0.75rem;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .teacher_box_message {
+            padding: 0.75rem 0.5rem;
+            margin-top: 0.75rem;
+            border-radius: 5px;
+            background-color: #fff8eb;
+        }
+
+        .teacher_box_message li {
+            padding-top: 0.25rem;
+            padding-left: 0.5rem;
+            text-align: left;
+            position: relative;
+            font-size: 0.675rem;
+            color: #252525;
+        }
+
+        .teacher_box_message li span {
+            width: 0.25rem;
+            height: 0.25rem;
+            border-radius: 50%;
+            background-color: #D9B270;
+            position: absolute;
+            top: 50%;
+            left: 0;
+        }
+
+        .class_list li {
+            padding-top: 0.5rem;
+            font-size: 0.7rem;
+            color: #666666;
+        }
+
+        .class_list li span {
+            color: #D9B270;
+            padding-right: 0.5rem;
+        }
+
+        .class_list li a {
+            padding-right: 0.5rem;
+        }
+    </style>
+</head>
+<body style="background-color: #fff;margin-bottom:51px; ">
+<div id="app">
+    <!--底部购买栏-->
+    <div class="footerbox" id="footerbox" v-show="footer">
+        <div class="footerleft">
+            <div>
+                <div class="price_box" style="color: #d9b270;font-size: 0.9rem" v-cloak>¥{{classData.price}}
+                </div>
+                <div style="color: #999999;font-size: 0.7rem">后续更新的课时可免费观看</div>
+            </div>
+        </div>
+        <div class="footerright" @click="hurrybuy()">立即购买</div>
+    </div>
+    <!--宣传图-->
+    <div class="Propaganda_box" :style="{'background-image': 'url(' + formatImg(classData.banner) + ')'}" v-cloak></div>
+    <!--为什么学习-->
+    <div style="height: 10px;background-color: #f5f5f5"></div>
+    <div class="why_box">
+        <div class="why_box_title"><span style="">{{classData.title}}</span></div>
+        <div class="why_box_message">
+            <span v-html="charToHtml(classData.intro)">
+            </span>
+        </div>
+    </div>
+    <div style="height: 10px;background-color: #f5f5f5"></div>
+    <!--讲师介绍-->
+    <div class="teacher_box">
+        <div class="teacher_box_title">讲师介绍</div>
+        <div class="">
+            <img :src="formatImg(classData.lecturer_head)" alt="" class="teacher_box_pic" align="center" v-cloak>
+            <span class="name-box">{{classData.lecturer}}</span>
+        </div>
+        <ul class="teacher_box_message">
+            <li v-html="charToHtml(classData.lecturer_desc)"><span></span></li>
+        </ul>
+    </div>
+    <div style="height: 10px;background-color: #f5f5f5"></div>
+    <!--课程大纲-->
+    <div class="class_box">
+        <div class="class_box_title">
+            课程大纲
+        </div>
+        <ul class="class_list">
+            <li v-for="(item,index) in classData.column_list"><span>第{{index +1}}课</span>{{item}}</li>
+        </ul>
+    </div>
+    <!--订阅须知-->
+    <div class="class_box">
+        <div class="class_box_title">
+            订阅须知
+        </div>
+        <ul class="class_list">
+            <li v-for="(ite,index) in classData.sub_notice"><a>{{index +1}}.</a>{{ite}}</li>
+        </ul>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/swiper-3.4.2.min.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+
+  var app = new Vue({
+    el: '#app',
+    data: {
+      formatImg: formatImg,
+      charToHtml: charToHtml,
+      imgUrl: '../../image/avatar.jpg',
+      des: 0,
+      title: '',
+      classData: {
+        price: ''
+      },
+      footer: true,
+      dialogBox: ''
+    },
+    created: function () {
+      apiready = function () {
+        if (api.pageParam.des) {
+          app.des = api.pageParam.des || 0;
+          app.title = api.pageParam.title;
+          app.getCourses();
+        }
+      }
+    },
+    methods: {
+      share: function () {
+        var apiKey = 'wxcfe803c780dc2647';
+        var dialogBox = api.require("dialogBox");
+        //MD Start
+        api.execScript({name: 'root', script: "ChatAna('TabPage1',{'Active':'开始分享'},'商学院-开始分享');"});
+        //MD End
+        dialogBox.actionMenu({
+          rect: {
+            h: 170
+          },
+          texts: {
+            cancel: '取消分享'
+          },
+          items: [
+            {
+              text: '微信好友',
+              icon: 'widget://res/icon/icon-wx.png'
+            },
+            {
+              text: '微信朋友圈',
+              icon: 'widget://res/icon/icon-pyq.png'
+            }
+          ],
+          styles: {
+            bg: '#FFF',
+            column: 2,
+            itemText: {
+              color: '#000',
+              size: 12,
+              marginT: 8
+            },
+            itemIcon: {
+              size: 60
+            },
+            cancel: {
+              bg: '#fff',
+              color: '#000',
+              h: 44,
+              size: 14
+            }
+          },
+          tapClose: true
+        }, function (ret) {
+          dialogBox.close({dialogName: 'actionMenu'});
+          if (ret.eventType == 'click') {
+            switch (ret.index) {
+              case 0:
+                var wx = api.require('wx');
+                wx.isInstalled(function (ret, err) {
+                  if (ret.installed) {
+                    wx.shareWebpage({
+                      apiKey: apiKey,
+                      scene: 'session',
+                      title: app.classData.title,
+//                      title: '测试',
+                      description: app.classData.intro,
+                      thumb: 'widget://image/logo.png',
+                      contentUrl: App.url + 'api.php/Api/Share/WXcourseInfo?id=' + app.des
+                    }, function (ret, err) {
+                      if (ret.status) {
+                        api.execScript({
+                          name: 'root',
+                          script: "ChatAna('SharePromoter',{'is_success':true,'sharingMethod':'session','page':'TabPage1'},'商学院-分享成功');"
+                        });
+                        api.toast({
+                          msg: '分享成功',
+                          duration: 2000,
+                          location: 'bottom'
+                        });
+                      } else {
+                        api.execScript({
+                          name: 'root',
+                          script: "ChatAna('SharePromoter',{'is_success':false,'sharingMethod':'session','page':'TabPage1'},'商学院-取消分享');"
+                        });
+                      }
+                    });
+                  }
+                });
+                break;
+              case 1:
+                var wx = api.require('wx');
+                wx.isInstalled(function (ret, err) {
+                  if (ret.installed) {
+                    wx.shareWebpage({
+                      apiKey: apiKey,
+                      scene: 'timeline',
+                      title: app.classData.title,
+                      description: app.classData.intro,
+                      thumb: 'widget://image/logo.png',
+                      contentUrl: App.url + 'api.php/Api/Share/WXcourseInfo?id=' + app.des
+                    }, function (ret, err) {
+                      if (ret.status) {
+                        api.execScript({
+                          name: 'root',
+                          script: "ChatAna('SharePromoter',{'is_success':true,'sharingMethod':'session','page':'TabPage1'},'商学院-分享成功');"
+                        });
+                        api.toast({
+                          msg: '分享成功',
+                          duration: 2000,
+                          location: 'bottom'
+                        });
+                      } else {
+                        api.execScript({
+                          name: 'root',
+                          script: "ChatAna('SharePromoter',{'is_success':false,'sharingMethod':'session','page':'TabPage1'},'商学院-取消分享');"
+                        });
+                      }
+                    });
+                  }
+                });
+                break;
+              default:
+            }
+          }
+        });
+      },
+      getCourses: function () {
+        api.showProgress({
+          title: '努力加载中...',
+          modal: false
+        });
+        api.execScript({name: 'root', frameName: 'FM', script: "app.closeBox();"});
+        var post = {
+          hash: $api.getStorage('token'),
+          id: app.des
+//            id:10
+        };
+        sendAjax(this, post, '/Api/Data/getCourse', function (res) {
+          api.hideProgress();
+          app.classData = res.data;
+          console.log(JSON.stringify(res));
+        })
+      },
+      //	跳转支付页
+      hurrybuy: function () {
+        var token = $api.getStorage('token');
+        if (token && (token == App.guest)) {
+          api.sendEvent({name: 'IndexEvent', extra: {page: 'login'}});
+          api.openWin({
+            name: 'login',
+            url: '../../html/me/login.html',
+            reload: false,
+            slidBackEnabled: false,
+            pageParam: {
+              name: 'authentication'
+            },
+            slidBackEnabled: true
+          });
+          return;
+        } else {
+          if (app.classData.price > 0) {
+            api.openWin({
+              name: 'classPay_win',
+              url: '../me/classPay_win.html',
+              pageParam: {
+                id: app.des,
+                price: app.classData.price,
+                title: app.classData.title
+              }
+            });
+          } else {
+            api.ajax({
+              url: App.url + 'api.php/Api/Pay/courseOrder_submit',
+              method: 'post',
+              data: {
+                values: {
+                  column_id: app.des,
+                  hash: $api.getStorage('token')
+                }
+              }
+            }, function (ret, err) {
+              if (ret) {
+                if (ret.code == 1) {
+                  api.sendEvent({
+                    name: 'paySuccess'
+                  });
+                  app.footer = false;
+                  App.buyedUpCopy();
+                } else {
+                  api.alert({msg: '课程购买失败,请重试'});
+                }
+              } else {
+                api.alert({msg: '课程购买失败,请重试'});
+              }
+            });
+          }
+        }
+      }
+    }
+  })
+
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>专业研究院</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+        }
+
+        .mianfei {
+            color: #d9b270;
+            font-size: 0.7rem;
+        }
+
+        #list2 {
+            position: relative;
+        }
+
+        .nomessage_my {
+            text-align: center;
+            width: 100%;
+            color: #999;
+            font-size: 0.7rem;
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 0;
+        }
+
+        .nomessage_my img {
+            width: 26%;
+        }
+
+        .no-tips_my {
+            margin-top: 0.5rem;
+        }
+
+        /*学习代言人*/
+        .study_promoter {
+            padding: 0.1rem 0.3rem;
+            font-size: 0.6rem;
+            color: #fff;
+            background-color: #D9B270;
+            border-top-left-radius: 100px;
+            border-bottom-left-radius: 100px;
+        }
+
+        .fm-list-text_my {
+            /*background-color: red;*/
+            width: 100%;
+            color: #666;
+            font-size: 0.65rem;
+            margin: 0.3rem 0;
+            line-height: 0.9rem;
+            min-height: 1.2rem;
+        }
+
+        .flex-con_my {
+            -webkit-box-flex: 4;
+            -webkit-flex: 4;
+            flex: 4;
+        }
+
+        .msgs {
+            margin-right: 0.3rem;
+        }
+    </style>
+</head>
+<body>
+<div id="mask" class="content-mask"></div>
+<div id="HeadBar">
+    <div class="z-head">
+        <a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+        <div class="z-ellipsis z-head-text"></div>
+        <span style="display: none;font-size: 1rem;color: #333;" tapmode=""
+              class="z-head-right icon iconfont icon-fenxiang3">
+			</span>
+    </div>
+</div>
+<div id="main">
+    <div id="fixStatus"></div>
+    <div class="main-box profession-detail-main-box" style="padding: 0;">
+        <div style="position: relative;" class="z-home-banner-box banner-box-2">
+            <div onclick="openEndorsement()"
+                 style="position: absolute;top: 0.5rem;right: 0;z-index:9">
+                <div class="study_promoter">学习代言人</div>
+            </div>
+            <div id="emba-text" style="bottom:40px;text-align: left;transition: all 0.3s;-webkit-transition: all 0.3s"
+                 class="emba-content-box">
+                <div style="text-align: left;" class="emba-speaker"></div>
+                <div style="text-align: left;" class="emba-text"></div>
+            </div>
+            <img id="pdbanner" class="z-home-bg" src="../../image/embaFM.jpg"
+                 onerror="this.src='../../image/embaFM.jpg'">
+            <div style="display: none" class="weekly-bottom"><span id="current-title"
+                                                                   style="display: inline-block;max-width: 40%;"></span>您已收听<span
+                    id="current-m"></span>分钟<span id="continue">继续听<span class="weekly-banner-play-btn"><img width="10"
+                                                                                                             height="10"
+                                                                                                             src="../../image/play2.png"
+                                                                                                             alt=""></span></span>
+            </div>
+        </div>
+        <div id="des" data-des="1" data-href="../../html/fm/content.html" data-name="content"
+             style="background-color: #fff !important; border-bottom: none;font-size: 0.9rem"
+             class="z-column2 fm-title-box">
+            栏目详情<span class="fr"><span class="mianfei"></span><span class="icon iconfont icon-ch2"></span></span>
+        </div>
+        <div class="weekly-content" style="display:none"></div>
+        <ul class="flex-wrap" style="padding: 15px;width:100%;background-color: #fff;">
+            <li class="flex-con">
+                <div id="weekly-people" class="weekly-1">0</div>
+                <div class="weekly-2">参与人数</div>
+            </li>
+
+            <li class="flex-con">
+                <div id="weekly-hour" class="weekly-1">15</div>
+                <div class="weekly-2">课时</div>
+            </li>
+        </ul>
+        <div style="height: 10px;background-color: #f5f5f5"></div>
+        <!--<div style="background-color: #fff !important; border-bottom: none;font-size: 0.9rem"-->
+        <!--class="z-column2 fm-title-box" onclick="openTeacherPage()">-->
+        <!--咨询讲师<span class="fr"><span class="mianfei"></span><span class="icon iconfont icon-ch2"></span></span>-->
+        <!--</div>-->
+        <!--<div style="height: 10px;background-color: #f5f5f5"></div>-->
+        <div class="up-box">
+            <div style="position: relative;" class="">
+                <div class="z-column2 fm-title-box flex-wrap"
+                     style="display: flex;align-items: center;justify-content: space-between">
+                    <div style="display: flex;align-items: center" onclick="bofang()">
+                        <img class="msgs" width="20" height="20" align="center" src="../../image/fmplay.png" alt="">全部播放
+                    </div>
+                    <!--<span class="icon iconfont icon-gn kechengliebiaoicon"></span>最新内容-->
+                    <span id="reverse" onclick="rev()" class="z-news-title2 fr"
+                          style="position: relative;display: none"><span id="paixutext" class="z-padding-15 paixu-text">正序</span><img
+                            width="20" height="20" src="../../image/reverse2.png" class="paixu-img"></span>
+                    <!--<span onclick="downloadAll()" class="z-news-title2 fr" style="position: relative;"><span class="z-padding-15 paixu-text">批量下载</span><img width="20" height="20" src="../../image/fmicon1.png" class="paixu-img"></span>-->
+                    <span onclick="downloadAll()" class="z-news-title2 fr" style="position: relative;"><span
+                            class="paixu-text">批量下载</span><img width="20" height="20" src="../../image/fmicon1.png"
+                                                               class="paixu-img"></span>
+                </div>
+                <ul id="list2" class="profession-list" style="background-color: #fff;">
+                    <li class="padding-3">
+                        <div class="z-FM-img-box">
+                            <img width="75" height="75" src="../../image/list1@error.png">
+                        </div>
+                        <div class="fm-profession-list">
+                            <div style="background-color: #efefef" class="fm-list-title"></div>
+                            <div class="fm-list-text">
+                                <div style="background-color: #efefef;height: 0.7rem;margin-bottom: 0.4rem"></div>
+                                <div style="background-color: #efefef;height: 0.7rem"></div>
+                            </div>
+                            <div class="fm-below"><span
+                                    style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"
+                                    class="fm-list-date"></span><span
+                                    style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="padding-3">
+                        <div class="z-FM-img-box">
+                            <img width="75" height="75" src="../../image/list1@error.png">
+                        </div>
+                        <div class="fm-profession-list">
+                            <div style="background-color: #efefef" class="fm-list-title"></div>
+                            <div class="fm-list-text">
+                                <div style="background-color: #efefef;height: 0.7rem;margin-bottom: 0.4rem"></div>
+                                <div style="background-color: #efefef;height: 0.7rem"></div>
+                            </div>
+                            <div class="fm-below"><span
+                                    style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"
+                                    class="fm-list-date"></span><span
+                                    style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="padding-3">
+                        <div class="z-FM-img-box">
+
+                            <img width="75" height="75" src="../../image/list1@error.png">
+                        </div>
+                        <div class="fm-profession-list">
+                            <div style="background-color: #efefef" class="fm-list-title"></div>
+                            <div class="fm-list-text">
+                                <div style="background-color: #efefef;height: 0.7rem;margin-bottom: 0.4rem"></div>
+                                <div style="background-color: #efefef;height: 0.7rem"></div>
+                            </div>
+                            <div class="fm-below"><span
+                                    style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"
+                                    class="fm-list-date"></span><span
+                                    style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"></span>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="padding-3">
+                        <div class="z-FM-img-box">
+
+                            <img width="75" height="75" src="../../image/list1@error.png">
+                        </div>
+                        <div class="fm-profession-list">
+                            <div style="background-color: #efefef" class="fm-list-title"></div>
+                            <div class="fm-list-text">
+                                <div style="background-color: #efefef;height: 0.7rem;margin-bottom: 0.4rem"></div>
+                                <div style="background-color: #efefef;height: 0.7rem"></div>
+                            </div>
+                            <div class="fm-below"><span
+                                    style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"
+                                    class="fm-list-date"></span><span
+                                    style="background-color: #efefef;width: 2rem;display: inline-block;height: 0.6rem"></span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script id="list_Tpl" type="text/template">
+    {{#data}}
+    <li style="position: relative;" class="padding-3">
+        <div id="buyed_box" style="margin-right: 30px" data-tid="{{tid}}" data-category="1" data-des="{{id}}"
+             data-name="audio" data-path="{{file}}" onclick="autoplaylink({{index}})">
+            <div class="z-FM-img-box">
+                <span class="icon iconfont icon-bofang2"></span>
+                <img data-pic="{{id}}" width="55" height="55" src="../../image/list1@error.png"
+                     onerror="this.src='../../image/list1@error.png'">
+            </div>
+            <div class="fm-profession-list"
+                 style="border-bottom: 1px solid #ddd;padding-bottom: 15px;margin-left: 65px;">
+                <div data-title="{{id}}" class="fm-list-title">{{title}}</div>
+                <div class="fm-list-text">{{des}}</div>
+                <div class="fm-below weekly-below"><span
+                        class="icon iconfont icon-1"></span><span>{{hearnum}}</span><span
+                        class="icon iconfont icon-shijian"></span><span>{{dur}}</span><span
+                        class="icon iconfont icon-dianzan"></span><span>{{likenum}}</span></div>
+            </div>
+        </div>
+        <span data-index='{{index}}' data-down-id='{{id}}' data-down-title='{{title}}' data-download="0"
+              onclick="download(this,'{{index}}')"
+              style="right: 20px;bottom: 30px; font-size: 1rem !important;position: absolute;z-index: 999;"
+              class="icon iconfont icon-xiazai2"></span>
+    </li>
+    {{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/islider.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+  var id = 0;
+  var buyed = 1;
+  var price = '0.00';
+  var title = '';
+  var PageNum = 0;
+  var HeadBar = $api.byId('HeadBar');
+  var length = 0;
+  var score_data, fs, db;
+  var boo = [false, true];
+  var zhuge, td;
+  var islider1;
+  var list = [];
+  var mba;
+  var dialogBox;
+  var blockArray = [];
+  var blocks = [];
+  var listData = [];
+  var wx;
+  var isview = false;
+  var pro = 0;
+
+  apiready = function () {
+    $api.fixStatusBar(HeadBar);
+    id = api.pageParam.des || 0;
+    price = api.pageParam.price || '0.00';
+    title = api.pageParam.title;
+    buyed = api.pageParam.buyed;
+    api.addEventListener({
+      name: 'paySuccess'
+    }, function (ret, err) {
+      if (ret) {
+        App.buyedUpCopy();
+      }
+    });
+    checkPay(buyed, price);
+    App.buyedUpCopy();
+    api.execScript({name: 'root', frameName: 'FM', script: "app.closeBox();"});
+    document.getElementById('des').setAttribute('data-des', id);
+    fs = api.require("fs");
+    db = api.require("db");
+    wx = api.require("wx");
+    dialogBox = api.require("dialogBox");
+
+    api.addEventListener({
+      name: 'topause'
+    }, function (ret, err) {
+      pause(ret.value.key1);
+    });
+
+    api.addEventListener({
+      name: 'PlayStatus'
+    }, function (ret, err) {
+      if (ret) {
+        if (ret.value.id) {
+          play(ret.value.id);
+        } else if (ret.value.key1) {
+          play(ret.value.key1);
+        }
+      }
+    });
+
+    App.openWWW(api.winName);
+
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from course where id=' + id)
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          courseData = ret.data[0];
+          db.selectSql({
+            name: 'main',
+            sql: ('select * from coursecontent where tid=' + id)
+          }, function (rets, errs) {
+            if (rets.status) {
+              if (rets.data.length > 0) {
+                courseData.list = rets.data;
+              } else {
+                courseData.list = [];
+              }
+            } else {
+              courseData.list = [];
+            }
+            upview(courseData);
+          });
+          if (!App.State()) {
+            //MD Start
+            api.execScript({
+              name: 'root',
+              script: "ChatAna('viewCourseDetail',{'CID':" + id + ",'title':'" + courseData.title + "'},'研究院详情');"
+            });
+            //MD End
+          }
+        } else {
+          if (!App.State()) {
+            App.tips('当前无网络，数据获取失败!');
+          }
+        }
+      }
+      if (App.State()) {
+        Refresh();
+      }
+    });
+  };
+
+  function checkPay(buyed, price) {
+    if (buyed == 1) {
+      document.querySelector('.mianfei').innerHTML = '查看详情';
+    }
+    if (price == '0.00' && buyed == 0) {
+      document.querySelector('.mianfei').innerHTML = '查看详情';
+    }
+  }
+
+  //  打开学习代言人
+  function openEndorsement() {
+    api.openWin({
+      name: 'Endorsement',
+      url: './Endorsement.html',
+      pageParam: {
+        des: id
+      }
+    });
+  }
+  //  讲师咨询
+  function openTeacherPage() {
+    api.openWin({
+      name: 'talkteacher',
+      url: './talkteacher.html',
+      pageParam: {
+        name: 'test'
+      }
+    });
+  }
+
+  function autoplaylink(n) {
+    console.log(JSON.stringify(listData[n]));
+    api.openWin({
+      name: 'audio',
+      url: '../../html/indexgroup/audio.html',
+      reload: false,
+      bgColor: '#fff',
+      pageParam: {
+        name: 'audio',
+        des: listData[n].id,   // 音频id
+        tid: listData[n].tid,  //课程id
+        rid: listData[n].pid, //练习id
+        pro: listData[n].pro,
+        category: 1,
+        auto: true
+      },
+      slidBackEnabled: true
+    });
+  }
+
+  /*
+   function PlayStatus(data){
+   if(typeof data == 'string'){
+   var data = App.JSON(data);
+   }
+   if(data.id){
+   play(data.id);
+   }else if(data.key1){
+   play(data.key1);
+   }
+   }
+   */
+
+  function showbottom() {
+    db.selectSql({
+      name: 'main',
+      sql: 'select * from currentaudio where tid=' + id
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          //id = ret.data[0].id;
+          document.getElementById("emba-text").style.bottom = "60px";
+          document.querySelector(".weekly-bottom").style.display = "block";
+          var t = ret.data[0].title;
+          if (t.length > 10) {
+            t = t.slice(0, 8) + '…';
+          }
+          document.getElementById("current-title").innerHTML = t;
+          var p = ret.data[0].progress || 0;
+          if (isNaN(p)) {
+            p = 0;
+            pro = 0;
+          } else {
+            pro = p;
+          }
+          p = (p / 60).toFixed(2);
+          document.getElementById("current-m").innerHTML = p;
+          document.getElementById("continue").addEventListener('click', function () {
+
+            document.getElementById("emba-text").style.bottom = "40px";
+            document.querySelector(".weekly-bottom").style.display = "none";
+
+            App.checkLogin();
+
+            //PRO
+
+            App.addpage('audio');
+            api.openWin({
+              name: 'audio',
+              url: '../../html/indexgroup/audio.html',
+              reload: false,
+              bgColor: '#fff',
+              pageParam: {
+                name: 'audio',
+                des: ret.data[0].id,
+                tid: id,
+                pro: pro,
+                category: 1,
+                auto: true
+              },
+              slidBackEnabled: true
+            });
+
+          });
+
+          setTimeout(function () {
+            document.getElementById("emba-text").style.bottom = "40px";
+            document.querySelector(".weekly-bottom").style.opacity = 0;
+            setTimeout(function () {
+              document.querySelector(".weekly-bottom").style.display = "none";
+            }, 300);
+          }, 5000)
+        }
+      }
+    });
+  }
+
+  function Refresh() {
+    api.showProgress({
+      style: 'default',
+      animationType: 'fade',
+      title: '加载中...',
+      modal: false
+    });
+    console.log($api.getStorage('token') + '|' + id);
+    api.execScript({
+      name: 'root',
+      script: "XO.GetProDetail('" + $api.getStorage('token') + "','" + id + "',{name:'professionDetail2',fun:'upview'},{name:'professionDetail2',fun:'fail'});"
+    });
+  }
+
+  function upview(data) {
+    blockArray = [];
+    if (typeof data == 'string') {
+      var data = JSON.parse(data);
+    }
+
+    if (!isview) {
+      isview = true;
+      //MD Start
+      api.execScript({
+        name: 'root',
+        script: "ChatAna('viewCourseDetail',{'CID':" + id + ",'title':'" + data.title + "'},'研究院详情');"
+      });
+      //MD End
+    }
+
+//    if(data.content.length>60){
+//      document.querySelector(".weekly-content").innerHTML = data.content.slice(0,60) + '……';
+//    }else{
+//      document.querySelector(".weekly-content").innerHTML = data.content;
+//    }
+//
+//    if(data.lecturer){
+//      document.querySelector(".emba-speaker").innerHTML = '主讲：'+data.lecturer;
+//    }
+//
+//    var co = data.intro;
+//    if(co && (co.length>20)){
+//      co = co.slice(0,20) + '…';
+//    }
+//
+//    if(co && co.length>10){
+//      document.querySelector(".emba-text").innerHTML = co;
+//    }
+
+    document.getElementById('des').setAttribute('data-title', data.title);
+    document.getElementById("weekly-people").innerHTML = data.people;
+    document.getElementById("weekly-hour").innerHTML = data.hour;
+    document.querySelector(".z-head-text").innerHTML = data.title;
+    document.getElementById("list2").innerHTML = '';
+
+    var banner = data.banner;
+    if (banner && (banner != 'null') && (typeof banner == 'string') && (banner != 'undefined')) {
+      var _file = App.file(banner);
+      fs.exist({
+        path: (api.fsDir + '/file/' + _file.full)
+      }, function (ret, err) {
+        if (ret.exist) {
+          banner = (api.fsDir + '/file/' + _file.full);
+          document.getElementById("pdbanner").src = banner;
+        } else {
+          if (banner.indexOf('/') == 0) {
+            var dface = App.url + banner;
+          } else {
+            var dface = banner;
+          }
+          api.download({
+            url: dface,
+            savePath: ('fs://file/' + _file.full),
+            cache: true,
+            allowResume: true
+          }, function (ret, err) {
+            banner = (api.fsDir + '/file/' + _file.full);
+            document.getElementById("pdbanner").src = banner;
+          });
+
+        }
+      });
+    }
+    document.getElementById("list2").innerHTML = '';
+    var iindex = 0;
+
+    data.list.forEach(function (arg) {
+      if (arg.hearnum > 9999) {
+        arg.hearnum = (arg.hearnum / 10000).toFixed(1) + '万'
+      }
+      if (arg.likenum > 9999) {
+        arg.likenum = (arg.likenum / 10000).toFixed(1) + '万'
+      }
+      arg.index = iindex;
+      arg.date = App.dateStr(arg.vtime);
+      var m, s;
+      m = parseInt(arg.duration / 60);
+      s = parseInt(arg.duration % 60);
+      m = m > 9 ? m : '0' + m;
+      s = s > 9 ? s : '0' + s;
+      arg.dur = m + ':' + s;
+      blockArray[arg.id] = {id: arg.id, ilock: arg.ilock, blocks: arg.blocks, type: arg.type};
+      iindex++;
+    });
+    listData = data.list;
+    var TM = new T7({tm: document.getElementById("list_Tpl")});
+    var html = TM.Tpl(data.list);
+    document.getElementById("list2").innerHTML = html;
+    api.execScript({
+      name: 'root',
+      script: "getPlayId();"
+    });
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from downfile')
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          ret.data.forEach(function (arg) {
+            $api.rmStorage('isdown' + arg.id);
+            if (document.querySelector("[data-down-id='" + arg.id + "']")) {
+              $api.setStorage('isdown' + arg.id, 1);
+              document.querySelector("[data-down-id='" + arg.id + "']").setAttribute("data-download", 1)
+            }
+          });
+        }
+      }
+    });
+    cachepics(0, data.list.length, data.list);
+
+    db.selectSql({
+      name: 'main',
+      sql: ('select * from course where id=' + id)
+    }, function (ret, err) {
+      if (ret.status) {
+        if (ret.data.length > 0) {
+          var sql1 = "update course set title='" + data.title + "',introduction='" + data.introduction + "',banner='" + data.banner + "',people=" + data.people + ",hour=" + data.hour + " where id=" + id;
+          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+          });
+        } else {
+          var sql1 = "INSERT INTO course (id,title,introduction,banner,people,hour) VALUES (" + id + ",'" + data.title + "','" + data.introduction + "','" + data.banner + "'," + data.people + "," + data.hour + ")";
+          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+          });
+        }
+      }
+    });
+
+    if (data.list && data.list.length > 0) {
+      data.list.forEach(function (arg) {
+        db.selectSql({
+          name: 'main',
+          sql: ('select * from coursecontent where id=' + arg.id)
+        }, function (ret, err) {
+          if (ret.status) {
+            if (ret.data.length > 0) {
+              if (typeof arg.blocks == 'undefined') {
+                arg.blocks = '';
+              }
+              var sql1 = "update coursecontent set title='" + arg.title + "',blocks='" + arg.blocks + "',file='" + arg.file + "',pic='" + arg.pic + "',note='" + arg.note + "',text='" + arg.text + "',size='" + arg.size + "',duration='" + arg.duration + "',tid='" + arg.cid + "',classify='',speaker='" + data.lecturer + "',path='" + arg.file + "',vtime='" + arg.vtime + "',ilock=1,hearnum=" + arg.hearnum + ",likenum=" + arg.likenum + " where id=" + arg.id;
+              db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+              });
+            } else {
+              if (typeof arg.blocks == 'undefined') {
+                arg.blocks = '';
+              }
+              var sql1 = "INSERT INTO coursecontent (id,title,file,blocks,pic,note,text,size,duration,tid,classify,speaker,path,vtime,ilock,hearnum,likenum) VALUES (" + arg.id + ",'" + arg.title + "','" + arg.file + "','" + arg.blocks + "','" + arg.pic + "','" + arg.note + "','" + arg.text + "','" + arg.size + "','" + arg.duration + "','" + arg.cid + "','','" + data.lecturer + "','" + arg.file + "','" + arg.vtime + "',1," + arg.hearnum + "," + arg.likenum + ")";
+              db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+              });
+            }
+          }
+        });
+      });
+    } else {
+      var sql1 = 'delete from coursecontent where tid=' + data.id;
+      db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+      });
+    }
+
+    App.init();
+    api.hideProgress();
+  }
+
+  function fail(msg) {
+    api.hideProgress();
+    App.tips(msg);
+  }
+
+  function rev() {
+    listData.reverse();
+    var img = document.querySelector('.paixu-img');
+    if (/transdao/.test(img.className)) {
+      img.className = 'paixu-img';
+      img.src = '../../image/reverse2.png';
+      document.getElementById('paixutext').innerHTML = '正序';
+    } else {
+      img.className = 'paixu-img transdao';
+      img.src = '../../image/reverse.png';
+      document.getElementById('paixutext').innerHTML = '倒序';
+    }
+    var TM = new T7({tm: document.getElementById("list_Tpl")});
+    var html = TM.Tpl(listData);
+    document.getElementById("list2").innerHTML = html;
+    api.execScript({
+      name: 'root',
+      script: "getPlayId();"
+    });
+    var d = document.querySelectorAll(".fm-profession-list");
+    if (d) {
+      d[d.length - 1].style.borderBottom = "none";
+    }
+    cachepics(0, listData.length, listData);
+    api.execScript({
+      name: 'root',
+      script: "reverseAudio(1);"
+    });
+    App.init();
+    api.hideProgress();
+  }
+
+  function cachepics(i, max, data) {
+
+    if (i < max) {
+      if (!data || !data[i]) {
+        return;
+      }
+      if (data[i].pic) {
+        var _file = App.file(data[i].pic);
+        fs.exist({
+          path: (api.fsDir + '/file/' + _file.full)
+        }, function (ret, err) {
+          if (ret.exist) {
+            data[i].pic = (api.fsDir + '/file/' + _file.full);
+            document.querySelector("[data-pic='" + data[i].id + "']").src = data[i].pic;
+            cachepics(i + 1, max, data);
+          } else {
+            if (data[i].pic.indexOf('/') == 0) {
+              var dpic = App.url + data[i].pic;
+            } else {
+              var dpic = data[i].pic;
+            }
+            api.download({
+              url: dpic,
+              savePath: ('fs://file/' + _file.full),
+              cache: true,
+              allowResume: true
+            }, function (ret, err) {
+              data[i].pic = (api.fsDir + '/file/' + _file.full);
+              document.querySelector("[data-pic='" + data[i].id + "']").src = data[i].pic;
+              cachepics(i + 1, max, data);
+            });
+          }
+        });
+      } else {
+        cachepics((i + 1), max, data);
+      }
+    }
+  }
+
+  function play(id) {
+    var dom = document.querySelector("[data-title='" + id + "']");
+    var act = document.querySelector(".active");
+    if (act) {
+      act.className = act.className.replace(/ active/, '');
+    }
+    if (dom) {
+      dom.className = dom.className + ' active';
+    }
+  }
+
+  function pause(id) {
+    var act = document.querySelector(".active");
+    if (act) {
+      act.className = act.className.replace(/ active/, '');
+    }
+  }
+
+  var dpic = '';
+  var lpic = "widget://res/logo.png";
+  function upviewlittle(data) {
+    //小兔地址data+1_,下载下来
+    var _file = App.file(data);
+    fs.exist({
+      path: (api.fsDir + '/file/' + _file.full)
+    }, function (ret, err) {
+      if (ret.exist) {
+        data = (api.fsDir + '/file/' + _file.full);
+        lpic = 'fs://file/' + _file.full;
+      } else {
+        if (data.indexOf('/') == 0) {
+          var dface = App.url + data;
+
+        } else {
+          var dface = data;
+        }
+        api.download({
+          url: dface,
+          savePath: ('fs://file/' + _file.full),
+          cache: false,
+          allowResume: false
+        }, function (ret, err) {
+          data = (api.fsDir + '/file/' + _file.full);
+          lpic = 'fs://file/' + _file.full;
+        });
+      }
+    });
+  }
+
+  function upshare(data) {
+    //小兔地址data+1_,下载下来
+
+    var little = data.split('/');
+    var littleURL = '';
+
+    if (little.length > 0) {
+      for (var i = 1; i < little.length - 1; i++) {
+        littleURL += '/' + little[i];
+      }
+      littleURL += '/1_' + little[little.length - 1];
+    }
+    upviewlittle(littleURL);
+    // api.imageCache({
+    //     url: App.url+data
+    // }, function(ret, err) {
+    //     document.getElementById("promoter").src = ret.url;
+    //     api.hideProgress();
+    // });
+    localStorage.setItem('promoterPIC', data);
+    var _file = App.file(data);
+    fs.exist({
+      path: (api.fsDir + '/file/' + _file.full)
+    }, function (ret, err) {
+      if (ret.exist) {
+        data = (api.fsDir + '/file/' + _file.full);
+        dpic = 'fs://file/' + _file.full;
+        api.hideProgress();
+      } else {
+        if (data.indexOf('/') == 0) {
+          var dface = App.url + data;
+        } else {
+          var dface = data;
+        }
+        api.download({
+          url: dface,
+          savePath: ('fs://file/' + _file.full),
+          cache: false,
+          allowResume: false
+        }, function (ret, err) {
+          data = (api.fsDir + '/file/' + _file.full);
+          dpic = 'fs://file/' + _file.full;
+          api.hideProgress();
+        });
+      }
+    });
+  }
+
+  var apiKey = 'wxcfe803c780dc2647';
+  document.querySelector('.icon-fenxiang3').onclick = function () {
+    if ($api.getStorage('nickname')) {
+      share();
+    } else {
+      api.toast({
+        msg: '完善个人资料后才可以分享',
+        duration: 2000,
+        location: 'bottom'
+      });
+    }
+  }
+
+  function share() {
+    //MD Start
+    api.execScript({name: 'root', script: "ChatAna('EMBAPage',{'Active':'开始分享'},'商学院-开始分享');"});
+    //MD End
+
+    dialogBox.actionMenu({
+      rect: {
+        h: 170
+      },
+      texts: {
+        cancel: '取消分享'
+      },
+      items: [
+        {
+          text: '微信好友',
+          icon: 'widget://res/icon/icon-wx.png'
+        },
+        {
+          text: '微信朋友圈',
+          icon: 'widget://res/icon/icon-pyq.png'
+        }
+      ],
+      styles: {
+        bg: '#FFF',
+        column: 2,
+        itemText: {
+          color: '#000',
+          size: 12,
+          marginT: 8
+        },
+        itemIcon: {
+          size: 60
+        },
+        cancel: {
+          bg: '#fff',
+          color: '#000',
+          h: 44,
+          size: 14
+        }
+      },
+      tapClose: true
+    }, function (ret) {
+      dialogBox.close({dialogName: 'actionMenu'});
+      if (ret.eventType == 'click') {
+        if (dpic.length > 0) {
+          switch (ret.index) {
+            case 0:
+              wx.isInstalled(function (ret, err) {
+                if (ret.installed) {
+                  wx.shareImage({
+                    apiKey: apiKey,
+                    scene: 'session',
+                    thumb: lpic,
+                    contentUrl: dpic
+                  }, function (ret, err) {
+                    if (ret.status) {
+                      //MD Start
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':true,'sharingMethod':'session','page':'EMBAPage'},'EMBA-分享成功');"
+                      });
+                      //MD End
+                      api.toast({
+                        msg: '分享成功',
+                        duration: 2000,
+                        location: 'bottom'
+                      });
+                    } else {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':false,'sharingMethod':'session','page':'EMBAPage'},'EMBA-取消分享');"
+                      });
+                    }
+                  });
+                }
+              });
+              break;
+            case 1:
+              wx.isInstalled(function (ret, err) {
+                if (ret.installed) {
+                  wx.shareImage({
+                    apiKey: apiKey,
+                    scene: 'timeline',
+                    thumb: lpic,
+                    contentUrl: dpic
+                  }, function (ret, err) {
+                    if (ret.status) {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':true,'sharingMethod':'timeline','page':'EMBAPage'},'EMBA-分享成功');"
+                      });
+                      api.toast({
+                        msg: '分享成功',
+                        duration: 2000,
+                        location: 'bottom'
+                      });
+                    } else {
+                      api.execScript({
+                        name: 'root',
+                        script: "ChatAna('SharePromoter',{'is_success':false,'sharingMethod':'timeline','page':'EMBAPage'},'EMBA-取消分享');"
+                      });
+                    }
+                  });
+                }
+              });
+              break;
+            default:
+          }
+        }
+      }
+    });
+  }
+
+  function downloadAll() {
+    CheckM = [];
+    for (var id in listData) {
+      if ((typeof listData[id] == 'object') && (listData[id].blocks.length > 4) && (listData[id].ilock == '1')) {
+        var blocks_temp = listData[id].blocks.split('|');
+        for (var i in blocks_temp) {
+          var tempi = blocks_temp[i].split(',');
+          CheckM.push({id: listData[id].id, blocks: i, file: '', hash: tempi[1], type: 1});
+        }
+      }
+    }
+    if (CheckM.length > 0) {
+      App.tips('已列入下载任务中!');
+    }
+      /*
+       var _CheckM = [];
+       for(var i=CheckM.length-1;i>=0;i--){
+       _CheckM.push(CheckM[i]);
+       }
+       CheckM = _CheckM;
+       */
+    Upfile(CheckM, 0, CheckM.length);
+  }
+
+  var CheckM = [];
+  function download(dom, ilock) {
+    App.checkLogin();
+//    if(ilock == 0){
+//      api.toast({
+//        msg: "无法下载未解锁音频",
+//        duration: 2000,
+//        location: 'bottom'
+//      });
+//      return;
+//    }
+    CheckM = [];
+    var title = dom.getAttribute("data-down-title");
+    var id = dom.getAttribute("data-down-id");
+    var boo = dom.getAttribute("data-download");
+    if (boo == 0) {
+      dom.setAttribute("data-download", 1);
+    }
+
+    api.execScript({
+      name: 'root',
+      script: "ChatAna('Download',{'courseTitle':'" + title + "','courseID':" + id + ",'page':'emba'},'研究院-下载课程');"
+    });
+
+    if ((typeof blockArray[id] == 'object') && (blockArray[id].blocks.length > 4)) {
+      var blocks_temp = blockArray[id].blocks.split('|');
+      for (var i in blocks_temp) {
+        var tempi = blocks_temp[i].split(',');
+        CheckM.push({id: blockArray[id].id, blocks: i, file: '', hash: tempi[1], type: id});
+      }
+
+      db.selectSql({
+        name: 'main',
+        sql: ("select * from downfile where `id`=" + blockArray[id].id)
+      }, function (ret, err) {
+        if (ret.status) {
+          if (ret.data.length > 0) {
+            if ((ret.data.length != blocks_temp.length) && (blocks_temp.length > 0)) {
+              App.tips('已列入下载任务中!');
+              db.executeSql({
+                name: 'main',
+                sql: 'delete from downfile where id=' + blockArray[id].id
+              }, function (ret, err) {
+                Upfile(CheckM, 0, CheckM.length);
+              });
+            } else {
+              App.tips('下载任务已存在!');
+            }
+          } else {
+            App.tips('已列入下载任务中!');
+            Upfile(CheckM, 0, CheckM.length);
+          }
+        }
+      });
+    }
+  }
+
+  function Upfile(CheckM, start, len) {
+    if (start < len) {
+      db.selectSql({
+        name: 'main',
+        sql: ('select * from downfile where id=' + CheckM[start].id + ' and blocks=' + CheckM[start].blocks)
+      }, function (ret, err) {
+        if (ret.status) {
+          var uptime = App.time();
+          if (ret.data.length > 0) {
+            var sql1 = "update downfile set file='" + CheckM[start].file + "',hash ='" + CheckM[start].hash + "',at=0,status=1,type=" + CheckM[start].type + " where id=" + CheckM[start].id + ' and blocks=' + CheckM[start].blocks;
+          } else {
+            var sql1 = "INSERT INTO downfile VALUES(" + CheckM[start].id + ",'" + CheckM[start].blocks + "','','" + CheckM[start].file + "','" + CheckM[start].hash + "',0,1," + CheckM[start].type + "," + (uptime.stamp + start) + ")";
+          }
+          db.executeSql({name: 'main', sql: sql1}, function (ret, err) {
+            Upfile(CheckM, (start + 1), len);
+          });
+        }
+      });
+    } else {
+      api.execScript({name: 'root', script: 'DownManage(0,\'doit\');'});
+    }
+  }
+
+  function bofang() {
+    api.openWin({
+      name: 'audio',
+      url: '../../html/indexgroup/audio.html',
+      reload: false,
+      bgColor: '#fff',
+      pageParam: {
+        name: 'audio',
+        des: listData[0].id,
+        tid: listData[0].tid,
+        rid: listData[0].pid,
+        pro: listData[0].pro,
+        category: 1,
+        auto: true
+      },
+      slidBackEnabled: true
+    });
+  }
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

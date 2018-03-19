@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>绑定微信</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body class="z-fff">
+	<div id="HeadBar">
+		<div class="z-head">
+			<a style="display: none" class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">绑定微信</div>
+			<span style="color:#666;padding: 0 15px;font-size: 0.75rem;display: none" tapmode="" class="z-head-right fenxiang3" >跳过
+			</span>
+		</div>
+	</div>
+	<div id="main" style="text-align: center;">
+		<div id="fixStatus"></div>
+		<img style="margin-top: 2rem" id="icon" width="60" src="../../res/icon/weixin_icon.png" alt="">
+		<div class="z-column2">
+			<div style="background-color: #24518e;height: 50px;line-height: 50px;font-size: 0.9rem" id="next" class="z-login-btn">完成</div>
+		</div>
+		<div onclick="goout();" style="margin-top: 50px;text-decoration: underline;"><span style="color: #24518e;">切换账号</span></div>
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript">
+	var HeadBar = $api.byId('HeadBar');
+	var wx;
+	var wx_openid = '';
+	var db;
+	var Will =0;
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+		wx = api.require('wx');
+		db = api.require('db');
+
+		api.addEventListener({
+	    name: 'keyback'
+	  }, function(ret, err) {
+	    if(Will == 0){
+	      Will = Will+1;
+	      api.toast({
+	          msg: '再次返回将退出本账号',
+	          duration: 2000,
+	          location: 'bottom'
+	      });
+	    }else{
+				db.executeSql({name: 'main',sql: "delete from currentaudio"},function(ret, err){});
+				db.executeSql({name: 'main',sql: "delete from user"},function(ret, err){});
+				$api.clearStorage();
+				api.removePrefs({key:'face'});
+				api.removePrefs({key:'token'});
+				api.removePrefs({key:'user_id'});
+				api.removePrefs({key:'nickname'});
+				api.removePrefs({key:'company'});
+				api.removePrefs({key:'position'});
+				api.removePrefs({key:'tel'});
+				api.rebootApp();
+	    }
+	  });
+
+		document.querySelector('.fenxiang3').onclick = function(){
+			$api.setStorage('jump_wx', '1');
+			api.closeToWin({
+			    name: 'root'
+			});
+		}
+
+		var indexFrameGroup = $api.getStorage('indexFrameGroup');
+		if(!indexFrameGroup || (indexFrameGroup != '1')){
+			api.execScript({name: 'root',script: "openIndexFrameGroup();"});
+		}
+
+		api.closeWin({name: 'login'});
+		api.execScript({name: 'phoneInfo',script: "CloseW();"});
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('bindwxpage',{'Active':'加载'},'绑定微信');"});
+		//MD End
+
+		wx.isInstalled(function(ret, err) {
+			if(ret.installed) {
+				document.getElementById('icon').onclick = function(){
+					jump();
+				}
+
+				document.getElementById('next').onclick = function(){
+					jump();
+				}
+			}else{
+				$api.setStorage('jump_wx', '1');
+				api.closeWin();
+			}
+		});
+	}
+
+	function jump(){
+		api.execScript({name: 'root', script: "ChatAna('wxauth',{'Active':'微信授权'},'微信绑定-微信授权');"});
+
+		api.toast({
+				msg: '微信授权中',
+				duration: 2000,
+				location: 'bottom'
+		});
+
+		wx.auth(function(ret, err) {
+			if (ret.status) {
+				wx.getToken({
+						code: ret.code
+				}, function(ret, err) {
+					if (ret.status) {
+						wx.getUserInfo({
+								accessToken: ret.accessToken,
+								openId: ret.openId
+						}, function(ret, err) {
+							wx_openid = ret.openid;
+							api.execScript({name: 'root', script: "ChatAna('bindwx',{'is_success':true},'微信绑定-授权成功');"});
+							api.execScript({name: 'root',script: "XO.BindUser('"+ $api.getStorage('token') +"',1,'"+ ret.openid +"',0,0,0,'"+ ret.unionid +"',{name:'bindWeChat',fun:'success'},{name:'bindWeChat',fun:'fail'});"});
+						});
+					} else {
+						api.execScript({name: 'root', script: "ChatAna('bindwx',{'is_success':false},'微信绑定-授权失败');"});
+						wx_openid = '';
+						api.toast({
+							msg: '授权失败',
+							duration: 2000,
+							location: 'bottom'
+						});
+					}
+				});
+			} else {
+				api.execScript({name: 'root', script: "ChatAna('bindwx',{'is_success':false},'微信绑定-授权失败');"});
+				api.toast({
+					msg: '授权失败',
+					duration: 2000,
+					location: 'bottom'
+				});
+			}
+		});
+	}
+
+	function goout(){
+		db.executeSql({name: 'main',sql: "delete from currentaudio"},function(ret, err){});
+		db.executeSql({name: 'main',sql: "delete from user"},function(ret, err){});
+		api.execScript({name: 'root', script: "EndPage();"});
+    	noIdentifyPlayNum = parseInt($api.getStorage("noIdentifyPlayNum")) || 0;
+
+		api.showProgress({
+				style: 'default',
+				animationType: 'fade',
+				title: '退出中...',
+				modal: false
+		});
+
+		if(window.navigator.userAgent.indexOf('iPhone')>0){
+	    		setTimeout(function(){
+    				api.hideProgress();
+    				out();
+    			},300);
+		}else{
+			setTimeout(function(){
+				api.hideProgress();
+					out();
+				Loginpath = '../../';
+				api.closeWin();
+			},300);
+		}
+	}
+
+	function success(){
+		api.toast({
+			msg: '授权成功!',
+			duration: 2000,
+			location: 'bottom'
+		});
+		$api.setStorage('wx_openid', wx_openid);
+		api.closeToWin({
+				name: 'root'
+		});
+	}
+
+	function fail(){
+		wx_openid = '';
+		api.toast({
+			msg: '授权失败',
+			duration: 2000,
+			location: 'bottom'
+		});
+	}
+</script>
+</html>

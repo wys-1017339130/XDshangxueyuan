@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>学习记录</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+    <style>
+    	*{
+    		box-sizing: border-box;
+    		-webkit-box-sizing: border-box;
+    	}
+    	html,body{
+    		background-color: #fff;
+    	}
+    </style>
+</head>
+<body>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">学习记录</div>
+			<span style="display: none" tapmode="" class="z-head-right icon iconfont icon-fenxiang1" >
+			</span>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<ul id="list2" class="profession-list" style="background-color: #fff"></ul>
+	</div>
+</body>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<li data-tid="{{tid}}" data-category="{{type}}" data-des="{{id}}" data-link="../../html/indexgroup/audio.html" data-name="audio" data-pro="{{progress}}" style="position: relative;" class="padding-3">
+		<div>
+			<div class="z-FM-img-box">
+				<span class="icon iconfont icon-bofang2"></span>
+				<img data-pic="{{id}}" width="55" height="55" src="../../image/list1@error.png" onerror="this.src='../../image/list1@error.png'">
+			</div>
+			<div class="fm-profession-list" style="border-bottom: 1px solid #ddd;padding-bottom: 15px;margin-right: 0;margin-left: 65px;">
+				<div data-title="{{id}}" class="fm-list-title">{{title}}</div>
+				<div class="fm-list-text" style="color: #999;"><span style="margin-right: 0.6rem;color: #666">{{curse}}</span>已收听{{rate}} <span style="margin-left: 0.6rem;color: #666">{{date}}</span></div>
+				<div style="height: 20px;" class="flex-wrap">
+					<div style="position: relative;" class="flex-con">
+						<div data-up="{{id}}" style="width: {{rate}};" class="studylist-up"></div>
+						<div class="studylist-down"></div>
+					</div>
+					<span style="line-height: 20px;text-align: center;padding-left: 10px;font-size: 0.7rem;color: #999">{{dur}}</span>
+				</div>
+			</div>
+		</div>
+	</li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/islider.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var PageNum = 0;
+	var length = 0;
+	var score_data,fs,db;
+	var boo = [false,true];
+	var zhuge,td;
+	var islider1;
+	var list = [];
+	var mba;
+	var dialogBox;
+	var blockArray = [];
+	var blocks = [];
+	var userID;
+	var HeadBar = $api.byId('HeadBar');
+	apiready = function(){
+		fs = api.require("fs");
+		db = api.require("db");
+		$api.fixStatusBar(HeadBar);
+		dialogBox = api.require("dialogBox");
+		userID = localStorage.getItem('userID');
+		App.buyedUpCopy();
+		App.openWWW(api.winName);
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('LearnList',{'Active':'加载'},'学习记录');"});
+		//MD End
+
+		api.addEventListener({
+		    name: 'topause'
+		}, function(ret, err) {
+		    pause(ret.value.key1);
+		});
+
+		api.addEventListener({
+		    name: 'PlayStatus'
+		}, function(ret, err) {
+			if(ret){
+				if(ret.value.id){
+					play(ret.value.id);
+				}else if(ret.value.key1){
+					play(ret.value.key1);
+				}
+			}
+		});
+
+		db.selectSql({
+		    name: 'main',
+		    sql: ('select * from studylist where uid='+userID)
+		}, function(ret, err) {
+		    if (ret.status) {
+		       if(ret.data.length>0){
+					var study = JSON.parse(ret.data[0].list);
+					upview(study);
+		       }else{
+		       		if(api.connectionType == 'none'){
+								api.alert({
+								    title: '当前无网络',
+								    msg: '系统无法获取到相关数据',
+								}, function(ret, err) {
+									if(ret.buttonIndex == 1){
+										api.closeWin();
+									}
+								});
+							}
+		       }
+		    }
+		});
+   		if(api.connectionType != 'none'){
+			Refresh();
+		}
+	};
+
+/*
+	function PlayStatus(data){
+		if(typeof data == 'string'){
+			var data = App.JSON(data);
+		}
+		if(data.id){
+			play(data.id);
+		}else if(data.key1){
+			play(data.key1);
+		}
+	}
+*/
+
+	function Refresh(){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});
+		api.execScript({name: 'root',script: "XO.GetStudyList('"+ $api.getStorage('token') +"',{name:'studylist',fun:'upview'},{name:'studylist',fun:'fail'});"});
+	}
+
+	function upview(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		document.getElementById("list2").innerHTML = '';
+		var iindex = 0;
+		blocks = [];
+		if(data)
+		data.forEach(function(arg){
+			arg.index = iindex;
+			arg.date = App.dateStr(arg.vtime);
+			var m,s;
+			m = parseInt(arg.duration/60);
+			s = parseInt(arg.duration%60);
+			m = m > 9 ? m : '0' + m;
+			s = s > 9 ? s : '0' + s;
+			arg.dur = m + ':' + s;
+			blocks.push({id:arg.id,blocks:arg.blocks,type:arg.type});
+			blockArray[arg.id] = blocks;
+			var pm,ps;
+			pm = parseInt(arg.progress/60);
+			ps = parseInt(arg.progress%60);
+			if(pm>0){
+				arg.pro = pm+'分钟'+ps+'秒';
+			}else{
+				arg.pro = ps+'秒';
+			}
+			arg.rate = parseInt(arg.progress/arg.duration*100)+'%';
+		});
+		var TM = new T7({tm: document.getElementById("list_Tpl")});
+		var html = TM.Tpl(data);
+		document.getElementById("list2").innerHTML = html;
+		var d = document.querySelectorAll(".fm-profession-list");
+		if(d){
+			d[d.length-1].style.borderBottom = "none";
+		}
+
+    api.execScript({
+        name: 'root',
+        script: "getPlayId();"
+    });
+
+		cachepics(0,data.length,data);
+
+		var sql1 = "delete from studylist";
+		db.executeSql({name: 'main',sql: sql1},function(ret, err){
+			//alert(JSON.stringify(ret)+'study'+JSON.stringify(err));
+		});
+		var sql2 = "insert into studylist (uid,list) values ('"+userID+"','"+JSON.stringify(data)+"')";
+		db.executeSql({name: 'main',sql: sql2},function(ret, err){
+			//alert(JSON.stringify(ret)+'insertstudy'+JSON.stringify(err));
+		});
+
+		App.init();
+		api.hideProgress();
+	}
+
+	function fail(msg){
+		document.getElementById('list2').innerHTML = '<li class="nomessage"><img src="../../image/nomessage.png" style="border-radius: 0" alt=""><div class="no-tips">当前暂无学习记录</div></li>';
+		api.hideProgress();
+	}
+
+	function cachepics(i,max,data){
+
+		if(i<max){
+			if(!data || !data[i]){
+				return;
+			}
+			if(data[i].pic){
+				var _file = App.file(data[i].pic);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i].pic = (api.fsDir + '/file/' +_file.full);
+				    		document.querySelector("[data-pic='"+data[i].id+"']").src = data[i].pic;
+				    		cachepics(i+1,max,data);
+				    }else{
+				    	if(data[i].pic.indexOf('/') == 0){
+							var dpic = App.url + data[i].pic;
+						}else{
+							var dpic = data[i].pic;
+						}
+				    	api.download({
+						    url: dpic,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i].pic = (api.fsDir + '/file/' +_file.full);
+							document.querySelector("[data-pic='"+data[i].id+"']").src = data[i].pic;
+							cachepics(i+1,max,data);
+						});
+				    }
+				});
+			}else{
+	   			cachepics((i + 1),max,data);
+	   		}
+		}
+	}
+
+	function play(id){
+		var dom = document.querySelector("[data-title='"+id+"']");
+		var act = document.querySelector(".active");
+		if(act){
+			act.className = act.className.replace(/ active/,'');
+		}
+		if(dom){
+			dom.className = dom.className + ' active';
+		}
+	}
+
+	function pause(id){
+		var act = document.querySelector(".active");
+		if(act){
+			act.className = act.className.replace(/ active/,'');
+		}
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

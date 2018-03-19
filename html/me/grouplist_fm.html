@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>小组任务列表</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css"/>
+    <link rel="stylesheet" href="../../iconfont/iconfont.css">
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .mywork {
+            background: white;
+        }
+
+        .myworktitle {
+            padding-left: 15px;
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+            font-size: 17px;
+            font-weight: bold;
+            box-sizing: border-box;
+            border-bottom: 1px solid #ebebeb;
+        }
+
+        .leftimg {
+            width: 20%;
+            display: inline-block;
+            float: left;
+        }
+
+        .leftimg img {
+            width: 4rem;
+            border-radius: 4px;
+            height: 5rem;
+            margin: auto;
+        }
+
+        .contentbox {
+            width: 100%;
+            height: 6.5rem;
+            border-bottom: 1px solid #ebebeb;
+            padding: 0.75rem 10px;
+            box-sizing: border-box;
+        }
+
+        .contentbox:active {
+            background: gainsboro;
+        }
+
+        .rightcontent {
+            display: inline-block;
+            float: left;
+            margin-left: 0.75rem;
+        }
+
+        /*头部*/
+        .headerboxtop {
+            width: 100%;
+            height: 3rem;
+            background: #d2b379;
+            padding: 20px 0 20px 0;
+            position: relative;
+        }
+
+        .opheader {
+            width: 23%;
+            float: left;
+            margin-left: 10px;
+            display: flex;
+        }
+
+        .opheader img {
+            margin: auto;
+            display: block;
+            width: 3.3rem;
+            height: 3.3rem;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .grouptext {
+            float: left;
+            margin-left: 5px;
+            color: white;
+            text-align: left;
+            font-size: 16px;
+            padding-top: 4px;
+        }
+
+        .grouptext p {
+            text-align: left;
+        }
+
+        .giverightbox {
+            position: absolute;
+            right: 0;
+            top: 35%;
+            padding: 0 10px;
+            color: #d2b379;
+            height: 1rem;
+            line-height: 1rem;
+            background: white;
+            border-bottom-left-radius: 20px;
+            border-top-left-radius: 20px;
+            font-size: 13px;
+            border-left: 4px solid #e4d1af;
+            border-top: 4px solid #e4d1af;
+            border-bottom: 4px solid #e4d1af;
+        }
+
+        /*分页*/
+        .bottomdiv {
+            width: 100%;
+            height: 3rem;
+            text-align: center;
+            line-height: 3rem;
+            background: #f4f4f4;
+            color: black;
+        }
+
+        .uptext {
+            color: #bfbfbf;
+            font-size: 13px;
+        }
+
+        .publicfont {
+            width: 20px;
+            height: 20px;
+            margin: auto;
+        }
+
+        .publicworkfont {
+            color: #797979;
+            font-size: 13px;
+        }
+
+        .pomimg {
+            width: 100%;
+            height: 3rem;
+            background: #d2b379;
+        }
+
+        .pomimg img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .messageboxtext {
+            width: 100%;
+            margin-top: 6rem;
+            color: #bfbfbf;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .messageboxtext img {
+            width: 7rem;
+            height: 7rem;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="headerboxtop">
+        <div class="opheader">
+            <img :src="formatImg(mynewlist.header)">
+        </div>
+        <div class="grouptext">
+            <p style="font-size: 16px;padding-bottom: 10px">{{mynewlist.name}}</p>
+            <p style="font-size: 14px"><span style="margin-right: 10px" @click="learnsomething">小组学习情况</span>
+                <i style="color: #ffffff;" class="iconfont icon-jiantou"></i></p>
+        </div>
+        <div class="giverightbox" @click="gotopublishtask">
+            发布任务
+        </div>
+    </div>
+    <div class="pomimg">
+        <img src="../../image/bolang.png">
+    </div>
+    <div class="mywork">
+        <div class="myworktitle">任务列表</div>
+        <!--<img src="../../image/bolang.png">-->
+        <div style="width: 100%;padding: 0 5px;box-sizing: border-box">
+            <div v-for="(item,index) in mygroupworkllist" v-if="ifshowtext==false" class="contentbox"
+                 @click="gototask(index)">
+                <div class="leftimg">
+                    <img v-if="item.pic!=''" :src="formatImg(item.pic)">
+                    <img v-else src="../../image/kong.png">
+                </div>
+                <div class="rightcontent" style="margin-left: 1rem">
+                    <div style="padding-bottom: 0.5rem;font-size: 15px">{{item.title}}</div>
+                    <div style="padding-bottom: 0.5rem"><span class="publicworkfont">{{item.lecturer || '暂无信息'}} | {{item.fit || '暂无信息'}}</span>
+                    </div>
+                    <div style="padding-bottom: 0.5rem">
+                        <!--<i class="iconfont publicworkfont icon-countDown"></i>-->
+                        <img style="float: left;width: 0.8rem;height:0.8rem" src="../../image/time.png">
+                        <span class="publicworkfont" style="margin-left: 5px;line-height: 0.7rem">{{item.start_date || '时间未定'}}至{{item.end_date || '时间未定'}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-show="ifshowtext" class="messageboxtext">
+        <img src="../../image/solan.png">
+        <p style="color:#b5b4b9">某人很懒，还没有任务！</p>
+    </div>
+    <div class="bottomdiv" v-if="ifshowtext==false">
+        <span v-if="rote" class="uptext">---上拉加载---</span>
+        <img v-if="load" class="publicfont" src="../../image/timg.gif">
+        <span v-if="overlate" class="uptext">数据已全部加载</span>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {
+  });
+  var app = new Vue({
+    el: '#app',
+    data: {
+      gid: '',
+      mynewlist: '',
+      page: 1,
+      rote: false,
+      overlate: false,
+      load: false,
+      mygroupworkllist: '',
+      ifshowtext: true,
+      formatImg:formatImg
+    },
+    created: function () {
+      apiready = function () {
+        app.gid = api.pageParam.gid;
+        //获取我的任务列表
+        app.groupdetailslist(1);
+        //获取我的头像
+        app.getGroupHeader();
+        //监听上拉刷新
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 30 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+//                滑动时候改变的值
+        }, function (ret, err) {
+//                app.rote = true;
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.groupdetailslist()
+        });
+        //监听发布任务成功，再一次调取接口
+        api.addEventListener({
+          name: 'revoreddate'
+        }, function (ret, err) {
+          //获取我的任务列表
+          app.groupdetailslist(1);
+          //获取我的头像
+          app.getGroupHeader();
+        });
+        //下拉刷新
+        api.setCustomRefreshHeaderInfo({
+          bgColor: '#efefef',
+          image: {
+            pull: 'widget://res/refresh/pull_image.png',
+            transform: [
+              'widget://res/refresh/refreshing_image_frame_01.png',
+              'widget://res/refresh/refreshing_image_frame_02.png',
+              'widget://res/refresh/refreshing_image_frame_03.png',
+              'widget://res/refresh/refreshing_image_frame_04.png',
+              'widget://res/refresh/refreshing_image_frame_05.png',
+              'widget://res/refresh/refreshing_image_frame_06.png',
+              'widget://res/refresh/refreshing_image_frame_07.png',
+              'widget://res/refresh/refreshing_image_frame_08.png',
+              'widget://res/refresh/refreshing_image_frame_09.png',
+              'widget://res/refresh/refreshing_image_frame_10.png',
+              'widget://res/refresh/refreshing_image_frame_11.png',
+              'widget://res/refresh/refreshing_image_frame_12.png'
+            ],
+            load: [
+              'widget://res/refresh/pull_end_image_frame_01.png'
+            ]
+          }
+        }, function () {
+          if (api.connectionType == 'none') {
+            api.refreshHeaderLoadDone();
+            api.toast({
+              msg: '未连接网络',
+              duration: 2000,
+              location: 'bottom'
+            });
+          } else {
+            app.page = 1;
+            app.rote = true;
+            app.overlate = false;
+            app.load = false;
+            app.allrefresh(function () {
+              api.refreshHeaderLoadDone();
+            });
+          }
+        });
+      };
+    },
+    filters: {},
+    methods: {
+      //小组学习情况
+      learnsomething: function () {
+        api.openWin({
+          name: 'learning_win',
+          url: './learning_win.html',
+          pageParam: {
+            boolindex: 1,
+            gid: app.gid
+          }
+        });
+      },
+      //发布任务
+      gotopublishtask: function () {
+        api.openWin({
+          name: 'publishtask_win',
+          url: './publishtask_win.html',
+          pageParam: {
+            gid: app.gid
+          }
+        });
+      },
+      //任务详情
+      gototask: function (index) {
+        api.openWin({
+          name: 'task_win',
+          url: './task_win.html',
+          pageParam: {
+            mid: app.mygroupworkllist[index].id
+          }
+        });
+      },
+      //获取小组头像
+      getGroupHeader: function () {
+        var post = {
+          hash: $api.getStorage('token'),
+          gid: app.gid
+        };
+        sendAjax(this, post, '/Api/Group/getGroupHeader', function (res) {
+          app.mynewlist = res.data
+        })
+      },
+      //小组任务列表
+      groupdetailslist: function (ref) {
+        var post = {
+          hash: $api.getStorage('token'),
+          gid: app.gid,
+          page: app.page,
+          perPage: 5
+        };
+        sendAjax(this, post, '/Api/Group/getGroupMission', function (res) {
+          if (ref == 1) {
+            app.mygroupworkllist = res.data.proList;
+            app.rote = true;
+            app.load = false;
+            if (app.mygroupworkllist.length == 0) {
+              app.ifshowtext = true
+            } else {
+              app.ifshowtext = false
+            }
+          } else {
+            app.mygroupworkllist = app.mygroupworkllist.concat(res.data.proList);
+            app.rote = true;
+            app.load = false
+          }
+          if (res.data.proList.length == 0 || res.data.proList == null) {
+            app.overlate = true;
+            app.rote = false;
+            app.load = false
+          }
+        })
+      },
+      //下拉刷新方法总和
+      allrefresh: function (callback) {
+        app.getGroupHeader();
+        app.groupdetailslist(1);
+        if (callback) {
+          callback()
+        }
+      }
+    }
+  });
+
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+
+</html>

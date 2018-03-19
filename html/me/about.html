@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>关于我们</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+    <style>
+    	html,body,#wrap{background-color: #fff;}
+    </style>
+</head>
+<body>
+<div>
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">关于我们</div>
+		</div>
+	</div>
+  <div id="main" class="warp">
+  	<div id="fixStatus"></div>
+    <div class="z-column clear" id="Text" style="border-bottom:0;"></div>
+  	<div  id="isnull" class="nomessage" style="display: none">
+			<img src="../../image/nomessage.png" alt="">
+			<div class="no-tips">暂无内容</div>
+		</div>
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+<script type="text/javascript" src="../../script/t.xiaoo.cn.js"></script>
+<script type="text/javascript" src="../../script/common.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript">
+	var HeadBar = $api.byId('HeadBar');
+	apiready = function(){
+       $api.fixStatusBar(HeadBar);
+
+			//MD Start
+			api.execScript({name: 'root', script: "ChatAna('About',{'Active':'加载'},'关于我们');"});
+ 			//MD End
+ 			App.openWWW(api.winName);
+	  		var storage = localStorage.getItem('about');
+			if((typeof storage == 'string') && (storage != 'null') && (storage != 'undefined') && (storage != '[object Object]')){
+				text(storage);
+				if(App.State()){
+					Refresh();
+				}
+			}else{
+				if(App.State()){
+					Refresh();
+				}
+			}
+		};
+
+	function Refresh(){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});
+    api.execScript({name: 'root',script: "XO.GetAbout('"+ $api.getStorage('token') +"',{name:'about',fun:'text'},{name:'about',fun:'fail'});"});
+	}
+	function text(data){
+		localStorage.setItem('about',data);
+		document.getElementById('Text').innerHTML = data;
+		api.hideProgress();
+	}
+	function fail(){
+		document.getElementById('isnull').style.display = 'block';
+		api.hideProgress();
+	}
+</script>
+</html>

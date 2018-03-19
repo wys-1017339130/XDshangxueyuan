@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+	<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+	<title>选择课程</title>
+	<link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+	<link rel="stylesheet" type="text/css" href="../../css/static.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+	<link rel="stylesheet" href="../../iconfont/iconfont.css">
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		.mywork{
+			background: white;
+			margin-top: 10px;
+		}
+		.myworktitle{
+			padding-left: 15px;
+			background: #f4f4f4;
+			line-height: 25px;
+			color: #9c9c9c;
+			font-size: 13px;
+			box-sizing: border-box;
+			border-bottom: 1px solid #ebebeb;
+		}
+		.leftimg{
+			width: 20%;
+			display: inline-block;
+			float: left;
+		}
+		.leftimg img {
+			width: 4rem;
+			border-radius: 4px;
+			height: 5rem;
+			margin: auto;
+		}
+		.contentbox{
+			width: 100%;
+			height: 6.5rem;
+			border-bottom: 1px solid #ebebeb;
+			padding: 0.75rem 10px;
+			position: relative;
+			box-sizing: border-box;
+		}
+		.rightcontent{
+			display: inline-block;
+			float: left;
+			margin-left: 0.75rem;
+		}
+		.thenewtext{
+			border-radius: 4px;
+			background: #ec7e3a;
+			color: white;
+			padding: 0 7px;
+			box-sizing: border-box;
+			font-size: 12px
+		}
+		.minteclass{
+			color: #666666;
+			font-size: 12px
+		}
+		.changebool{
+			background: url('../../image/backwhite.png');
+			background-size:  100% 100%;
+			border-radius: 50%;
+			width: 1.8rem;
+			height: 1.8rem;
+			position: absolute;
+			right: 12px;
+			top: 0.6rem;
+		}
+		/*分页*/
+		.bottomdiv {
+			width: 100%;
+			height: 3rem;
+			text-align: center;
+			line-height: 3rem;
+			background: white;
+			color: black;
+			margin-top: 2rem;
+		}
+
+		.uptext {
+			color: #bfbfbf;
+			font-size: 13px;
+		}
+		.publicfont {
+			width: 20px;
+			height: 20px;
+			margin: auto;
+		}
+	</style>
+</head>
+<body>
+<div id="app" style="background: white">
+	<div class="mywork">
+		<div class="myworktitle">课程列表(只可能选择1门课程)</div>
+		<div v-for="(item,index) in courselist" class="contentbox" @click="changetruebtn(index)">
+			<div class="leftimg" >
+				<img :src= "formatImg(item.pic) ">
+			</div>
+			<div class="rightcontent" style="margin-left: 0.8rem">
+				<div style="padding-bottom: 0.5rem;font-size: 14px">{{item.title}}</div>
+				<div style="padding-bottom: 0.5rem">
+					<span class="minteclass">{{item.lecturer || '暂无信息'}}</span>
+					<span class="minteclass">|{{item.fit || '暂无信息'}}</span>
+				</div>
+				<div style="line-height: 1rem">
+					<span class="thenewtext">最新</span>
+					<span class="minteclass">{{item.tag}}</span>
+				</div>
+			</div>
+			<!--<div class="changebool" :class="{beforechangstyle: changidx == index}"></div>-->
+			<img class="changebool" v-if="changidx == index" src="../../image/changetrue.png">
+			<img class="changebool" v-else  src="../../image/backwhite.png">
+		</div>
+	</div>
+	<div class="bottomdiv">
+		<span v-if="rote" class="uptext">---上拉加载---</span>
+		<img v-if="load" class="publicfont" src="../../image/timg.gif">
+		<span v-if="overlate" class="uptext">数据已全部加载</span>
+	</div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/fastclick.js"></script>
+<script>
+  new FastClick(document.body);
+</script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript">
+  document.body.addEventListener('touchstart', function () {});
+  var app = new Vue({
+    el: '#app',
+    data: {
+      changidx:null,
+      page:1,
+      rote: false,
+      overlate: false,
+      load: false,
+      courselist:'',
+      formatImg:formatImg
+    },
+    created: function () {
+      apiready = function () {
+        app.getclasslist(1);
+        //监听上拉滑动
+        api.addEventListener({
+          name: 'scrolltobottom',
+          extra: {
+            threshold: 30 //设置距离底部多少距离时触发，默认值为0，数字类型
+          }
+//                滑动时候改变的值
+        }, function (ret, err) {
+//                app.rote = true;
+          app.load = true;
+          app.rote = false;
+          app.overlate = false;
+          app.page++;
+          app.getclasslist()
+        });
+        //下拉刷新
+        api.setCustomRefreshHeaderInfo({
+          bgColor: '#efefef',
+          image: {
+            pull: 'widget://res/refresh/pull_image.png',
+            transform: [
+              'widget://res/refresh/refreshing_image_frame_01.png',
+              'widget://res/refresh/refreshing_image_frame_02.png',
+              'widget://res/refresh/refreshing_image_frame_03.png',
+              'widget://res/refresh/refreshing_image_frame_04.png',
+              'widget://res/refresh/refreshing_image_frame_05.png',
+              'widget://res/refresh/refreshing_image_frame_06.png',
+              'widget://res/refresh/refreshing_image_frame_07.png',
+              'widget://res/refresh/refreshing_image_frame_08.png',
+              'widget://res/refresh/refreshing_image_frame_09.png',
+              'widget://res/refresh/refreshing_image_frame_10.png',
+              'widget://res/refresh/refreshing_image_frame_11.png',
+              'widget://res/refresh/refreshing_image_frame_12.png'
+            ],
+            load: [
+              'widget://res/refresh/pull_end_image_frame_01.png'
+            ]
+          }
+        }, function () {
+          if (api.connectionType == 'none') {
+            api.refreshHeaderLoadDone();
+            api.toast({
+              msg: '未连接网络',
+              duration: 2000,
+              location: 'bottom'
+            });
+          } else {
+            app.page = 1;
+            app.rote = true;
+            app.overlate = false;
+            app.load = false;
+            app.getclasslist(1,function() {
+              api.refreshHeaderLoadDone();
+            });
+          }
+        });
+      };
+    },
+    filters:{},
+    methods: {
+      //选择课程
+      changetruebtn:function(index) {
+        app.changidx = index;
+        api.sendEvent({
+          name: 'courseidxlist',
+          extra: {
+            courseidxlist: app.courselist[index]
+          }
+        });
+      },
+      //获取课程列表
+      getclasslist:function(ref, callback) {
+        var post ={
+          perPage:7,
+          page:app.page
+        };
+        sendAjax(this,post,'/Api/Group/getCourseList',function (res) {
+          if (ref == 1) {
+            app.courselist = res.data.proList;
+            app.rote = true;
+            app.load = false
+          } else {
+            app.courselist = app.courselist.concat(res.data.proList);
+            app.rote = true;
+            app.load = false;
+          }
+          if (res.data.proList.length == 0 || res.data.proList == null) {
+            app.overlate = true;
+            app.rote = false;
+            app.load = false;
+          }
+          if(callback){
+            callback()
+					}
+        })
+      }
+    }
+  });
+
+</script>
+<script type="text/javascript" src="../../iconfont/iconfont.js"></script>
+
+</html>

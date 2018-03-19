@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport"
+          content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+</head>
+<style>
+    body, html {
+        background-color: transparent;
+    }
+
+    #header {
+        display: flex;
+        position: fixed;
+        width: 100%;
+        height: 2.4rem;
+        line-height: 2.4rem;
+        background-color: transparent;
+        padding: 8px 10px;
+        padding-top: 15px;
+        box-sizing: border-box;
+    }
+
+    .left-box {
+        font-size: 1rem;
+        margin-left: 0.5rem;
+    }
+
+    .right-box {
+        position: absolute;
+        right: 10px;
+    }
+
+    .Count_down {
+        display: -webkit-box;
+        position: fixed;
+        bottom: 0px;
+        height: 2rem;
+        -webkit-box-align: center;
+        background-color: rgba(0, 0, 0, 0.3);
+        width: 100%;
+    }
+
+    .Count_down > div:first-child {
+        -webkit-box-flex: 1;
+    }
+</style>
+<body>
+<div id="apwr" style="background-color: transparent;">
+    <header class="aui-bar aui-bar-nav" id="header" style="border-bottom: 0px;">
+        <a class="left-box" @click="closeWins()"><img width="29" src="../../image/fanhui_b.png" alt=""></a>
+        <span class="aui-title"></span>
+        <!--<span class="right-box"><img width="29" src="../../image/fanxinag_b.png" alt=""></span>-->
+    </header>
+    <div class="" style="text-align: right;padding-right: 10px;padding-top: 3.4rem;" @click="shipin_app()">
+        <!--<img v-show="shi == true" width="29" src="../../image/shiping1.png" alt="">-->
+        <!--<img v-show="shi == false" width="29" src="../../image/shiping2.png" alt="">-->
+    </div>
+    <div class="" style="text-align: right;padding-right: 10px;padding-top: 0.4rem;" @click="setMute()">
+        <img v-show="Mute == true" width="29" src="../../image/yuyin_b.png" alt="">
+        <img v-show="Mute != true" width="29" src="../../image/yuyin_B2.png" alt="">
+    </div>
+    <div class="Count_down">
+        <div style="font-size: 0.6rem;padding-left: 0.6rem;color: #fff;">{{renshu}}在线人数</div>
+        <!--<div style="width: 50px;">-->
+            <!--<img @click="makeAppointment()" v-show="mmm == true" width="40" src="../../image/quanping_b.png" alt="">-->
+            <!--<img @click='makeAppointment()' v-show="mmm == false" width="29" src="../../image/fanhuiquanping.png"-->
+                 <!--alt="">-->
+        <!--</div>-->
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+  var app = new Vue({
+    el: '#apwr',
+    data: {
+      Mute: true,
+      mmm: true,
+      renshu: '0',
+      shi: true,
+
+    },
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        app.Mute = api.pageParam.MuteSta
+        app.renshu = api.pageParam.number
+      }
+    },
+    methods: {
+      shipin_app: function () {
+        api.execScript({
+          name: 'live_player',
+          frameName: 'frm_mine',
+          script: 'app.setFullScreen()'
+        })
+        app.shi != app.shi
+      },
+      makeAppointment: function () {
+        app.mmm = !app.mmm;
+//        if(app.mmm){
+        api.execScript({
+          name: 'live_player',
+          frameName: 'frm_mine',
+//            script: 'app.full_btn_click()'
+          script: 'app.setFullScreen(' + app.mmm + ')'
+        })
+//        }else{
+//          api.execScript({
+//            name: 'live_player',
+//            frameName: 'frm_mine_full',
+//            script: 'app.setFullScreen(' + app.mmm + ')'
+//          })
+//        }
+      },
+      map_app: function () {
+        app.mmm = true
+        api.execScript({
+          name: 'live_player',
+          frameName: 'frm_mine',
+          script: 'app.setFullScreen_No(false)'
+        })
+      },
+      setMute: function () {
+        app.Mute = !app.Mute;
+        api.execScript({
+          name: 'live_player',
+          frameName: 'frm_mine',
+          script: 'app.setMute(' + app.Mute + ')'
+        })
+      },
+      closeWins: function () {
+        api.confirm({
+          title: '是否退出直播',
+          buttons: ['确定', '取消']
+        }, function (ret) {
+          var index = ret.buttonIndex;
+          if (index == '1') {
+            api.execScript({
+              name: 'live_player',
+              frameName: 'frm_mine',
+              script: 'app.closeWins()'
+            })
+          }
+        });
+      }
+    }
+  })
+</script>
+</html>

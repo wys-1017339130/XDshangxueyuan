@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>我赞过的</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body class="z-fff">
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">我赞过的</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<ul class="z-index-head clear z-border-bottom">
+			<li class="z-sub fl"><span class="z-subfont z-dongtai z-active">我的点赞</span></li>
+			<li class="z-sub fl"><span class="z-subfont z-xiaoyou">点赞最多</span></li>
+			<li class="z-slider"></li>
+		</ul>
+		<ul id="list" class="box-wraper">
+		</ul>
+	</div>
+</body>
+<script id="list_Tpl" type="text/template">
+	{{#data}}
+	<li data-des="{{id}}" data-tid="{{tid}}" data-category="{{type}}" data-link="../../html/indexgroup/audio.html" data-name="audio" data-path="{{file}}" data-id="{{id}}"  class="box z-column clear">
+		<div class="fl list-img-box">
+			<img width="60" height="60" src="{{pic}}" class="list-img-box-back">
+			<img width="42" height="42" src="../../image/play_btn.png" class="list-img-box-front">
+		</div>
+		<div class="list-font-box">
+			<div data-active="{{id}}" class="list-title">{{title}}</div>
+			<div class="list-text"><span class="tags">{{year}}年</span><span class="tags">{{column}}</span><span class="tags">{{likenum}}人点赞</span></div>
+		</div>
+	</li>
+	{{/data}}
+</script>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript" src="../../script/md5.js"></script>
+<script type="text/javascript">
+	var id = 0;
+	var PageNum = 0;
+	var HeadBar = $api.byId('HeadBar');
+	var type = 0;
+	var ani,fs;
+	apiready = function(){
+		$api.fixStatusBar(HeadBar);
+		id = api.pageParam.des || 0;
+		fs = api.require('fs');
+		slider();
+
+		App.openWWW(api.winName);
+
+		//MD Start
+		api.execScript({name: 'root', script: "ChatAna('likelist',{'Active':'加载'},'点赞记录');"});
+		//MD End
+
+		api.addEventListener({
+		    name: 'topause'
+		}, function(ret, err) {
+		    pause(ret.value.key1);
+		});
+
+		api.addEventListener({
+		    name: 'PlayStatus'
+		}, function(ret, err) {
+			if(ret){
+				if(ret.value.id){
+					play(ret.value.id);
+				}else if(ret.value.key1){
+					play(ret.value.key1);
+				}
+			}
+		});
+
+		var menu1 = document.querySelector(".z-dongtai");
+		var menu2 = document.querySelector(".z-xiaoyou");
+		menu1.addEventListener('click',function(){
+			document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nodz.png" alt=""><div class="no-tips">未连接网络</div></li>';
+			if(!App.State()){
+				return;
+			}
+			var cl = menu1.className;
+			if(/z-active/.test(cl)){
+				return;
+			}else{
+				document.querySelector(".z-active").className = document.querySelector(".z-active").className.replace(/ z-active/,'');
+				menu1.className += ' z-active';
+				slider();
+			}
+			type = 0;
+			Refresh(type);
+		});
+		menu2.addEventListener('click',function(){
+			if(!App.State()){
+				document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nodz.png" alt=""><div class="no-tips">未连接网络</div></li>';
+				return;
+			}
+			var cl = menu2.className;
+			if(/z-active/.test(cl)){
+				return;
+			}else{
+				document.querySelector(".z-active").className = document.querySelector(".z-active").className.replace(/ z-active/,'');
+				menu2.className += ' z-active';
+				slider();
+			}
+			type = 1;
+			Refresh(type);
+		});
+		if(api.connectionType == 'none'){
+			document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nodz.png" alt=""><div class="no-tips">未连接网络</div></li>';
+		}else{
+			Refresh(type);
+		}
+	}
+
+/*
+	function PlayStatus(data){
+		if(typeof data == 'string'){
+			var data = App.JSON(data);
+		}
+		if(data.id){
+			play(data.id);
+		}else if(data.key1){
+			play(data.key1);
+		}
+	}
+*/
+	function slider(){
+		var rect = document.querySelector(".z-active").getBoundingClientRect();
+		document.querySelector(".z-slider").style.width = rect.width + "px";
+		document.querySelector(".z-slider").style.left = rect.left + "px";
+	}
+
+	function Refresh(type){
+		api.showProgress({
+		    style: 'default',
+		    animationType: 'fade',
+		    title: '加载中...',
+		    modal: false
+		});//数据加载中显示方块
+		if(type == 0){
+			api.execScript({name: 'root',script: "XO.GetLike('"+ $api.getStorage('token') +"',0,{name:'likes',fun:'upview'},{name:'likes',fun:'fail'});"});
+		}else{
+			api.execScript({name: 'root',script: "XO.GetMostLike('"+ $api.getStorage('token') +"',0,{name:'likes',fun:'upview'},{name:'likes',fun:'fail'});"});
+		}
+	}
+
+	function upview(data){
+		if(type == 0){
+			localStorage.setItem('likes',data);
+		}
+		if(data == '无信息'){
+			document.getElementById('list').innerHTML = '';
+			App.init();
+			api.hideProgress();
+			return;
+		}
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		data.forEach(function(arg){
+			if(arg.utime){
+				arg.year = new Date(parseInt(arg.utime*1000));
+			}else{
+				arg.year = new Date(parseInt(arg.vtime*1000));
+			}
+
+			arg.year = arg.year.getFullYear();
+		})
+		cachepics(0,data.length,data,document.getElementById("list_Tpl"),document.getElementById('list'));
+		// api.execScript({
+  //           name: 'root',
+  //           script: "getPlayId();"
+  //       });
+		App.init();
+		api.hideProgress();
+	}
+
+	function up(){
+		PageNum++;
+		api.execScript({name: 'root',script: "XO.GetLike('"+ $api.getStorage('token') +"','"+PageNum+"',{name:'likes',fun:'upview'},{name:'likes',fun:'fail'});"});
+	}
+
+	function fail(msg){
+		document.getElementById('list').innerHTML = '<li class="nomessage"><img src="../../image/nodz.png" alt=""><div class="no-tips">当前暂无点赞</div></li>';
+		api.hideProgress();
+	}
+
+
+	function play(id){
+		if(document.querySelector(".active")){
+			document.querySelector(".active").className = "list-title";
+		}
+		if(document.querySelector("[data-active='"+id+"']")){
+			document.querySelector("[data-active='"+id+"']").className = "list-title active";
+		}
+	}
+
+	function pause(id){
+		if(document.querySelector(".active")){
+			document.querySelector(".active").className = "list-title";
+		}
+	}
+
+
+	function cachepics(i,max,data,template,box){
+		if(i<max){
+			if(data[i].pic){
+				var _file = App.file(data[i].pic);
+				fs.exist({
+				    path: (api.fsDir + '/file/' +_file.full)
+				}, function(ret, err) {
+				    if (ret.exist) {
+				    		data[i].pic = (api.fsDir + '/file/' +_file.full);
+				    		cachepics(i+1,max,data,template,box);
+				    }else{
+				    	if(data[i].pic.indexOf('/') == 0){
+							var dpic = App.url + data[i].pic;
+						}else{
+							var dpic = data[i].pic;
+						}
+				    		api.download({
+						    url: dpic,
+						    savePath: ('fs://file/' +_file.full),
+						    cache: true,
+						    allowResume: true
+						}, function(ret, err) {
+							data[i].pic = (api.fsDir + '/file/' +_file.full);
+							cachepics(i+1,max,data,template,box);
+						});
+				    }
+				});
+			}else{
+       			cachepics((i + 1),max,data,template,box);
+       		}
+		}else{
+			//结束
+			var TM = new T7({tm: template});
+			var html = TM.Tpl(data);
+			box.innerHTML = html;
+			api.execScript({
+	            name: 'root',
+	            script: "getPlayId();"
+	        });
+			App.init();
+			api.hideProgress();
+		}
+	}
+
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>

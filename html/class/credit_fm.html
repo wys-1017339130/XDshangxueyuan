@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>我的学分</title>
+</head>
+<link rel="stylesheet" href="../../css/api.css"/>
+<link rel="stylesheet" href="../../css/style.css"/>
+<link rel="stylesheet" type="text/css" href="../../css/static.css"/>
+<style>
+  #app {
+    background: white;
+  }
+
+  #header {
+    border-bottom: 0px solid #ccc;
+    display: flex;
+    height: 44px;
+    color: #fff;
+    background-repeat: no-repeat;
+    line-height: 44px;
+  }
+
+  .left-box {
+    font-size: 1rem;
+    margin-left: 0.5rem;
+  }
+  .right-box{
+    position: absolute;
+    right:10px;
+    font-size: 0.75rem;
+  }
+</style>
+<body>
+<div id='app'>
+  <header class="aui-bar aui-bar-nav" id="header" style="background-image: url('../../image/xuefen.png');background-size:cover;background-repeat: no-repeat; ">
+    <a class="left-box iconfont icon-jiantou z-fanhui" @click="closeWindow()"></a>
+    <span class="aui-title">我的学分</span>
+    <span class="right-box" @click="detaalis()">明细</span>
+  </header>
+</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/vue.min.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/vue-resource.js"></script>
+<script type="text/javascript" src="../../script/public.js"></script>
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: {},
+    created: function () {
+      apiready = function () {
+        $api.fixStatusBar($api.dom('header'));
+        api.openFrame({
+          name: 'credit_win',
+          url: "./credit_win.html",
+          rect: {
+            x: 0,
+            y: $api.offset($api.dom('header')).h,
+            w: 'auto'
+          }
+        })
+      }
+    },
+    methods: {
+      detaalis: function () {
+        api.openWin({
+          name: 'Detailed_fm',
+          url: './Detailed_fm.html',
+          pageParam: {}
+        })
+      },
+      closeWindow:function () {
+        api.closeWin()
+      }
+    }
+  })
+</script>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <title>密码</title>
+    <link rel="stylesheet" type="text/css" href="../../css/api.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/static.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/stylewz.css" />
+</head>
+<body class="z-fff">
+	<div id="HeadBar">
+		<div class="z-head">
+			<a class="z-head-left icon iconfont icon-jiantou z-fanhui"></a>
+			<div class="z-ellipsis z-head-text">行动在线商学院</div>
+		</div>
+	</div>
+	<div id="main">
+		<div id="fixStatus"></div>
+		<div class="z-login-title">填写6位短信验证码</div>
+		<div class="z-column2">
+			<div for="code" class="z-row z-border-bottom z-password">
+				<span>验证码：</span>
+				<input id="code" value="" placeholder="请输入验证码" type="tel">
+				<div id="send" class="z-code-btn">发送验证码</div>
+			</div>
+		</div>
+		<div class="z-column2">
+			<div id="next" class="z-login-btn">下一步</div>
+		</div>
+		
+		<!-- <div class="z-column2">
+			<input class="checkbox_c iconfont" type="checkbox" id="tips_xieyi">同意<span class="z-0084ff">《实效商学院使用协议》</span>
+		</div> -->
+	</div>
+</body>
+<script type="text/javascript" src="../../script/api.js"></script>
+<script type="text/javascript" src="../../script/t7.js"></script>
+<script type="text/javascript" src="../../script/App.js"></script>
+<script type="text/javascript" src="../../script/com.js"></script>
+<script type="text/javascript" src="../../script/jquery.min.js"></script>
+<script type="text/javascript">
+	var clicked = false;
+	var HeadBar = $api.byId('HeadBar');
+	var s = 60; 
+	var inte,phone,nickname,sex,industry,job,province;
+
+	apiready = function(){
+		phone = api.pageParam.phone;
+		nickname = api.pageParam.nickname;
+		job = api.pageParam.job;
+		industry = api.pageParam.industry;
+		province = api.pageParam.province;
+		sex = api.pageParam.sex == '女' ? 0:1;
+		$api.fixStatusBar(HeadBar);
+		App.init();
+
+		document.getElementById('send').onclick = function(){
+			if(api.connectionType == 'none'){
+				api.toast({
+				    msg: '未连接网络',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+				return;
+			}
+			if(clicked){
+				return;
+			}
+
+			// if(!document.getElementById('tips_xieyi').checked){
+			// 	api.toast({
+			// 	    msg: '未同意使用协议',
+			// 	    duration: 2000,
+			// 	    location: 'bottom'
+			// 	});
+			// 	return;
+			// }
+
+			clicked = true;
+			clickSendBtn();
+			inte = setInterval(clickSendBtn,1000);
+			api.execScript({name: 'root',script: "XO.GetCode('"+phone+"',{name:'code',fun:'sendSuccess'},{name:'code',fun:'fail'});"});
+		}
+
+		document.getElementById('next').onclick = function(){
+
+			if(api.connectionType == 'none'){
+				api.toast({
+				    msg: '未连接网络',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+				return;
+			}
+			// if(!document.getElementById('tips_xieyi').checked){
+			// 	api.toast({
+			// 	    msg: '未同意使用协议',
+			// 	    duration: 2000,
+			// 	    location: 'bottom'
+			// 	});
+			// 	return;
+			// }
+
+			var code = document.getElementById('code').value;
+			if(!code){
+				api.toast({
+				    msg: '请输入验证码',
+				    duration: 2000,
+				    location: 'bottom'
+				});
+				return;
+			}
+
+			//api.execScript({name: 'root',script: "XO.Register('"+phone+"','"+nickname+"','"+job+"','"+code+"','"+sex+"','"+industry+"','"+province+"',{name:'code',fun:'register'},{name:'code',fun:'fail'});"});
+			$.ajax({
+				url: App.url + '/Register',
+				async: false,
+				data: {
+					phone: phone,
+					nickname: nickname,
+					job:job,
+					code:code,
+					sex:sex,
+					industry:industry,
+					province:province
+				},
+				dataType: 'jsonp',
+				success:function(data){
+					register(JSON.stringify(data));
+				},
+				error: function(data){
+					codeFailCheck(data);
+				}
+			})
+		}
+	};
+
+	function register(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		$api.setStorage('token',data.token);
+		api.toast({
+		    msg: data.msg,
+		    duration: 2000,
+		    location: 'bottom'
+		});
+		api.execScript({
+	        name: 'root',
+	        script: 'openIndexFrameGroup();'
+	    });
+	    api.closeToWin({
+		    name: 'root'
+		});
+    }
+
+	function clickSendBtn(){
+		if(s > 0){
+			document.getElementById('send').innerHTML = s +'s后重新发送';
+			s--;
+		}else{
+			document.getElementById('send').innerHTML = '发送验证码';
+			s = 60;
+			clicked = false;
+			clearInterval(inte);
+		}
+	}
+
+	function sendSuccess(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		api.toast({
+		    msg: data.msg,
+		    duration: 2000,
+		    location: 'bottom'
+		});
+	}
+
+	function fail(data){
+		if(typeof data == 'string'){
+			var data = JSON.parse(data);
+		}
+		api.toast({
+		    msg: data.msg,
+		    duration: 2000,
+		    location: 'bottom'
+		});
+	}
+</script>
+<script type="text/javascript" src="../../script/so.xiaoo.cn.js"></script>
+</html>
